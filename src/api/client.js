@@ -22,6 +22,12 @@ export const fetchSummary = ({ documentId, text, level }, signal) =>
 export const fetchAllSummaries = ({ documentId, text }, signal) =>
   post("/summarize-all", { documentId, text }, signal).then((d) => d.summaries);
 
+export const fetchTermImages = ({ term }, signal) =>
+  post("/visualize/images", { term }, signal).then((d) => d.images);
+
+export const fetchFlowchart = ({ documentId, text }, signal) =>
+  post("/visualize/flow", { documentId, text }, signal).then((d) => d.flow);
+
 export const fetchKeyTerms = ({ documentId, text }, signal) =>
   post("/key-terms", { documentId, text }, signal).then((d) => d.terms);
 

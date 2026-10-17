@@ -2,11 +2,22 @@ import { useEffect, useRef, useState } from "react";
 import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
 import PrivacyNote from "./components/PrivacyNote";
+<<<<<<< Updated upstream
+=======
+import StudyHistory from "./components/StudyHistory";
+import DocumentViewer from "./components/DocumentViewer";
+>>>>>>> Stashed changes
 import StudyPanel from "./components/StudyPanel";
 import StudyHistory from "./components/StudyHistory";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
+<<<<<<< Updated upstream
 import { getHistory } from "./lib/studyHistory";
+=======
+import { getHistory, relativeTime } from "./lib/studyHistory";
+import Sprout from "./sprout/Sprout";
+import { useSprout } from "./sprout/SproutContext";
+>>>>>>> Stashed changes
 
 const textSizes = {
   small: "text-sm",
@@ -50,22 +61,34 @@ function App() {
   const [theme, setTheme] = useState(getSavedTheme);
   const [textSize, setTextSize] = useState(getSavedTextSize);
   const studyDoc = useDocument();
-  const [panelOpen, setPanelOpen] = useState(false);
+  const [extractError, setExtractError] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
   const [history, setHistory] = useState(getHistory);
+<<<<<<< Updated upstream
+=======
+  const { say } = useSprout();
+  const justExtractedRef = useRef(false);
+  const [navOpen, setNavOpen] = useState(false);
+  const navRef = useRef(null);
+  const [page, setPage] = useState("study");
+  const [studyMode, setStudyMode] = useState(null);
+>>>>>>> Stashed changes
 
   useEffect(() => {
     function handlePointerDown(event) {
       if (!settingsRef.current?.contains(event.target)) {
         setSettingsOpen(false);
       }
+      if (!navRef.current?.contains(event.target)) {
+        setNavOpen(false);
+      }
     }
 
     function handleKeyDown(event) {
       if (event.key === "Escape") {
         setSettingsOpen(false);
-        setPanelOpen(false);
+        setNavOpen(false);
       }
     }
 
@@ -121,10 +144,75 @@ function App() {
     studyDoc.remove();
   }
 
-  // Open the panel as soon as a document finishes extracting.
+  // Open the panel as soon as a document finishes extracting, and let
+  // Sprout say something about it — worded differently when it came in via
+  // the Canvas extension (see justExtractedRef, set below).
   useEffect(() => {
-    if (studyDoc.status === "ready") setPanelOpen(true);
-  }, [studyDoc.documentId, studyDoc.status]);
+    if (studyDoc.status !== "ready") return;
+    setHistory(getHistory());
+    if (justExtractedRef.current) {
+      justExtractedRef.current = false;
+      say("Nice, I grabbed that for you! Ready when you are. ✨", "happy");
+    } else {
+      say("Got it — let's break this down. 🌱", "happy");
+    }
+  }, [studyDoc.documentId, studyDoc.status, say]);
+
+  // Pick up content handed off by the Canvas extension: it opens this app
+  // with ?extract=<id>, and the text is waiting at /api/extract/:id.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const id = url.searchParams.get("extract");
+    if (!id) return;
+    url.searchParams.delete("extract");
+    window.history.replaceState({}, "", url);
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/extract/${encodeURIComponent(id)}`);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error ?? "That extracted page could not be loaded.");
+        if (!localStorage.getItem("recap-name")) {
+          setName("there");
+          localStorage.setItem("recap-name", "there");
+        }
+        setView("app");
+        justExtractedRef.current = true;
+        studyDoc.loadText(data.text, data.fileName, "extension");
+      } catch (err) {
+        setView("app");
+        setExtractError(err.message);
+      }
+    })();
+    // Runs once on mount; studyDoc.loadText is stable (useCallback).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function handleResumeHistory(entry) {
+    setPage("study");
+    studyDoc.loadText(entry.text, entry.fileName, entry.source);
+  }
+
+  const ready = studyDoc.status === "ready";
+
+  function navigate(target) {
+    setNavOpen(false);
+    if (target === "history") {
+      setHistory(getHistory());
+      setPage("history");
+      return;
+    }
+    setPage("study");
+    // "home" = upload/overview with no tool open
+    setStudyMode(target === "home" ? null : target);
+  }
+
+  const navItems = [
+    { id: "home", label: "Home", needsDoc: false },
+    { id: "flashcards", label: "Flashcards", needsDoc: true },
+    { id: "ask", label: "Chatbot", needsDoc: true },
+    { id: "history", label: "Past documents", needsDoc: false },
+  ];
 
   const today = new Intl.DateTimeFormat(undefined, {
     weekday: "short",
@@ -138,6 +226,7 @@ function App() {
       className={`min-h-screen bg-theme-bg text-theme-text ${textSizes[textSize]}`}
     >
       <div
+<<<<<<< Updated upstream
         className={`mx-auto flex min-h-screen w-full flex-col px-6 ${studyDoc.status === "ready" && name ? "max-w-7xl" : "max-w-4xl"}`}
       >
         <header className="flex min-h-16 items-center justify-between border-b border-theme-border">
@@ -167,6 +256,74 @@ function App() {
             {view === "app" && (
               <div className="flex items-center gap-4">
               <span className="text-sm text-theme-muted max-[420px]:hidden">
+=======
+        className={`mx-auto flex min-h-screen w-full flex-col px-6 ${ready && view === "app" ? "max-w-7xl" : "max-w-4xl"}`}
+      >
+        <header className="flex min-h-16 items-center justify-between border-b border-black dark:border-white">
+          <div className="flex items-center gap-4">
+            {view === "app" && (
+              <div className="relative" ref={navRef}>
+                <button
+                  type="button"
+                  aria-label="Navigation menu"
+                  aria-expanded={navOpen}
+                  aria-controls="nav-menu"
+                  onClick={() => setNavOpen((open) => !open)}
+                  className="flex h-9 w-9 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-black bg-transparent dark:border-white"
+                >
+                  <span className="h-0.5 w-5 bg-current" />
+                  <span className="h-0.5 w-5 bg-current" />
+                  <span className="h-0.5 w-5 bg-current" />
+                </button>
+                {navOpen && (
+                  <nav
+                    id="nav-menu"
+                    aria-label="Pages"
+                    className="absolute left-0 top-full z-10 mt-2 w-56 rounded-xl border border-black bg-white p-2 text-black dark:border-white dark:bg-black dark:text-white"
+                  >
+                    {navItems.map((item) => {
+                      const disabled = item.needsDoc && !ready;
+                      const active =
+                        item.id === "history"
+                          ? page === "history"
+                          : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          disabled={disabled}
+                          title={disabled ? "Upload a document first" : undefined}
+                          aria-current={active ? "page" : undefined}
+                          onClick={() => navigate(item.id)}
+                          className={`block w-full rounded-lg px-3 py-2 text-left disabled:cursor-not-allowed disabled:opacity-40 ${
+                            active
+                              ? "bg-black text-white dark:bg-white dark:text-black"
+                              : "bg-transparent hover:bg-black/5 dark:hover:bg-white/10"
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                  </nav>
+                )}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                if (name) navigate("home");
+                else setView("home");
+              }}
+              className="cursor-pointer bg-transparent p-0 font-bold text-inherit"
+            >
+              recap
+            </button>
+          </div>
+          {view === "app" && (
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-neutral-600 dark:text-neutral-300 max-[420px]:hidden">
+>>>>>>> Stashed changes
                 {today}
               </span>
               <div className="relative" ref={settingsRef}>
@@ -250,13 +407,46 @@ function App() {
             </section>
           )}
 
-          {view === "app" && (
+          {view === "app" && page === "history" && (
+            <section className="py-18">
+              <h1 className="text-3xl font-semibold">Past documents</h1>
+              {history.length === 0 ? (
+                <p className="mt-3 text-neutral-600 dark:text-neutral-300">
+                  Nothing here yet. Upload a document and it will show up here.
+                </p>
+              ) : (
+                <ul className="mt-6 space-y-2">
+                  {history.map((entry) => (
+                    <li key={entry.fileName + entry.savedAt}>
+                      <button
+                        type="button"
+                        onClick={() => handleResumeHistory(entry)}
+                        className="flex w-full items-center justify-between gap-3 rounded-lg border border-black px-4 py-3 text-left hover:bg-black/5 dark:border-white dark:hover:bg-white/10"
+                      >
+                        <span className="min-w-0 truncate font-medium">{entry.fileName}</span>
+                        <span className="shrink-0 text-xs text-neutral-500">
+                          {relativeTime(entry.savedAt)}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+
+          {view === "app" && page === "study" && (
             <section className="py-18">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h1 className="text-3xl font-semibold">Welcome, {name}.</h1>
+<<<<<<< Updated upstream
                   <p className="mt-3 leading-relaxed text-theme-muted">
                     Upload a file to read it next to your study panel.
+=======
+                  <p className="mt-3 leading-relaxed text-neutral-600 dark:text-neutral-300">
+                    Upload a file, then create a recap.
+>>>>>>> Stashed changes
                   </p>
                 </div>
                 <button
@@ -277,6 +467,7 @@ function App() {
               <ExtensionBanner />
               <StudyHistory entries={history} onResume={handleResumeHistory} />
 
+<<<<<<< Updated upstream
               <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <article className="border border-theme-border bg-theme-surface p-5">
                   <h2 className="text-xl font-semibold">Upload a file</h2>
@@ -313,6 +504,41 @@ function App() {
                       : "Your recap starts with an upload."}
                   </p>
                 </article>
+=======
+              <div className={`mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-2" : ""}`}>
+                {ready ? (
+                  <DocumentViewer
+                    file={studyDoc.file}
+                    text={studyDoc.text}
+                    onReplace={handleSelectFile}
+                    onRemove={handleRemoveFile}
+                  />
+                ) : (
+                  <article className="rounded-xl border border-black p-5 dark:border-white">
+                    <h2 className="text-xl font-semibold">Upload a file</h2>
+                    <div className="mt-4">
+                      <UploadArea
+                        file={studyDoc.file}
+                        status={studyDoc.status}
+                        error={studyDoc.error}
+                        onSelect={handleSelectFile}
+                        onRemove={handleRemoveFile}
+                      />
+                    </div>
+                  </article>
+                )}
+
+                {ready && (
+                  <StudyPanel
+                    key={studyDoc.documentId}
+                    fileName={studyDoc.file.name}
+                    documentId={studyDoc.documentId}
+                    text={studyDoc.text}
+                    mode={studyMode}
+                    onModeChange={setStudyMode}
+                  />
+                )}
+>>>>>>> Stashed changes
               </div>
               <p className="mt-5 text-sm text-theme-muted">
                 Files stay in this browser demo.
@@ -325,16 +551,7 @@ function App() {
           Recap
         </footer>
       </div>
-      {studyDoc.status === "ready" && (
-        <StudyPanel
-          key={studyDoc.documentId}
-          open={panelOpen}
-          fileName={studyDoc.file.name}
-          documentId={studyDoc.documentId}
-          text={studyDoc.text}
-          onClose={() => setPanelOpen(false)}
-        />
-      )}
+      {view === "app" && <Sprout />}
     </div>
   );
 }
