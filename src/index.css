@@ -41,6 +41,12 @@
   --review-t: #eee;
   --reflect: #111;
   --reflect-t: #eee;
+  /* Sprout stays a brown bear cub here (the accent is black, which would make it a blob) */
+  --sprout-body: #c0753f;
+  --sprout-ear: #c0753f;
+  --sprout-leaf: #5c7a4a;
+  --sprout-leaf-2: #c0753f;
+  --sprout-cheek: #2b2420;
 }
 
 [data-theme="mauve"] {
@@ -747,6 +753,7 @@ input,
 }
 .animate-sprout-blink {
   animation: sprout-blink 4.5s ease-in-out infinite;
+  transform-box: fill-box;
   transform-origin: center;
 }
 

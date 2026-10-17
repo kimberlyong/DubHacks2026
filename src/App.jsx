@@ -7,9 +7,9 @@ import DocumentViewer from "./components/DocumentViewer";
 import GamePage from "./components/game/GamePage";
 import SavedPlans from "./components/SavedPlans";
 import StudyPanel from "./components/StudyPanel";
+import CameraRecovery from "./components/CameraRecovery";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
-import { useFaceRecovery } from "./hooks/useFaceRecovery";
 import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
 import { useSprout } from "./sprout/SproutContext";
@@ -67,16 +67,6 @@ function App() {
   const [page, setPage] = useState("study");
   const [studyMode, setStudyMode] = useState(null);
 
-  // Camera-based focus check-ins. Runs entirely in the browser (no frame is
-  // ever uploaded); Sprout is the only thing that reacts — a quiet nudge
-  // while the student's attention has drifted, and a warmer welcome once
-  // they've actually settled back in.
-  const { enabled: cameraEnabled, setEnabled: setCameraEnabled, status: cameraStatus, error: cameraError } =
-    useFaceRecovery({
-      onDistracted: () => say("Hey, I'm here whenever you're ready to come back. 👀", "nudge"),
-      onReturn: () => say("Welcome back! Let's pick up where you left off. 🌱", "happy"),
-    });
-
   useEffect(() => {
     function handlePointerDown(event) {
       if (!settingsRef.current?.contains(event.target)) {
@@ -119,7 +109,6 @@ function App() {
     setNameInput("");
     handleRemoveFile();
     localStorage.removeItem("recap-name");
-    setCameraEnabled(false);
     setView("home");
   }
 
@@ -329,6 +318,7 @@ function App() {
                   id="settings-panel"
                   className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text shadow-lg"
                 >
+
                   <fieldset>
                     <legend className="mb-2">Color theme</legend>
                     <div className="grid grid-cols-2 gap-2">
@@ -371,33 +361,23 @@ function App() {
                       ))}
                     </div>
                   </fieldset>
-                  {view === "app" && (
-                    <fieldset className="mt-4">
-                      <legend className="mb-2">Camera check-ins</legend>
-                      <button
-                        type="button"
-                        className={`w-full rounded-lg border border-theme-border px-2 py-1 ${
-                          cameraEnabled ? "bg-theme-accent text-theme-on-accent" : "bg-theme-surface text-theme-text"
-                        }`}
-                        aria-pressed={cameraEnabled}
-                        onClick={() => setCameraEnabled((on) => !on)}
-                      >
-                        {cameraEnabled ? "On — Sprout's watching for you" : "Off — turn on Sprout's check-ins"}
-                      </button>
-                      <p className="mt-2 text-xs text-theme-muted">
-                        {cameraEnabled ? cameraStatus : "Processed on your device only — nothing is uploaded."}
-                      </p>
-                      {cameraError && <p className="mt-1 text-xs text-theme-urgent">{cameraError}</p>}
-                    </fieldset>
-                  )}
                 </div>
               )}
             </div>
+
           </div>
         </header>
 
         <main className="app-main flex-1">
+<<<<<<< HEAD
           {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
+=======
+          {view === "app" && (
+            <CameraRecovery fileName={studyDoc.file?.name} />
+          )}
+          
+          {view === "home" && <Homepage onGetStarted={() => setView("signin")} />}
+>>>>>>> ce36ea486939f9f447654d9ffa3425b910d427fd
 
           {view === "signin" && (
             <section className="signin-section mx-auto max-w-xl py-18">
@@ -526,6 +506,7 @@ function App() {
                       </div>
                     </article>
 
+
                     <article className="dashboard-card rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
                       <h2 className="text-xl font-semibold">Past files</h2>
                       {history.length === 0 ? (
@@ -550,6 +531,7 @@ function App() {
                           ))}
                         </ul>
                       )}
+
                     </article>
                   </>
                 )}
