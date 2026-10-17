@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from "react";
+import ExtensionBanner from "./components/ExtensionBanner";
+import StudyHistory from "./components/StudyHistory";
 import StudyPanel from "./components/StudyPanel";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
+import { getHistory } from "./lib/studyHistory";
+import Muse from "./muse/Muse";
+import { useMuse } from "./muse/MuseContext";
 
 const textSizes = {
   small: "text-sm",
@@ -26,6 +31,9 @@ function App() {
   const [extractError, setExtractError] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
+  const [history, setHistory] = useState(getHistory);
+  const { say } = useMuse();
+  const justExtractedRef = useRef(false);
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -37,6 +45,7 @@ function App() {
     function handleKeyDown(event) {
       if (event.key === "Escape") {
         setSettingsOpen(false);
+        setPanelOpen(false);
       }
     }
 
@@ -86,10 +95,20 @@ function App() {
     studyDoc.remove();
   }
 
-  // Open the panel as soon as a document finishes extracting.
+  // Open the panel as soon as a document finishes extracting, and let Muse
+  // say something about it — worded differently when it came in via the
+  // Canvas extension (see justExtractedRef, set below).
   useEffect(() => {
-    if (studyDoc.status === "ready") setPanelOpen(true);
-  }, [studyDoc.documentId, studyDoc.status]);
+    if (studyDoc.status !== "ready") return;
+    setPanelOpen(true);
+    setHistory(getHistory());
+    if (justExtractedRef.current) {
+      justExtractedRef.current = false;
+      say("Nice, I grabbed that for you! Ready when you are. ✨", "happy");
+    } else {
+      say("Got it — let's break this down. 🦊", "happy");
+    }
+  }, [studyDoc.documentId, studyDoc.status, say]);
 
   // Pick up content handed off by the Canvas extension: it opens this app
   // with ?extract=<id>, and the text is waiting at /api/extract/:id.
@@ -109,7 +128,8 @@ function App() {
           setName("there");
           localStorage.setItem("recap-name", "there");
         }
-        studyDoc.loadText(data.text, data.fileName);
+        justExtractedRef.current = true;
+        studyDoc.loadText(data.text, data.fileName, "extension");
       } catch (err) {
         setExtractError(err.message);
       }
@@ -117,6 +137,10 @@ function App() {
     // Runs once on mount; studyDoc.loadText is stable (useCallback).
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  function handleResumeHistory(entry) {
+    studyDoc.loadText(entry.text, entry.fileName, entry.source);
+  }
 
   const today = new Intl.DateTimeFormat(undefined, {
     weekday: "short",
@@ -223,7 +247,7 @@ function App() {
                     className="w-full min-w-0 border border-black bg-white px-2 py-2 text-black placeholder:text-neutral-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black dark:border-white dark:bg-black dark:text-white dark:focus-visible:outline-white"
                   />
                   <button
-                    className="border border-black bg-black px-3 py-2 text-white dark:border-white dark:bg-white dark:text-black"
+                    className="rounded-lg border border-accent-dark bg-accent px-3 py-2 text-white dark:border-accent"
                     type="submit"
                   >
                     Sign in
@@ -241,7 +265,7 @@ function App() {
                   </p>
                 </div>
                 <button
-                  className="whitespace-nowrap border border-black bg-white px-3 py-2 text-black dark:border-white dark:bg-black dark:text-white"
+                  className="whitespace-nowrap rounded-lg border border-black bg-white px-3 py-2 text-black dark:border-white dark:bg-black dark:text-white"
                   type="button"
                   onClick={handleSignOut}
                 >
@@ -255,8 +279,11 @@ function App() {
                 </p>
               )}
 
+              <ExtensionBanner />
+              <StudyHistory entries={history} onResume={handleResumeHistory} />
+
               <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <article className="border border-black p-5 dark:border-white">
+                <article className="rounded-xl border border-black p-5 dark:border-white">
                   <h2 className="text-xl font-semibold">Upload a file</h2>
                   <div className="mt-4">
                     <UploadArea
@@ -269,13 +296,13 @@ function App() {
                   </div>
                 </article>
 
-                <article className="border border-black p-5 dark:border-white">
+                <article className="rounded-xl border border-black p-5 dark:border-white">
                   <h2 className="text-xl font-semibold">Create a recap</h2>
                   <p className="my-4 text-neutral-600 dark:text-neutral-300">
                     Make a summary of your uploaded file.
                   </p>
                   <button
-                    className="border border-black bg-white px-3 py-2 text-black disabled:cursor-not-allowed disabled:opacity-50 dark:border-white dark:bg-black dark:text-white"
+                    className="rounded-lg border border-accent-dark bg-accent px-3 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-accent"
                     type="button"
                     disabled={studyDoc.status !== "ready"}
                     onClick={() => setPanelOpen(true)}
@@ -313,6 +340,7 @@ function App() {
           onClose={() => setPanelOpen(false)}
         />
       )}
+      {name && <Muse />}
     </div>
   );
 }

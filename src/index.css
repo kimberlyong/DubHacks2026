@@ -1,3 +1,41 @@
 @import "tailwindcss";
 
 @custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-accent: #8b7cf6;
+  --color-accent-dark: #6952e0;
+}
+
+@keyframes muse-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes muse-shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+@keyframes muse-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+
+.animate-muse-bob {
+  animation: muse-bob 3s ease-in-out infinite;
+}
+.animate-muse-shake {
+  animation: muse-shake 0.4s ease-in-out infinite;
+}
+.animate-muse-blink {
+  animation: muse-blink 4.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-muse-bob,
+  .animate-muse-shake,
+  .animate-muse-blink {
+    animation: none;
+  }
+}
