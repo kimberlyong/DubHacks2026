@@ -26,7 +26,7 @@ export async function generate(prompt, { json = false, signal } = {}) {
   );
 
   if (!res.ok) {
-    if (res.status === 429) throw new ApiError(429, "Gemini is busy right now. Please try again shortly.");
+    if (res.status === 429 || res.status === 503) throw new ApiError(429, "Gemini is busy right now. Please try again shortly.");
     if (res.status === 400 && (await res.text()).includes("token")) {
       throw new ApiError(413, "This document is too large for the model to process.");
     }

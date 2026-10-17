@@ -2,11 +2,11 @@ import { useEffect, useRef, useState } from "react";
 import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
 import PrivacyNote from "./components/PrivacyNote";
-import StudyHistory from "./components/StudyHistory";
+import DocumentViewer from "./components/DocumentViewer";
 import StudyPanel from "./components/StudyPanel";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
-import { getHistory } from "./lib/studyHistory";
+import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
 import { useSprout } from "./sprout/SproutContext";
 
@@ -15,6 +15,21 @@ const textSizes = {
   medium: "text-base",
   large: "text-lg",
 };
+
+const themes = [
+  { id: "mist", label: "Black & white (default)" },
+  { id: "blush", label: "Blush" },
+  { id: "mauve", label: "Mauve" },
+  { id: "sky", label: "Light blue" },
+  { id: "dusk", label: "Dusk (dark)" },
+];
+
+function getSavedTheme() {
+  const savedTheme = localStorage.getItem("recap-theme");
+  if (themes.some(({ id }) => id === savedTheme)) return savedTheme;
+  if (savedTheme === "dark") return "dusk";
+  return "mist";
+}
 
 function getSavedTextSize() {
   const savedSize = localStorage.getItem("recap-size");
@@ -34,30 +49,34 @@ function App() {
   const [view, setView] = useState(getInitialView);
   const [name, setName] = useState(() => localStorage.getItem("recap-name") ?? "");
   const [nameInput, setNameInput] = useState("");
-  const [theme, setTheme] = useState(
-    () => (localStorage.getItem("recap-theme") === "dark" ? "dark" : "light"),
-  );
+  const [theme, setTheme] = useState(getSavedTheme);
   const [textSize, setTextSize] = useState(getSavedTextSize);
   const studyDoc = useDocument();
-  const [panelOpen, setPanelOpen] = useState(false);
   const [extractError, setExtractError] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
   const [history, setHistory] = useState(getHistory);
   const { say } = useSprout();
   const justExtractedRef = useRef(false);
+  const [navOpen, setNavOpen] = useState(false);
+  const navRef = useRef(null);
+  const [page, setPage] = useState("study");
+  const [studyMode, setStudyMode] = useState(null);
 
   useEffect(() => {
     function handlePointerDown(event) {
       if (!settingsRef.current?.contains(event.target)) {
         setSettingsOpen(false);
       }
+      if (!navRef.current?.contains(event.target)) {
+        setNavOpen(false);
+      }
     }
 
     function handleKeyDown(event) {
       if (event.key === "Escape") {
         setSettingsOpen(false);
-        setPanelOpen(false);
+        setNavOpen(false);
       }
     }
 
@@ -100,12 +119,11 @@ function App() {
   }
 
   async function handleSelectFile(file) {
-    setPanelOpen(false);
     await studyDoc.upload(file);
+    setHistory(getHistory());
   }
 
   function handleRemoveFile() {
-    setPanelOpen(false);
     studyDoc.remove();
   }
 
@@ -114,7 +132,6 @@ function App() {
   // the Canvas extension (see justExtractedRef, set below).
   useEffect(() => {
     if (studyDoc.status !== "ready") return;
-    setPanelOpen(true);
     setHistory(getHistory());
     if (justExtractedRef.current) {
       justExtractedRef.current = false;
@@ -155,8 +172,30 @@ function App() {
   }, []);
 
   function handleResumeHistory(entry) {
+    setPage("study");
     studyDoc.loadText(entry.text, entry.fileName, entry.source);
   }
+
+  const ready = studyDoc.status === "ready";
+
+  function navigate(target) {
+    setNavOpen(false);
+    if (target === "history") {
+      setHistory(getHistory());
+      setPage("history");
+      return;
+    }
+    setPage("study");
+    // "home" = upload/overview with no tool open
+    setStudyMode(target === "home" ? null : target);
+  }
+
+  const navItems = [
+    { id: "home", label: "Home", needsDoc: false },
+    { id: "flashcards", label: "Flashcards", needsDoc: true },
+    { id: "ask", label: "Chatbot", needsDoc: true },
+    { id: "history", label: "Past documents", needsDoc: false },
+  ];
 
   const today = new Intl.DateTimeFormat(undefined, {
     weekday: "short",
@@ -166,20 +205,92 @@ function App() {
 
   return (
     <div
-      className={`min-h-screen bg-white text-black dark:bg-black dark:text-white ${textSizes[textSize]}`}
+      data-theme={theme}
+      className={`min-h-screen bg-theme-bg text-theme-text ${textSizes[textSize]}`}
     >
-      <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-6">
-        <header className="flex min-h-16 items-center justify-between border-b border-black dark:border-white">
-          <button
-            type="button"
-            onClick={() => setView(name ? "app" : "home")}
-            className="cursor-pointer bg-transparent p-0 font-bold text-inherit"
-          >
-            recap
-          </button>
-          {view === "app" && (
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-neutral-600 dark:text-neutral-300 max-[420px]:hidden">
+      <div
+        className={`mx-auto flex min-h-screen w-full flex-col px-6 ${ready && view === "app" ? "max-w-7xl" : "max-w-4xl"}`}
+      >
+        <header className="flex min-h-16 items-center justify-between border-b border-theme-border">
+          <div className="flex items-center gap-4">
+            {view === "app" && (
+              <div className="relative" ref={navRef}>
+                <button
+                  type="button"
+                  aria-label="Navigation menu"
+                  aria-expanded={navOpen}
+                  aria-controls="nav-menu"
+                  onClick={() => setNavOpen((open) => !open)}
+                  className="flex h-9 w-9 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-black bg-transparent dark:border-white"
+                >
+                  <span className="h-0.5 w-5 bg-current" />
+                  <span className="h-0.5 w-5 bg-current" />
+                  <span className="h-0.5 w-5 bg-current" />
+                </button>
+                {navOpen && (
+                  <nav
+                    id="nav-menu"
+                    aria-label="Pages"
+                    className="absolute left-0 top-full z-10 mt-2 w-56 rounded-xl border border-theme-border bg-theme-surface p-2 text-theme-text"
+                  >
+                    {navItems.map((item) => {
+                      const disabled = item.needsDoc && !ready;
+                      const active =
+                        item.id === "history"
+                          ? page === "history"
+                          : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
+                      return (
+                        <button
+                          key={item.id}
+                          type="button"
+                          disabled={disabled}
+                          title={disabled ? "Upload a document first" : undefined}
+                          aria-current={active ? "page" : undefined}
+                          onClick={() => navigate(item.id)}
+                          className={`block w-full rounded-lg px-3 py-2 text-left disabled:cursor-not-allowed disabled:opacity-40 ${
+                            active
+                              ? "bg-theme-accent text-theme-on-accent"
+                              : "bg-transparent hover:bg-theme-border/30"
+                          }`}
+                        >
+                          {item.label}
+                        </button>
+                      );
+                    })}
+                  </nav>
+                )}
+              </div>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                if (name) navigate("home");
+                else setView("home");
+              }}
+              className="cursor-pointer bg-transparent p-0 font-bold text-inherit"
+            >
+              recap
+            </button>
+          </div>
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm text-theme-muted">
+              <span className="max-[520px]:hidden">Color theme</span>
+              <select
+                aria-label="Select color theme"
+                value={theme}
+                onChange={(event) => handleThemeChange(event.target.value)}
+                className="max-w-36 cursor-pointer border border-theme-border bg-theme-surface px-2 py-1 text-theme-text"
+              >
+                {themes.map(({ id, label }) => (
+                  <option key={id} value={id}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {view === "app" && (
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-theme-muted max-[420px]:hidden">
                 {today}
               </span>
               <div className="relative" ref={settingsRef}>
@@ -195,28 +306,8 @@ function App() {
                 {settingsOpen && (
                   <div
                     id="settings-panel"
-                    className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-black bg-white p-4 text-black dark:border-white dark:bg-black dark:text-white"
+                    className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text"
                   >
-                    <fieldset>
-                      <legend className="mb-2">Appearance</legend>
-                      <div className="flex gap-2">
-                        {["light", "dark"].map((option) => (
-                          <button
-                            key={option}
-                            type="button"
-                            className={`flex-1 rounded-lg border border-black px-2 py-1 capitalize dark:border-white ${
-                              theme === option
-                                ? "bg-black text-white dark:bg-white dark:text-black"
-                                : "bg-white text-black dark:bg-black dark:text-white"
-                            }`}
-                            aria-pressed={theme === option}
-                            onClick={() => handleThemeChange(option)}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    </fieldset>
                     <fieldset className="mt-4">
                       <legend className="mb-2">Text size</legend>
                       <div className="flex gap-2">
@@ -224,10 +315,10 @@ function App() {
                           <button
                             key={option}
                             type="button"
-                            className={`flex-1 rounded-lg border border-black px-2 py-1 capitalize dark:border-white ${
+                            className={`flex-1 rounded-lg border border-theme-border px-2 py-1 capitalize ${
                               textSize === option
-                                ? "bg-black text-white dark:bg-white dark:text-black"
-                                : "bg-white text-black dark:bg-black dark:text-white"
+                                ? "bg-theme-accent text-theme-on-accent"
+                                : "bg-theme-surface text-theme-text"
                             }`}
                             aria-pressed={textSize === option}
                             onClick={() => handleTextSizeChange(option)}
@@ -240,8 +331,9 @@ function App() {
                   </div>
                 )}
               </div>
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </header>
 
         <main className="flex-1">
@@ -250,7 +342,7 @@ function App() {
           {view === "signin" && (
             <section className="mx-auto max-w-xl py-18">
               <h1 className="text-3xl font-semibold">Welcome</h1>
-              <p className="my-3 mb-5 leading-relaxed text-neutral-600 dark:text-neutral-300">
+              <p className="my-3 mb-5 leading-relaxed text-theme-muted">
                 Sign in to upload your notes and create a recap.
               </p>
               <form onSubmit={handleSignIn}>
@@ -268,10 +360,10 @@ function App() {
                     required
                     value={nameInput}
                     onChange={(event) => setNameInput(event.target.value)}
-                    className="w-full min-w-0 rounded-lg border border-black bg-white px-2 py-2 text-black placeholder:text-neutral-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black dark:border-white dark:bg-black dark:text-white dark:focus-visible:outline-white"
+                    className="w-full min-w-0 rounded-lg border border-theme-border bg-theme-surface px-2 py-2 text-theme-text placeholder:text-theme-muted"
                   />
                   <button
-                    className="rounded-lg border border-accent-dark bg-accent px-3 py-2 text-white dark:border-accent"
+                    className="rounded-lg border border-theme-accent bg-theme-accent px-3 py-2 text-theme-on-accent"
                     type="submit"
                   >
                     Sign in
@@ -282,17 +374,45 @@ function App() {
             </section>
           )}
 
-          {view === "app" && (
+          {view === "app" && page === "history" && (
+            <section className="py-18">
+              <h1 className="text-3xl font-semibold">Past documents</h1>
+              {history.length === 0 ? (
+                <p className="mt-3 text-theme-muted">
+                  Nothing here yet. Upload a document and it will show up here.
+                </p>
+              ) : (
+                <ul className="mt-6 space-y-2">
+                  {history.map((entry) => (
+                    <li key={entry.fileName + entry.savedAt}>
+                      <button
+                        type="button"
+                        onClick={() => handleResumeHistory(entry)}
+                        className="flex w-full items-center justify-between gap-3 rounded-lg border border-black px-4 py-3 text-left hover:bg-black/5 dark:border-white dark:hover:bg-white/10"
+                      >
+                        <span className="min-w-0 truncate font-medium">{entry.fileName}</span>
+                        <span className="shrink-0 text-xs text-neutral-500">
+                          {relativeTime(entry.savedAt)}
+                        </span>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </section>
+          )}
+
+          {view === "app" && page === "study" && (
             <section className="py-18">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h1 className="text-3xl font-semibold">Welcome, {name}.</h1>
-                  <p className="mt-3 leading-relaxed text-neutral-600 dark:text-neutral-300">
+                  <p className="mt-3 leading-relaxed text-theme-muted">
                     Upload a file, then create a recap.
                   </p>
                 </div>
                 <button
-                  className="whitespace-nowrap rounded-lg border border-black bg-white px-3 py-2 text-black dark:border-white dark:bg-black dark:text-white"
+                  className="whitespace-nowrap rounded-lg border border-theme-border bg-theme-surface px-3 py-2 text-theme-text"
                   type="button"
                   onClick={handleSignOut}
                 >
@@ -300,73 +420,59 @@ function App() {
                 </button>
               </div>
 
-              {extractError && (
-                <p role="alert" className="mt-4 text-red-700 dark:text-red-400">
-                  {extractError}
+              {studyDoc.error && (
+                <p role="alert" className="mt-4 text-theme-urgent">
+                  {studyDoc.error}
                 </p>
               )}
 
               <ExtensionBanner />
-              <StudyHistory entries={history} onResume={handleResumeHistory} />
 
-              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <article className="rounded-xl border border-black p-5 dark:border-white">
-                  <h2 className="text-xl font-semibold">Upload a file</h2>
-                  <div className="mt-4">
-                    <UploadArea
-                      file={studyDoc.file}
-                      status={studyDoc.status}
-                      error={studyDoc.error}
-                      onSelect={handleSelectFile}
-                      onRemove={handleRemoveFile}
-                    />
-                  </div>
-                </article>
+              <div className={`mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-2" : ""}`}>
+                {ready ? (
+                  <DocumentViewer
+                    file={studyDoc.file}
+                    text={studyDoc.text}
+                    onReplace={handleSelectFile}
+                    onRemove={handleRemoveFile}
+                  />
+                ) : (
+                  <article className="rounded-xl border border-theme-border bg-theme-surface p-5">
+                    <h2 className="text-xl font-semibold">Upload a file</h2>
+                    <div className="mt-4">
+                      <UploadArea
+                        file={studyDoc.file}
+                        status={studyDoc.status}
+                        error={studyDoc.error}
+                        onSelect={handleSelectFile}
+                        onRemove={handleRemoveFile}
+                      />
+                    </div>
+                  </article>
+                )}
 
-                <article className="rounded-xl border border-black p-5 dark:border-white">
-                  <h2 className="text-xl font-semibold">Create a recap</h2>
-                  <p className="my-4 text-neutral-600 dark:text-neutral-300">
-                    Make a summary of your uploaded file.
-                  </p>
-                  <button
-                    className="rounded-lg border border-accent-dark bg-accent px-3 py-2 text-white disabled:cursor-not-allowed disabled:opacity-50 dark:border-accent"
-                    type="button"
-                    disabled={studyDoc.status !== "ready"}
-                    onClick={() => setPanelOpen(true)}
-                  >
-                    Open study panel
-                  </button>
-                  <p
-                    className="mt-3 text-sm text-neutral-600 dark:text-neutral-300"
-                    aria-live="polite"
-                  >
-                    {studyDoc.status === "ready"
-                      ? "Your file is ready to study."
-                      : "Your recap starts with an upload."}
-                  </p>
-                </article>
+                {ready && (
+                  <StudyPanel
+                    key={studyDoc.documentId}
+                    fileName={studyDoc.file.name}
+                    documentId={studyDoc.documentId}
+                    text={studyDoc.text}
+                    mode={studyMode}
+                    onModeChange={setStudyMode}
+                  />
+                )}
               </div>
-              <p className="mt-5 text-sm text-neutral-600 dark:text-neutral-300">
+              <p className="mt-5 text-sm text-theme-muted">
                 Files stay in this browser demo.
               </p>
             </section>
           )}
         </main>
 
-        <footer className="border-t border-black py-4 text-sm text-neutral-600 dark:border-white dark:text-neutral-300">
+        <footer className="border-t border-theme-border py-4 text-sm text-theme-muted">
           Recap
         </footer>
       </div>
-      {studyDoc.status === "ready" && (
-        <StudyPanel
-          key={studyDoc.documentId}
-          open={panelOpen}
-          fileName={studyDoc.file.name}
-          documentId={studyDoc.documentId}
-          text={studyDoc.text}
-          onClose={() => setPanelOpen(false)}
-        />
-      )}
       {view === "app" && <Sprout />}
     </div>
   );

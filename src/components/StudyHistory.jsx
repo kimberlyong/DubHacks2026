@@ -10,15 +10,15 @@ export default function StudyHistory({ entries, onResume }) {
   const [latest, ...rest] = entries;
 
   return (
-    <div className="mt-6 border border-dashed border-black/30 p-4 dark:border-white/30">
-      <p className="text-sm text-neutral-600 dark:text-neutral-300">Picking up where you left off?</p>
+    <div className="mt-6 border border-dashed border-theme-border p-4">
+      <p className="text-sm text-theme-muted">Picking up where you left off?</p>
       <button
         type="button"
         onClick={() => onResume(latest)}
-        className="mt-2 flex w-full items-center justify-between gap-3 rounded-lg border border-black/10 bg-accent/5 px-3 py-2 text-left hover:bg-accent/10 dark:border-white/10"
+        className="mt-2 flex w-full items-center justify-between gap-3 rounded-lg border border-theme-border bg-theme-surface px-3 py-2 text-left hover:bg-theme-border/20"
       >
         <span className="min-w-0 truncate font-medium">{latest.fileName}</span>
-        <span className="shrink-0 text-xs text-neutral-500">{relativeTime(latest.savedAt)}</span>
+        <span className="shrink-0 text-xs text-theme-muted">{relativeTime(latest.savedAt)}</span>
       </button>
 
       {rest.length > 0 && (
@@ -29,7 +29,7 @@ export default function StudyHistory({ entries, onResume }) {
               type="button"
               onClick={() => onResume(entry)}
               title={`${entry.fileName} (${SOURCE_LABEL[entry.source] ?? entry.source})`}
-              className="max-w-40 truncate rounded-full border border-black/20 px-3 py-1 text-xs hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+              className="max-w-40 truncate rounded-full border border-theme-border px-3 py-1 text-xs hover:bg-theme-border/20"
             >
               {entry.fileName}
             </button>
