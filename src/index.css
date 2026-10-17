@@ -630,6 +630,10 @@ select:focus-visible {
   border-radius: 999px;
 }
 
+.app-main > section:not(.homepage) .flashcard-face {
+  border-radius: 1rem;
+}
+
 .app-main > section:not(.homepage) button {
   box-shadow: none;
 }
