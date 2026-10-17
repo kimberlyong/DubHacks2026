@@ -15,9 +15,10 @@ const textSizes = {
 };
 
 const themes = [
-  { id: "mist", label: "Mist (default)" },
+  { id: "mist", label: "Black & white (default)" },
   { id: "blush", label: "Blush" },
   { id: "mauve", label: "Mauve" },
+  { id: "sky", label: "Light blue" },
   { id: "dusk", label: "Dusk (dark)" },
 ];
 
