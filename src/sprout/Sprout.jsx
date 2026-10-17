@@ -75,8 +75,15 @@ export default function Sprout() {
           {/* body */}
           <ellipse cx="50" cy="92" rx="22" ry="14" fill="var(--sprout-body, var(--accent))" stroke="var(--sprout-outline, none)" strokeWidth="2.5" />
           {/* one floppy ear (left), one small round ear (right) — asymmetric on purpose */}
-          <path d="M28 40 Q6 44 10 66 Q14 78 30 68 Z" fill="var(--sprout-ear, var(--accent))" />
-          <circle cx="76" cy="34" r="10" fill="var(--sprout-ear, var(--accent))" />
+          <g className="sprout-ears">
+            <path d="M28 40 Q6 44 10 66 Q14 78 30 68 Z" fill="var(--sprout-ear, var(--accent))" />
+            <circle cx="76" cy="34" r="10" fill="var(--sprout-ear, var(--accent))" />
+          </g>
+          {/* round panda ears on top of the head, only shown by themes that ask for them */}
+          <g className="sprout-panda-ears">
+            <circle cx="26" cy="27" r="12" fill="var(--sprout-ear, var(--accent))" />
+            <circle cx="74" cy="27" r="12" fill="var(--sprout-ear, var(--accent))" />
+          </g>
           {/* head */}
           <circle cx="50" cy="52" r="32" fill="var(--sprout-body, var(--accent))" stroke="var(--sprout-outline, none)" strokeWidth="2.5" />
           {/* sprout leaves on top of head */}

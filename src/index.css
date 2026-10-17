@@ -747,6 +747,16 @@ input,
   96% { transform: scaleY(0.1); }
 }
 
+.sprout-panda-ears {
+  display: none;
+}
+[data-theme="mist"] .sprout-ears {
+  display: none;
+}
+[data-theme="mist"] .sprout-panda-ears {
+  display: inline;
+}
+
 .animate-sprout-bob {
   animation: sprout-bob 3s ease-in-out infinite;
 }
