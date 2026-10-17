@@ -1,12 +1,13 @@
-import { BookOpen, Brain, ClipboardList, HelpCircle, ListTree, MessageCircle, Baby } from "lucide-react";
+import { BookOpen, Brain, ClipboardList, HelpCircle, ListTree, MessageCircle, Network, Target } from "lucide-react";
 
 export const STUDY_MODES = [
+  { id: "plan", label: "Plan My Time", Icon: Target },
   { id: "flashcards", label: "Flashcards", Icon: BookOpen },
   { id: "quiz", label: "Practice Quiz", Icon: HelpCircle },
   { id: "keyTerms", label: "Key Terms & Definitions", Icon: ClipboardList },
   { id: "outline", label: "Outline / Study Guide", Icon: ListTree },
   { id: "ask", label: "Ask Questions", Icon: MessageCircle },
-  { id: "eli5", label: "Explain Like I'm 5", Icon: Baby },
+  { id: "visualizer", label: "Visualizer", Icon: Network },
 ];
 
 export default function StudyOptions({ activeMode, loadingMode, onSelect }) {
@@ -26,7 +27,7 @@ export default function StudyOptions({ activeMode, loadingMode, onSelect }) {
               disabled={loading}
               aria-pressed={activeMode === id}
               onClick={() => onSelect(id)}
-              className={`flex cursor-pointer items-center gap-2 border border-theme-border px-3 py-2 text-left hover:bg-theme-border/20 disabled:cursor-not-allowed disabled:opacity-50 ${
+              className={`flex cursor-pointer items-center gap-2 rounded-lg border border-theme-border px-3 py-2 text-left hover:bg-theme-border/20 disabled:cursor-not-allowed disabled:opacity-50 ${
                 activeMode === id ? "bg-theme-accent text-theme-on-accent hover:bg-theme-accent" : ""
               }`}
             >

@@ -1,25 +1,46 @@
 @import "tailwindcss";
 
 :root,
+[data-theme="sand"] {
+  color-scheme: light;
+  --bg: #faf6f0;
+  --surface: #fffdf9;
+  --text: #2b2420;
+  --muted: #7a6f63;
+  --border: #e6dccc;
+  --accent: #c0753f;
+  --on-accent: #fff;
+  --urgent: #b23b3b;
+  --urgent-t: #f6dede;
+  --concept: #3f6b8c;
+  --concept-t: #dde7ee;
+  --action: #5c7a4a;
+  --action-t: #e2ead9;
+  --review: #a9792f;
+  --review-t: #f1e4c8;
+  --reflect: #8a5a7a;
+  --reflect-t: #ecdbe6;
+}
+
 [data-theme="mist"] {
   color-scheme: light;
-  --bg: #f4f2e2;
-  --surface: #faf9ef;
-  --text: #243040;
-  --muted: #4f5e70;
-  --border: #c0cfb0;
-  --accent: #5b6e8a;
+  --bg: #fff;
+  --surface: #fff;
+  --text: #000;
+  --muted: #555;
+  --border: #ddd;
+  --accent: #000;
   --on-accent: #fff;
-  --urgent: #9a4437;
-  --urgent-t: #f3dad2;
-  --concept: #3f5f8a;
-  --concept-t: #dce4ec;
-  --action: #4f6b3a;
-  --action-t: #dce8cc;
-  --review: #7a5a10;
-  --review-t: #f1e6bf;
-  --reflect: #5f5a8c;
-  --reflect-t: #e2e0f0;
+  --urgent: #000;
+  --urgent-t: #f2f2f2;
+  --concept: #222;
+  --concept-t: #eee;
+  --action: #333;
+  --action-t: #eee;
+  --review: #444;
+  --review-t: #eee;
+  --reflect: #111;
+  --reflect-t: #eee;
 }
 
 [data-theme="blush"] {
@@ -64,6 +85,27 @@
   --reflect-t: #ebd6ea;
 }
 
+[data-theme="sky"] {
+  color-scheme: light;
+  --bg: #edf6fc;
+  --surface: #f8fcff;
+  --text: #172b3b;
+  --muted: #4d6578;
+  --border: #b8d4e7;
+  --accent: #4e84a8;
+  --on-accent: #fff;
+  --urgent: #97483d;
+  --urgent-t: #f2dcd8;
+  --concept: #345f88;
+  --concept-t: #d9e8f2;
+  --action: #416b58;
+  --action-t: #dcebe1;
+  --review: #765d2a;
+  --review-t: #f1e9d4;
+  --reflect: #5a5f89;
+  --reflect-t: #e2e5f1;
+}
+
 [data-theme="dusk"] {
   color-scheme: dark;
   --bg: #1e2328;
@@ -71,8 +113,8 @@
   --text: #e6e9eb;
   --muted: #a9b3bb;
   --border: #3a424a;
-  --accent: #8fbfa9;
-  --on-accent: #14201b;
+  --accent: #78aee8;
+  --on-accent: #101b2a;
   --urgent: #f0a596;
   --urgent-t: #43292a;
   --concept: #9cc4e8;
@@ -122,6 +164,13 @@ input:focus-visible,
 select:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
+}
+
+button,
+select,
+input,
+.theme-surface {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
 }
 
 @keyframes sprout-bob {
