@@ -121,13 +121,16 @@ export default function Sprout() {
           <circle cx="71" cy="58" r="5.5" fill="var(--sprout-cheek, var(--text))" opacity="var(--sprout-cheek-opacity, 0.5)" />
           {/* muzzle */}
           <ellipse cx="50" cy="63" rx="13" ry="10" fill="white" opacity="0.92" />
+          {/* panda eye patches, only drawn by themes that set --sprout-eye-patch */}
+          <ellipse cx="39" cy="49" rx="8" ry="10" transform="rotate(25 39 49)" fill="var(--sprout-eye-patch, transparent)" />
+          <ellipse cx="61" cy="49" rx="8" ry="10" transform="rotate(-25 61 49)" fill="var(--sprout-eye-patch, transparent)" />
           {/* eyes (blink via CSS animation), each with a little sparkle */}
           <g className="animate-sprout-blink">
-            <ellipse cx="40" cy="48" rx="4" ry="5.5" fill="#1a1a1a" />
+            <ellipse cx="40" cy="48" rx="4" ry="5.5" fill="#1a1a1a" stroke="var(--sprout-eye-ring, none)" strokeWidth="1.6" />
             <circle cx="41.5" cy="46" r="1.5" fill="white" />
           </g>
           <g className="animate-sprout-blink">
-            <ellipse cx="60" cy="48" rx="4" ry="5.5" fill="#1a1a1a" />
+            <ellipse cx="60" cy="48" rx="4" ry="5.5" fill="#1a1a1a" stroke="var(--sprout-eye-ring, none)" strokeWidth="1.6" />
             <circle cx="61.5" cy="46" r="1.5" fill="white" />
           </g>
           {/* bear nose + little smile */}

@@ -46,8 +46,9 @@
   --sprout-outline: #1a1a1a;
   --sprout-ear: #1a1a1a;
   --sprout-ear-rim: #fff;
-  --sprout-ear-inner: #f5a3b5;
-  --sprout-ear-inner-opacity: 1;
+  --sprout-ear-inner-opacity: 0; /* solid black panda ears */
+  --sprout-eye-patch: #1a1a1a;
+  --sprout-eye-ring: #fff;
   --sprout-leaf: #6a6a6a;
   --sprout-leaf-2: #b5b5b5;
   --sprout-cheek: #f5a3b5;
