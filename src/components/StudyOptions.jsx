@@ -27,7 +27,7 @@ export default function StudyOptions({ activeMode, loadingMode, onSelect }) {
               disabled={loading}
               aria-pressed={activeMode === id}
               onClick={() => onSelect(id)}
-              className={`flex cursor-pointer items-center gap-2 border border-theme-border px-3 py-2 text-left hover:bg-theme-border/20 disabled:cursor-not-allowed disabled:opacity-50 ${
+              className={`flex cursor-pointer items-center gap-2 rounded-lg border border-theme-border px-3 py-2 text-left hover:bg-theme-border/20 disabled:cursor-not-allowed disabled:opacity-50 ${
                 activeMode === id ? "bg-theme-accent text-theme-on-accent hover:bg-theme-accent" : ""
               }`}
             >

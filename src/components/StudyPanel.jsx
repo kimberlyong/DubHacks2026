@@ -22,7 +22,7 @@ export default function StudyPanel({ fileName, documentId, text, mode, onModeCha
   return (
     <aside
       aria-labelledby="study-panel-title"
-      className="flex flex-col border border-theme-border bg-theme-surface text-theme-text"
+      className="flex flex-col overflow-hidden rounded-xl border border-theme-border bg-theme-surface text-theme-text shadow-sm"
     >
       <header className="border-b border-theme-border p-5">
         <h2 id="study-panel-title" className="text-xl font-semibold">
