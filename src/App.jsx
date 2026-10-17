@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import StudyPanel from "./components/StudyPanel";
 import UploadArea from "./components/UploadArea";
+import CameraRecovery from "./components/CameraRecovery";
 import { useDocument } from "./hooks/useDocument";
 
 const textSizes = {
@@ -171,6 +172,7 @@ function App() {
         </header>
 
         <main className="flex-1">
+        <CameraRecovery />
           {!name ? (
             <section className="mx-auto max-w-xl py-18">
               <h1 className="text-3xl font-semibold">Welcome</h1>
