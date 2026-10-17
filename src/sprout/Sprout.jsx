@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { useMuse } from "./MuseContext";
+import { useSprout } from "./SproutContext";
 
 const IDLE_TIPS = [
   "Stuck on something? Try reading it out loud — it slows your brain down just enough.",
@@ -16,10 +16,10 @@ function randomTip() {
 }
 
 // The little floating study companion. Any part of the app can make it talk
-// via useMuse().say(text, mood) — see MuseContext.jsx. On its own, it offers
-// a quiet study tip every so often when nothing else is going on.
-export default function Muse() {
-  const { message, say } = useMuse();
+// via useSprout().say(text, mood) — see SproutContext.jsx. On its own, it
+// offers a quiet study tip every so often when nothing else is going on.
+export default function Sprout() {
+  const { message, say } = useSprout();
   const [tipsOpen, setTipsOpen] = useState(false);
   const idleTimerRef = useRef(null);
 
@@ -64,30 +64,36 @@ export default function Muse() {
 
       <button
         type="button"
-        aria-label="Muse, your study buddy — click for tips"
+        aria-label="Sprout, your study buddy — click for tips"
         onClick={() => setTipsOpen((open) => !open)}
         className={`group relative size-16 cursor-pointer rounded-full bg-transparent p-0 transition-transform duration-200 hover:scale-105 ${
-          mood === "nudge" ? "animate-muse-shake" : "animate-muse-bob"
+          mood === "nudge" ? "animate-sprout-shake" : "animate-sprout-bob"
         }`}
       >
-        <svg viewBox="0 0 100 100" className="size-full drop-shadow-md">
-          {/* ears */}
-          <path d="M22 38 L14 10 L42 28 Z" fill="var(--color-accent)" />
-          <path d="M78 38 L86 10 L58 28 Z" fill="var(--color-accent)" />
-          <path d="M26 34 L21 17 L39 29 Z" fill="var(--color-accent-dark)" />
-          <path d="M74 34 L79 17 L61 29 Z" fill="var(--color-accent-dark)" />
+        <svg viewBox="0 0 100 110" className="size-full drop-shadow-md">
+          {/* body */}
+          <ellipse cx="50" cy="92" rx="22" ry="14" fill="var(--color-accent-dark)" />
+          {/* one floppy ear (left), one small round ear (right) — asymmetric on purpose */}
+          <path d="M28 40 Q6 44 10 66 Q14 78 30 68 Z" fill="var(--color-accent)" />
+          <circle cx="76" cy="34" r="10" fill="var(--color-accent)" />
           {/* head */}
-          <circle cx="50" cy="55" r="34" fill="var(--color-accent)" />
+          <circle cx="50" cy="52" r="32" fill="var(--color-accent)" />
+          {/* sprout leaves on top of head */}
+          <path d="M46 22 Q38 6 50 2 Q52 16 46 22 Z" fill="#7cc576" />
+          <path d="M54 22 Q64 8 52 2 Q48 16 54 22 Z" fill="#9ad794" />
           {/* cheeks */}
-          <circle cx="27" cy="62" r="6" fill="var(--color-accent-dark)" opacity="0.5" />
-          <circle cx="73" cy="62" r="6" fill="var(--color-accent-dark)" opacity="0.5" />
+          <circle cx="29" cy="58" r="5.5" fill="var(--color-accent-dark)" opacity="0.5" />
+          <circle cx="71" cy="58" r="5.5" fill="var(--color-accent-dark)" opacity="0.5" />
           {/* snout patch */}
-          <ellipse cx="50" cy="66" rx="14" ry="10" fill="white" opacity="0.9" />
+          <ellipse cx="50" cy="62" rx="13" ry="9" fill="white" opacity="0.92" />
           {/* eyes (blink via CSS animation) */}
-          <ellipse className="animate-muse-blink" cx="39" cy="50" rx="4.5" ry="6" fill="#1a1a1a" />
-          <ellipse className="animate-muse-blink" cx="61" cy="50" rx="4.5" ry="6" fill="#1a1a1a" />
+          <ellipse className="animate-sprout-blink" cx="40" cy="48" rx="4" ry="5.5" fill="#1a1a1a" />
+          <ellipse className="animate-sprout-blink" cx="60" cy="48" rx="4" ry="5.5" fill="#1a1a1a" />
           {/* nose */}
-          <circle cx="50" cy="64" r="3" fill="#1a1a1a" />
+          <circle cx="50" cy="60" r="2.6" fill="#1a1a1a" />
+          {/* paws */}
+          <ellipse cx="36" cy="102" rx="7" ry="5" fill="var(--color-accent-dark)" />
+          <ellipse cx="64" cy="102" rx="7" ry="5" fill="var(--color-accent-dark)" />
         </svg>
       </button>
     </div>

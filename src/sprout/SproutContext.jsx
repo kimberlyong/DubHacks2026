@@ -1,13 +1,13 @@
 import { createContext, useCallback, useContext, useRef, useState } from "react";
 
-const MuseContext = createContext(null);
+const SproutContext = createContext(null);
 
 const DEFAULT_DURATION_MS = 4500;
 
 // Shared across the app (and meant for other features to plug into — e.g.
-// the camera/distraction-detection piece can call muse.say("...", "nudge")
+// the camera/distraction-detection piece can call sprout.say("...", "nudge")
 // the same way the upload flow does, with no extra wiring).
-export function MuseProvider({ children }) {
+export function SproutProvider({ children }) {
   const [message, setMessage] = useState(null); // { text, mood } | null
   const timeoutRef = useRef(null);
 
@@ -22,11 +22,11 @@ export function MuseProvider({ children }) {
     setMessage(null);
   }, []);
 
-  return <MuseContext.Provider value={{ message, say, clear }}>{children}</MuseContext.Provider>;
+  return <SproutContext.Provider value={{ message, say, clear }}>{children}</SproutContext.Provider>;
 }
 
-export function useMuse() {
-  const ctx = useContext(MuseContext);
-  if (!ctx) throw new Error("useMuse must be used inside <MuseProvider>");
+export function useSprout() {
+  const ctx = useContext(SproutContext);
+  if (!ctx) throw new Error("useSprout must be used inside <SproutProvider>");
   return ctx;
 }

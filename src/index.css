@@ -7,35 +7,35 @@
   --color-accent-dark: #6952e0;
 }
 
-@keyframes muse-bob {
+@keyframes sprout-bob {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-4px); }
 }
-@keyframes muse-shake {
+@keyframes sprout-shake {
   0%, 100% { transform: rotate(0deg); }
   25% { transform: rotate(-6deg); }
   75% { transform: rotate(6deg); }
 }
-@keyframes muse-blink {
+@keyframes sprout-blink {
   0%, 92%, 100% { transform: scaleY(1); }
   96% { transform: scaleY(0.1); }
 }
 
-.animate-muse-bob {
-  animation: muse-bob 3s ease-in-out infinite;
+.animate-sprout-bob {
+  animation: sprout-bob 3s ease-in-out infinite;
 }
-.animate-muse-shake {
-  animation: muse-shake 0.4s ease-in-out infinite;
+.animate-sprout-shake {
+  animation: sprout-shake 0.4s ease-in-out infinite;
 }
-.animate-muse-blink {
-  animation: muse-blink 4.5s ease-in-out infinite;
+.animate-sprout-blink {
+  animation: sprout-blink 4.5s ease-in-out infinite;
   transform-origin: center;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .animate-muse-bob,
-  .animate-muse-shake,
-  .animate-muse-blink {
+  .animate-sprout-bob,
+  .animate-sprout-shake,
+  .animate-sprout-blink {
     animation: none;
   }
 }
