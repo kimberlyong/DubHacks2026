@@ -1,43 +1,39 @@
 import { LEVELS } from "../lib/levels";
 
 const thumb =
-  "[&::-webkit-slider-thumb]:size-4 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-2 [&::-webkit-slider-thumb]:border-theme-surface [&::-webkit-slider-thumb]:bg-theme-accent " +
-  "[&::-moz-range-thumb]:size-4 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-2 [&::-moz-range-thumb]:border-theme-surface [&::-moz-range-thumb]:bg-theme-accent";
+  "[&::-webkit-slider-thumb]:size-6 [&::-webkit-slider-thumb]:-mt-2 [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:border-4 [&::-webkit-slider-thumb]:border-theme-surface [&::-webkit-slider-thumb]:bg-theme-accent [&::-webkit-slider-thumb]:shadow-md " +
+  "[&::-moz-range-thumb]:size-5 [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:border-4 [&::-moz-range-thumb]:border-theme-surface [&::-moz-range-thumb]:bg-theme-accent";
 
 export default function SummarySlider({ level, onChange }) {
   const current = LEVELS[level];
   return (
-    <div>
-      <label htmlFor="summary-level" className="font-semibold">
-        Summary level
-      </label>
-      <div className="mt-3">
-        <input
-          id="summary-level"
-          type="range"
-          min={0}
-          max={LEVELS.length - 1}
-          step={1}
-          value={level}
-          aria-valuetext={current.name}
-          aria-describedby="summary-level-description"
-          onChange={(e) => onChange(Number(e.target.value))}
-          className={`h-4 w-full cursor-pointer appearance-none bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-theme-accent [&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-theme-border [&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-theme-border ${thumb}`}
-        />
-        {/* px-2 matches half the thumb width so ticks line up with thumb centers */}
-        <div aria-hidden="true" className="flex justify-between px-2">
-          {LEVELS.map((l) => (
-            <div key={l.id} className="relative flex w-0 flex-col items-center">
-              <span className="h-2 w-px bg-theme-border" />
-              <span className={`mt-1 whitespace-nowrap text-xs ${l.name === current.name ? "font-semibold" : "text-theme-muted"}`}>
-                {l.name}
-              </span>
-            </div>
-          ))}
-        </div>
+    <div className="rounded-3xl bg-theme-surface-2 px-5 pb-4 pt-4">
+      <div className="flex items-baseline justify-between gap-3">
+        <label htmlFor="summary-level" className="font-display text-lg font-semibold">
+          How deep should we go?
+        </label>
+        <span className="rounded-full bg-theme-accent-soft px-2.5 py-0.5 text-sm font-medium text-theme-accent">
+          {current.name}
+        </span>
       </div>
-      <p id="summary-level-description" className="mt-8 text-sm" aria-live="polite">
-        <span className="font-semibold">{current.name}:</span> {current.description}
+      <input
+        id="summary-level"
+        type="range"
+        min={0}
+        max={LEVELS.length - 1}
+        step={1}
+        value={level}
+        aria-valuetext={current.name}
+        aria-describedby="summary-level-description"
+        onChange={(e) => onChange(Number(e.target.value))}
+        className={`mt-4 h-6 w-full cursor-pointer appearance-none bg-transparent [&::-webkit-slider-runnable-track]:h-2 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-theme-border [&::-moz-range-track]:h-2 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-theme-border ${thumb}`}
+      />
+      <div aria-hidden="true" className="mt-1 flex justify-between text-xs text-theme-muted">
+        <span>Simplest</span>
+        <span>Most detail</span>
+      </div>
+      <p id="summary-level-description" className="mt-3 text-sm text-theme-muted" aria-live="polite">
+        {current.description}
       </p>
     </div>
   );

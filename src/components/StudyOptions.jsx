@@ -1,42 +1,50 @@
-import { BookOpen, Brain, ClipboardList, HelpCircle, ListTree, MessageCircle, Network, Target } from "lucide-react";
+import { BookOpen, ClipboardList, HelpCircle, ListTree, MessageCircle, Network, Sparkles, Target } from "lucide-react";
+
+// Each tool gets a soft pastel tone so the tabs read at a glance.
+const TONES = {
+  concept: "bg-theme-concept-t text-theme-concept",
+  action: "bg-theme-action-t text-theme-action",
+  review: "bg-theme-review-t text-theme-review",
+  reflect: "bg-theme-reflect-t text-theme-reflect",
+};
 
 export const STUDY_MODES = [
-  { id: "plan", label: "Plan My Time", Icon: Target },
-  { id: "flashcards", label: "Flashcards", Icon: BookOpen },
-  { id: "quiz", label: "Practice Quiz", Icon: HelpCircle },
-  { id: "keyTerms", label: "Key Terms & Definitions", Icon: ClipboardList },
-  { id: "outline", label: "Outline / Study Guide", Icon: ListTree },
-  { id: "ask", label: "Ask Questions", Icon: MessageCircle },
-  { id: "visualizer", label: "Visualizer", Icon: Network },
+  { id: "summary", label: "Summary", Icon: Sparkles, tone: "concept" },
+  { id: "plan", label: "Plan my time", Icon: Target, tone: "action" },
+  { id: "keyTerms", label: "Key terms", Icon: ClipboardList, tone: "review" },
+  { id: "visualizer", label: "Visualize", Icon: Network, tone: "reflect" },
+  { id: "ask", label: "Ask", Icon: MessageCircle, tone: "concept" },
+  { id: "flashcards", label: "Flashcards", Icon: BookOpen, tone: "action", soon: true },
+  { id: "quiz", label: "Quiz", Icon: HelpCircle, tone: "review", soon: true },
+  { id: "outline", label: "Outline", Icon: ListTree, tone: "reflect", soon: true },
 ];
 
-export default function StudyOptions({ activeMode, loadingMode, onSelect }) {
+export default function StudyTabs({ activeMode, onSelect }) {
   return (
-    <section aria-labelledby="study-options-heading">
-      <h3 id="study-options-heading" className="mb-3 flex items-center gap-2 font-semibold">
-        <Brain aria-hidden="true" className="size-4" />
-        Other ways to study
-      </h3>
-      <div className="grid grid-cols-1 gap-2 min-[400px]:grid-cols-2">
-        {STUDY_MODES.map(({ id, label, Icon }) => {
-          const loading = loadingMode === id;
-          return (
-            <button
-              key={id}
-              type="button"
-              disabled={loading}
-              aria-pressed={activeMode === id}
-              onClick={() => onSelect(id)}
-              className={`flex cursor-pointer items-center gap-2 rounded-lg border border-theme-border px-3 py-2 text-left hover:bg-theme-border/20 disabled:cursor-not-allowed disabled:opacity-50 ${
-                activeMode === id ? "bg-theme-accent text-theme-on-accent hover:bg-theme-accent" : ""
-              }`}
-            >
-              <Icon aria-hidden="true" className={`size-4 shrink-0 ${loading ? "animate-pulse" : ""}`} />
-              {label}
-            </button>
-          );
-        })}
-      </div>
-    </section>
+    <div role="tablist" aria-label="Study tools" className="flex flex-wrap gap-1.5">
+      {STUDY_MODES.map(({ id, label, Icon, tone, soon }) => {
+        const active = activeMode === id;
+        return (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={active}
+            onClick={() => onSelect(id)}
+            className={`flex shrink-0 cursor-pointer items-center gap-1.5 rounded-full px-3.5 py-2 text-sm font-medium ${
+              active ? TONES[tone] : "text-theme-muted hover:bg-theme-surface-2 hover:text-theme-text"
+            }`}
+          >
+            <Icon aria-hidden="true" className="size-4" />
+            {label}
+            {soon && (
+              <span className="rounded-full bg-theme-surface-2 px-1.5 text-[0.65rem] uppercase tracking-wide text-theme-muted">
+                soon
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
   );
 }

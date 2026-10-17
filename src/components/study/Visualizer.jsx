@@ -44,11 +44,11 @@ function TermImages({ documentId, text }) {
           onChange={(e) => setInput(e.target.value)}
           placeholder="Type a term from your document"
           aria-label="Term to look up"
-          className="w-full min-w-0 border border-black bg-white px-2 py-1 text-black dark:border-white dark:bg-black dark:text-white"
+          className="w-full min-w-0 rounded-full border border-theme-border bg-theme-surface-2 px-4 py-2 text-theme-text"
         />
         <button
           type="submit"
-          className="flex cursor-pointer items-center gap-1 border border-black bg-black px-3 py-1 text-white dark:border-white dark:bg-white dark:text-black"
+          className="flex shrink-0 cursor-pointer items-center gap-1 rounded-full bg-theme-accent px-4 py-2 text-theme-on-accent"
         >
           <Search aria-hidden="true" className="size-4" />
           Find
@@ -62,7 +62,7 @@ function TermImages({ documentId, text }) {
               key={term}
               type="button"
               onClick={() => search(term)}
-              className="cursor-pointer border border-black px-2 py-0.5 text-sm hover:bg-neutral-100 dark:border-white dark:hover:bg-neutral-900"
+              className="cursor-pointer rounded-full bg-theme-surface-2 px-3 py-1 text-sm hover:bg-theme-accent-soft"
             >
               {term}
             </button>
@@ -73,7 +73,7 @@ function TermImages({ documentId, text }) {
       <div aria-live="polite">
         {state.status === "loading" && <p className="text-sm">Searching for “{state.term}”…</p>}
         {state.status === "error" && (
-          <p role="alert" className="text-sm text-red-700 dark:text-red-400">
+          <p role="alert" className="text-sm text-theme-urgent">
             {state.error}
           </p>
         )}
@@ -85,12 +85,12 @@ function TermImages({ documentId, text }) {
       {state.images.length > 0 && (
         <ul className="grid grid-cols-2 gap-3">
           {state.images.map((img) => (
-            <li key={img.url} className="border border-black p-2 text-xs dark:border-white">
+            <li key={img.url} className="rounded-2xl border border-theme-border p-2 text-xs">
               <a href={img.pageUrl} target="_blank" rel="noreferrer">
-                <img src={img.url} alt={img.title} loading="lazy" className="h-32 w-full bg-white object-contain" />
+                <img src={img.url} alt={img.title} loading="lazy" className="h-32 w-full rounded-xl bg-white object-contain" />
               </a>
               <p className="mt-1 break-words">{img.title}</p>
-              <p className="break-words text-neutral-600 dark:text-neutral-300">
+              <p className="break-words text-theme-muted">
                 {img.credit}
                 {img.license ? ` · ${img.license}` : ""}
               </p>
@@ -98,7 +98,7 @@ function TermImages({ documentId, text }) {
           ))}
         </ul>
       )}
-      <p className="text-xs text-neutral-600 dark:text-neutral-300">Images from Wikimedia Commons.</p>
+      <p className="text-xs text-theme-muted">Images from Wikimedia Commons.</p>
     </section>
   );
 }
@@ -131,14 +131,14 @@ function Flowchart({ documentId, text }) {
         type="button"
         onClick={build}
         disabled={status === "loading"}
-        className="flex cursor-pointer items-center gap-2 border border-black px-3 py-1 hover:bg-neutral-100 disabled:cursor-not-allowed disabled:opacity-50 dark:border-white dark:hover:bg-neutral-900"
+        className="flex cursor-pointer items-center gap-2 rounded-full bg-theme-surface-2 px-4 py-1.5 hover:bg-theme-accent-soft disabled:cursor-not-allowed disabled:opacity-50"
       >
         <Workflow aria-hidden="true" className="size-4" />
         {status === "loading" ? "Building…" : flow ? "Rebuild flowchart" : "Build a flowchart"}
       </button>
       <div aria-live="polite">
         {status === "error" && (
-          <p role="alert" className="text-sm text-red-700 dark:text-red-400">
+          <p role="alert" className="text-sm text-theme-urgent">
             {error}
           </p>
         )}
@@ -152,11 +152,11 @@ function Flowchart({ documentId, text }) {
           <ol className="flex flex-col items-stretch">
             {flow.steps.map((step, i) => (
               <li key={i} className="flex flex-col items-center">
-                <div className="w-full border border-black p-3 dark:border-white">
+                <div className="w-full rounded-2xl border border-theme-border bg-theme-surface p-3">
                   <p className="font-semibold">
                     {i + 1}. {step.label}
                   </p>
-                  {step.detail && <p className="text-sm text-neutral-700 dark:text-neutral-300">{step.detail}</p>}
+                  {step.detail && <p className="text-sm text-theme-muted">{step.detail}</p>}
                 </div>
                 {i < flow.steps.length - 1 && <ArrowDown aria-hidden="true" className="my-1 size-5" />}
               </li>

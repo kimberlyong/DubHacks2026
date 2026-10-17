@@ -44,8 +44,8 @@ function ChipGroup({ options, value, onChange, getLabel = (o) => o }) {
             onClick={() => onChange(id)}
             className={`rounded-full border px-3 py-1.5 text-sm ${
               selected
-                ? "border-accent-dark bg-accent text-white"
-                : "border-black/20 hover:bg-black/5 dark:border-white/20 dark:hover:bg-white/10"
+                ? "border-theme-accent bg-theme-accent text-theme-on-accent"
+                : "border-theme-border hover:bg-theme-surface-2"
             }`}
           >
             {getLabel(option)}
@@ -92,14 +92,14 @@ export default function Plan({ documentId, text }) {
           type="button"
           disabled={status === "loading"}
           onClick={() => generate(minutes, energy)}
-          className="w-full rounded-lg border border-accent-dark bg-accent px-3 py-2 text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full rounded-lg border border-theme-accent bg-theme-accent px-3 py-2 text-theme-on-accent disabled:cursor-not-allowed disabled:opacity-60"
         >
           {status === "loading" ? "Building your plan…" : "Make my plan"}
         </button>
         {status === "loading" && (
           <div role="status" aria-label="Building your plan" className="animate-pulse space-y-2 motion-reduce:animate-none">
             {[0, 1, 2].map((i) => (
-              <div key={i} className="h-10 bg-neutral-200 dark:bg-neutral-800" />
+              <div key={i} className="h-14 rounded-2xl bg-theme-surface-2" />
             ))}
           </div>
         )}
@@ -109,11 +109,11 @@ export default function Plan({ documentId, text }) {
 
   if (status === "error") {
     return (
-      <div role="alert" className="border border-red-700 p-4 dark:border-red-400">
-        <p className="text-red-700 dark:text-red-400">{error}</p>
+      <div role="alert" className="rounded-2xl bg-theme-urgent-t p-4">
+        <p className="text-theme-urgent">{error}</p>
         <button
           type="button"
-          className="mt-3 flex cursor-pointer items-center gap-2 border border-black px-3 py-1 dark:border-white"
+          className="mt-3 flex cursor-pointer items-center gap-2 rounded-full bg-theme-surface px-4 py-1.5 text-sm font-medium"
           onClick={() => generate(minutes, energy)}
         >
           <RotateCcw aria-hidden="true" className="size-4" />
@@ -128,14 +128,14 @@ export default function Plan({ documentId, text }) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <p className="text-sm text-neutral-600 dark:text-neutral-300">
+        <p className="text-sm text-theme-muted">
           {params.minutes} min · {ENERGY_OPTIONS.find((o) => o.id === params.energy)?.label ?? params.energy} energy ·{" "}
           {doneCount}/{steps.length} done
         </p>
         <button
           type="button"
           onClick={reset}
-          className="cursor-pointer bg-transparent p-0 text-sm font-medium text-accent-dark underline dark:text-accent"
+          className="cursor-pointer bg-transparent p-0 text-sm font-medium text-theme-accent underline"
         >
           Make a new plan
         </button>
@@ -145,10 +145,10 @@ export default function Plan({ documentId, text }) {
         {steps.map((step, i) => (
           <li key={i}>
             <label
-              className={`flex cursor-pointer items-start gap-3 rounded-lg border p-3 ${
+              className={`flex cursor-pointer items-start gap-3 rounded-2xl border p-3.5 ${
                 done.has(i)
-                  ? "border-black/10 bg-black/[0.02] opacity-60 dark:border-white/10 dark:bg-white/[0.03]"
-                  : "border-black/20 dark:border-white/20"
+                  ? "border-theme-border bg-theme-surface-2 opacity-60"
+                  : "border-theme-border bg-theme-surface hover:border-theme-accent"
               }`}
             >
               <input
@@ -161,10 +161,10 @@ export default function Plan({ documentId, text }) {
                 <p className={`font-medium ${done.has(i) ? "line-through" : ""}`}>
                   {step.title}
                   {step.minutes ? (
-                    <span className="ml-2 text-xs font-normal text-neutral-500">~{step.minutes} min</span>
+                    <span className="ml-2 text-xs font-normal text-theme-muted">~{step.minutes} min</span>
                   ) : null}
                 </p>
-                <p className="mt-0.5 text-sm text-neutral-600 dark:text-neutral-300">{step.instruction}</p>
+                <p className="mt-0.5 text-sm text-theme-muted">{step.instruction}</p>
               </div>
             </label>
           </li>

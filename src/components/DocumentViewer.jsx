@@ -102,16 +102,16 @@ function PdfBody({ file }) {
     setPage(n);
   }
 
-  const frame = "h-[75vh] border border-black dark:border-white";
+  const frame = "h-[75vh] overflow-hidden rounded-2xl border border-theme-border";
   if (failed) return <p className="text-sm">Couldn't preview this PDF.</p>;
   if (!pdf) return <p className="text-sm">Loading document…</p>;
 
   const btn =
-    "flex size-7 cursor-pointer items-center justify-center border border-black disabled:cursor-not-allowed disabled:opacity-40 dark:border-white";
+    "flex size-8 cursor-pointer items-center justify-center rounded-full bg-theme-surface hover:bg-theme-accent-soft disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
     <div className={`flex flex-col ${frame}`}>
-      <div className="flex items-center justify-between gap-3 border-b border-black px-3 py-2 text-sm dark:border-white">
+      <div className="flex items-center justify-between gap-3 border-b border-theme-border bg-theme-surface-2 px-3 py-2 text-sm">
         <label className="flex items-center gap-1">
           Page
           <input
@@ -120,7 +120,7 @@ function PdfBody({ file }) {
             max={pdf.numPages}
             value={page}
             onChange={(e) => goToPage(e.target.value)}
-            className="w-12 border border-black bg-transparent px-1 py-0.5 text-center dark:border-white"
+            className="w-12 rounded-lg border border-theme-border bg-theme-surface px-1 py-0.5 text-center"
           />
           of {pdf.numPages}
         </label>
@@ -152,7 +152,7 @@ function PdfBody({ file }) {
         tabIndex={0}
         role="region"
         aria-label={`${file.name} pages`}
-        className="flex-1 overflow-auto bg-neutral-200 p-3 dark:bg-neutral-800"
+        className="flex-1 overflow-auto bg-theme-surface-2 p-3"
       >
         <div className="mx-auto flex w-max min-w-full flex-col items-center gap-3">
           {Array.from({ length: pdf.numPages }, (_, i) => (
@@ -161,7 +161,7 @@ function PdfBody({ file }) {
               ref={(el) => {
                 canvasRefs.current[i] = el;
               }}
-              className="bg-white"
+              className="rounded-md bg-white shadow-sm"
             />
           ))}
         </div>
@@ -194,7 +194,7 @@ function DocumentBody({ file, text }) {
     };
   }, [file, ext]);
 
-  const frame = "h-[75vh] w-full rounded-lg border border-theme-border overflow-hidden";
+  const frame = "h-[75vh] w-full overflow-hidden rounded-2xl border border-theme-border";
 
   if (ext === ".pdf") return <PdfBody file={file} />;
   if (ext === ".docx" && docxHtml) {
@@ -214,7 +214,7 @@ function DocumentBody({ file, text }) {
       tabIndex={0}
       role="region"
       aria-label="Document text"
-      className="max-h-[75vh] overflow-y-auto whitespace-pre-wrap break-words rounded-lg border border-theme-border bg-theme-surface p-4 leading-relaxed"
+      className="max-h-[75vh] overflow-y-auto whitespace-pre-wrap break-words rounded-2xl bg-theme-surface-2/60 px-6 py-5 text-[1.05em] leading-loose"
     >
       {text}
     </div>
@@ -231,25 +231,29 @@ export default function DocumentViewer({ file, text, onReplace, onRemove }) {
   }
 
   return (
-    <article className="rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
-      <header className="mb-4 flex items-start justify-between gap-3">
-        <h2 className="min-w-0 break-all text-xl font-semibold">{file.name}</h2>
-        <div className="flex shrink-0 items-center gap-1">
+    <article className="cozy-card p-4 sm:p-5">
+      <header className="mb-4 flex items-center justify-between gap-3 px-1">
+        <div className="min-w-0">
+          <p className="text-xs font-medium uppercase tracking-wide text-theme-muted">Now reading</p>
+          <h2 className="truncate font-display text-xl font-semibold">{file.name}</h2>
+        </div>
+        <div className="flex shrink-0 items-center gap-1.5">
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="flex cursor-pointer items-center gap-1 rounded-lg border border-theme-border px-2 py-1 text-sm"
+            className="flex cursor-pointer items-center gap-1.5 rounded-full bg-theme-surface-2 px-3.5 py-1.5 text-sm font-medium hover:bg-theme-accent-soft"
           >
             <FileUp aria-hidden="true" className="size-4" />
-            Upload new
+            New reading
           </button>
           <button
             type="button"
-            aria-label={`Remove ${file.name}`}
+            aria-label={`Close ${file.name}`}
+            title="Close this reading"
             onClick={onRemove}
-            className="cursor-pointer p-1"
+            className="cursor-pointer rounded-full p-2 text-theme-muted hover:bg-theme-surface-2 hover:text-theme-text"
           >
-            <X aria-hidden="true" className="size-5" />
+            <X aria-hidden="true" className="size-4" />
           </button>
           <input
             ref={inputRef}

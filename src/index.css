@@ -1,139 +1,179 @@
 @import "tailwindcss";
 
+/* ---------------------------------------------------------------------------
+   Themes. Every color in the app comes from these variables, so a theme is
+   just a palette. "sand" is the cozy default: oat paper, cocoa text, a warm
+   peach accent, and soft pastel tints (sage, sky, butter, lilac) used to
+   color-code the study tools.
+--------------------------------------------------------------------------- */
 :root,
 [data-theme="sand"] {
   color-scheme: light;
-  --bg: #faf6f0;
-  --surface: #fffdf9;
-  --text: #2b2420;
-  --muted: #7a6f63;
-  --border: #e6dccc;
-  --accent: #c0753f;
+  --bg: #f7f1e8;
+  --bg-glow-1: #fbd9c4;
+  --bg-glow-2: #dfe9d3;
+  --surface: #fffaf4;
+  --surface-2: #f3ebe0;
+  --text: #3d322b;
+  --muted: #8a7a6c;
+  --border: #ecdfcf;
+  --accent: #df8a65;
+  --accent-soft: #fbe3d6;
   --on-accent: #fff;
-  --urgent: #b23b3b;
-  --urgent-t: #f6dede;
-  --concept: #3f6b8c;
-  --concept-t: #dde7ee;
-  --action: #5c7a4a;
-  --action-t: #e2ead9;
-  --review: #a9792f;
-  --review-t: #f1e4c8;
-  --reflect: #8a5a7a;
-  --reflect-t: #ecdbe6;
-}
-
-[data-theme="mist"] {
-  color-scheme: light;
-  --bg: #fff;
-  --surface: #fff;
-  --text: #000;
-  --muted: #555;
-  --border: #ddd;
-  --accent: #000;
-  --on-accent: #fff;
-  --urgent: #000;
-  --urgent-t: #f2f2f2;
-  --concept: #222;
-  --concept-t: #eee;
-  --action: #333;
-  --action-t: #eee;
-  --review: #444;
-  --review-t: #eee;
-  --reflect: #111;
-  --reflect-t: #eee;
+  --shadow: 61 50 43;
+  --urgent: #b5483d;
+  --urgent-t: #f8dcd7;
+  --concept: #4f7393;
+  --concept-t: #dde8f1;
+  --action: #5f7f4e;
+  --action-t: #e2ecd8;
+  --review: #a07a2e;
+  --review-t: #f6e9c8;
+  --reflect: #8a5d82;
+  --reflect-t: #eedff0;
 }
 
 [data-theme="blush"] {
   color-scheme: light;
-  --bg: #f4ebe1;
-  --surface: #faf5ee;
-  --text: #2e0509;
-  --muted: #6b4a4a;
-  --border: #e0bfc8;
-  --accent: #be8272;
-  --on-accent: #2e0509;
-  --urgent: #8a2f2b;
-  --urgent-t: #f2d3d0;
-  --concept: #3f5f82;
-  --concept-t: #d9e3ec;
-  --action: #56602f;
-  --action-t: #dde3c2;
-  --review: #7a5a10;
-  --review-t: #f3e2b8;
-  --reflect: #7a4a6a;
-  --reflect-t: #ebd5e3;
+  --bg: #f8ece9;
+  --bg-glow-1: #f6cfd3;
+  --bg-glow-2: #f3e1c9;
+  --surface: #fff8f6;
+  --surface-2: #f4e2de;
+  --text: #432a2e;
+  --muted: #8f6e70;
+  --border: #efd6d4;
+  --accent: #d9788a;
+  --accent-soft: #f9dde2;
+  --on-accent: #fff;
+  --shadow: 67 42 46;
+  --urgent: #a63b3b;
+  --urgent-t: #f6d6d3;
+  --concept: #4c6a8c;
+  --concept-t: #dde5ef;
+  --action: #5e7a4c;
+  --action-t: #e3ebd8;
+  --review: #9a742c;
+  --review-t: #f4e6c6;
+  --reflect: #8b5a86;
+  --reflect-t: #efdcee;
 }
 
 [data-theme="mauve"] {
   color-scheme: light;
-  --bg: #f7eef1;
-  --surface: #fffafb;
-  --text: #3b2b30;
-  --muted: #6a5560;
-  --border: #e5cbd8;
-  --accent: #a9829c;
-  --on-accent: #2b1d26;
-  --urgent: #9a3550;
-  --urgent-t: #f8d3dd;
-  --concept: #4a5c8c;
-  --concept-t: #dce1f0;
-  --action: #4f6b4a;
-  --action-t: #dde8d6;
-  --review: #7d5a3c;
-  --review-t: #eedfcf;
-  --reflect: #7a4f73;
-  --reflect-t: #ebd6ea;
+  --bg: #f3eef6;
+  --bg-glow-1: #e3d3f0;
+  --bg-glow-2: #f6dfe6;
+  --surface: #fdfaff;
+  --surface-2: #ebe3f0;
+  --text: #372d40;
+  --muted: #7d6f88;
+  --border: #e5daee;
+  --accent: #9c7bc4;
+  --accent-soft: #ebe0f6;
+  --on-accent: #fff;
+  --shadow: 55 45 64;
+  --urgent: #a8405a;
+  --urgent-t: #f6d6de;
+  --concept: #4a5f92;
+  --concept-t: #dee3f3;
+  --action: #4f6f4c;
+  --action-t: #dfead9;
+  --review: #8c6738;
+  --review-t: #f1e3cf;
+  --reflect: #7e5079;
+  --reflect-t: #eedaed;
 }
 
 [data-theme="sky"] {
   color-scheme: light;
-  --bg: #edf6fc;
-  --surface: #f8fcff;
-  --text: #172b3b;
-  --muted: #4d6578;
-  --border: #b8d4e7;
-  --accent: #4e84a8;
+  --bg: #eef4f7;
+  --bg-glow-1: #d3e6f2;
+  --bg-glow-2: #e6efdc;
+  --surface: #fbfdff;
+  --surface-2: #e4edf2;
+  --text: #22323d;
+  --muted: #6a7f8c;
+  --border: #d9e6ee;
+  --accent: #5b98bf;
+  --accent-soft: #dceaf4;
   --on-accent: #fff;
-  --urgent: #97483d;
-  --urgent-t: #f2dcd8;
-  --concept: #345f88;
-  --concept-t: #d9e8f2;
-  --action: #416b58;
-  --action-t: #dcebe1;
-  --review: #765d2a;
-  --review-t: #f1e9d4;
-  --reflect: #5a5f89;
-  --reflect-t: #e2e5f1;
+  --shadow: 34 50 61;
+  --urgent: #a24d40;
+  --urgent-t: #f3dcd8;
+  --concept: #3a6690;
+  --concept-t: #dbe8f3;
+  --action: #43705a;
+  --action-t: #dcece2;
+  --review: #81662c;
+  --review-t: #f2e9d2;
+  --reflect: #5d5f93;
+  --reflect-t: #e2e4f3;
 }
 
+/* Cozy night: warm cocoa instead of cold blue-gray. */
 [data-theme="dusk"] {
   color-scheme: dark;
-  --bg: #1e2328;
-  --surface: #272d33;
-  --text: #e6e9eb;
-  --muted: #a9b3bb;
-  --border: #3a424a;
-  --accent: #78aee8;
-  --on-accent: #101b2a;
-  --urgent: #f0a596;
-  --urgent-t: #43292a;
-  --concept: #9cc4e8;
-  --concept-t: #243545;
-  --action: #9ed3ac;
-  --action-t: #24392b;
-  --review: #e8c770;
-  --review-t: #3f3622;
-  --reflect: #c5b1e8;
-  --reflect-t: #342c45;
+  --bg: #211a17;
+  --bg-glow-1: #3d2a22;
+  --bg-glow-2: #26302a;
+  --surface: #2b2320;
+  --surface-2: #352b27;
+  --text: #f3e8dd;
+  --muted: #b9a596;
+  --border: #423630;
+  --accent: #f0a07c;
+  --accent-soft: #4a3329;
+  --on-accent: #2a1a13;
+  --shadow: 0 0 0;
+  --urgent: #f2a596;
+  --urgent-t: #4a2a27;
+  --concept: #a3c6e6;
+  --concept-t: #26384a;
+  --action: #a8d4ae;
+  --action-t: #26392c;
+  --review: #ead08a;
+  --review-t: #3f3623;
+  --reflect: #d2b8e6;
+  --reflect-t: #372c44;
+}
+
+/* High contrast, for anyone who needs it. Not the default. */
+[data-theme="mist"] {
+  color-scheme: light;
+  --bg: #fff;
+  --bg-glow-1: #fff;
+  --bg-glow-2: #fff;
+  --surface: #fff;
+  --surface-2: #f2f2f2;
+  --text: #000;
+  --muted: #444;
+  --border: #999;
+  --accent: #000;
+  --accent-soft: #e6e6e6;
+  --on-accent: #fff;
+  --shadow: 0 0 0;
+  --urgent: #000;
+  --urgent-t: #f2f2f2;
+  --concept: #000;
+  --concept-t: #eee;
+  --action: #000;
+  --action-t: #eee;
+  --review: #000;
+  --review-t: #eee;
+  --reflect: #000;
+  --reflect-t: #eee;
 }
 
 @theme inline {
   --color-theme-bg: var(--bg);
   --color-theme-surface: var(--surface);
+  --color-theme-surface-2: var(--surface-2);
   --color-theme-text: var(--text);
   --color-theme-muted: var(--muted);
   --color-theme-border: var(--border);
   --color-theme-accent: var(--accent);
+  --color-theme-accent-soft: var(--accent-soft);
   --color-theme-on-accent: var(--on-accent);
   --color-theme-urgent: var(--urgent);
   --color-theme-urgent-t: var(--urgent-t);
@@ -147,61 +187,96 @@
   --color-theme-reflect-t: var(--reflect-t);
   --color-accent: var(--accent);
   --color-accent-dark: var(--accent);
+  --font-display: "Fraunces", Georgia, serif;
+}
+
+/* The app root carries data-theme, so the page background lives on it
+   (body would miss theme changes). Two soft glows keep it from feeling flat. */
+.app-canvas {
+  background-color: var(--bg);
+  background-image:
+    radial-gradient(60rem 40rem at -10% -10%, var(--bg-glow-1), transparent 60%),
+    radial-gradient(50rem 36rem at 110% 20%, var(--bg-glow-2), transparent 60%);
+  background-attachment: fixed;
+  color: var(--text);
+  transition: background-color 0.3s, color 0.3s;
 }
 
 body {
   margin: 0;
-  background: var(--bg);
-  color: var(--text);
   font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
   line-height: 1.6;
-  transition: background 0.25s, color 0.25s;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Soft, warm elevation instead of hard borders. */
+.cozy-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1.5rem;
+  box-shadow:
+    0 1px 2px rgb(var(--shadow) / 0.04),
+    0 8px 24px -12px rgb(var(--shadow) / 0.18);
+}
+
+.cozy-pop {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 1.25rem;
+  box-shadow: 0 18px 40px -16px rgb(var(--shadow) / 0.35);
 }
 
 button:focus-visible,
 a:focus-visible,
 input:focus-visible,
-select:focus-visible {
+select:focus-visible,
+[tabindex]:focus-visible {
   outline: 3px solid var(--accent);
   outline-offset: 2px;
 }
 
 button,
 select,
-input,
-.theme-surface {
-  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+input {
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease,
+    transform 0.15s ease, box-shadow 0.15s ease;
 }
 
+/* --- Sprout ------------------------------------------------------------- */
 @keyframes sprout-bob {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-4px); }
+  50% { transform: translateY(-5px); }
 }
 @keyframes sprout-shake {
   0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-6deg); }
-  75% { transform: rotate(6deg); }
+  25% { transform: rotate(-7deg); }
+  75% { transform: rotate(7deg); }
 }
 @keyframes sprout-blink {
   0%, 92%, 100% { transform: scaleY(1); }
   96% { transform: scaleY(0.1); }
 }
+@keyframes sprout-sway {
+  0%, 100% { transform: rotate(-6deg); }
+  50% { transform: rotate(6deg); }
+}
+@keyframes bubble-in {
+  from { opacity: 0; transform: translateY(6px) scale(0.97); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
 
-.animate-sprout-bob {
-  animation: sprout-bob 3s ease-in-out infinite;
-}
-.animate-sprout-shake {
-  animation: sprout-shake 0.4s ease-in-out infinite;
-}
-.animate-sprout-blink {
-  animation: sprout-blink 4.5s ease-in-out infinite;
-  transform-origin: center;
-}
+.animate-sprout-bob { animation: sprout-bob 3.2s ease-in-out infinite; }
+.animate-sprout-shake { animation: sprout-shake 0.45s ease-in-out infinite; }
+.animate-sprout-blink { animation: sprout-blink 4.5s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.animate-sprout-sway { animation: sprout-sway 3.5s ease-in-out infinite; transform-box: fill-box; transform-origin: bottom center; }
+.animate-bubble-in { animation: bubble-in 0.25s ease-out both; }
 
 @media (prefers-reduced-motion: reduce) {
   .animate-sprout-bob,
   .animate-sprout-shake,
-  .animate-sprout-blink {
+  .animate-sprout-blink,
+  .animate-sprout-sway,
+  .animate-bubble-in {
     animation: none;
   }
 }

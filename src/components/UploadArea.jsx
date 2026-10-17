@@ -1,8 +1,8 @@
-import { FileText, Loader2, UploadCloud, X } from "lucide-react";
+import { FileUp, Loader2 } from "lucide-react";
 import { useRef, useState } from "react";
 import { ACCEPTED_EXTENSIONS } from "../lib/extractText";
 
-export default function UploadArea({ file, status, error, onSelect, onRemove }) {
+export default function UploadArea({ file, status, error, onSelect }) {
   const inputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
 
@@ -15,8 +15,8 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
   return (
     <div>
       <div
-        className={`flex flex-col items-center gap-2 rounded-xl border border-dashed border-theme-border p-6 text-center ${
-          dragging ? "bg-theme-border/20" : ""
+        className={`flex flex-col items-center rounded-3xl border-2 border-dashed px-6 py-12 text-center ${
+          dragging ? "border-theme-accent bg-theme-accent-soft" : "border-theme-border bg-theme-surface-2/60"
         }`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -29,14 +29,24 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
           handleFiles(e.dataTransfer.files);
         }}
       >
-        <UploadCloud aria-hidden="true" className="size-6" />
-        <p>Drag a file here, or</p>
+        <span className="flex size-16 items-center justify-center rounded-full bg-theme-accent-soft text-theme-accent">
+          {status === "extracting" ? (
+            <Loader2 aria-hidden="true" className="size-7 animate-spin motion-reduce:animate-none" />
+          ) : (
+            <FileUp aria-hidden="true" className="size-7" />
+          )}
+        </span>
+        <p className="mt-4 font-display text-xl font-semibold">
+          {status === "extracting" ? `Reading ${file?.name ?? "your file"}…` : "Drop a reading here"}
+        </p>
+        <p className="mt-1 text-sm text-theme-muted">A PDF, Word doc, or text file, up to 10 MB</p>
         <button
           type="button"
-          className="cursor-pointer rounded-lg border border-theme-accent bg-theme-accent px-3 py-2 text-theme-on-accent"
+          disabled={status === "extracting"}
+          className="mt-5 cursor-pointer rounded-full bg-theme-accent px-6 py-2.5 font-medium text-theme-on-accent shadow-sm hover:-translate-y-0.5 hover:shadow-md disabled:cursor-wait disabled:opacity-60"
           onClick={() => inputRef.current?.click()}
         >
-          {file ? "Replace file" : "Choose a file"}
+          Choose a file
         </button>
         <input
           ref={inputRef}
@@ -47,36 +57,13 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
           accept={ACCEPTED_EXTENSIONS.join(",")}
           onChange={(e) => handleFiles(e.target.files)}
         />
-        <p className="text-sm text-theme-muted">PDF, DOCX, TXT, or MD · up to 10 MB</p>
       </div>
 
-      <div aria-live="polite" className="mt-3 text-sm">
-        {status === "extracting" && (
-          <p className="flex items-center gap-2">
-            <Loader2 aria-hidden="true" className="size-4 animate-spin motion-reduce:animate-none" />
-            Reading {file?.name}…
-          </p>
-        )}
-        {status === "error" && (
-          <p role="alert" className="rounded-lg bg-theme-urgent-t px-3 py-2 text-theme-urgent">
-            {error}
-          </p>
-        )}
-        {status === "ready" && file && (
-          <p className="flex items-center gap-2">
-            <FileText aria-hidden="true" className="size-4 shrink-0" />
-            <span className="min-w-0 break-all">{file.name}</span>
-            <button
-              type="button"
-              className="ml-auto shrink-0 cursor-pointer p-1"
-              aria-label={`Remove ${file.name}`}
-              onClick={onRemove}
-            >
-              <X aria-hidden="true" className="size-4" />
-            </button>
-          </p>
-        )}
-      </div>
+      {status === "error" && (
+        <p role="alert" className="mt-3 rounded-2xl bg-theme-urgent-t px-4 py-2.5 text-sm text-theme-urgent">
+          {error}
+        </p>
+      )}
     </div>
   );
 }
