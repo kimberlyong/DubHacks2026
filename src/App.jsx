@@ -7,7 +7,6 @@ import DocumentViewer from "./components/DocumentViewer";
 import GamePage from "./components/game/GamePage";
 import SavedPlans from "./components/SavedPlans";
 import StudyPanel from "./components/StudyPanel";
-import CameraRecovery from "./components/CameraRecovery";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
 import { getHistory, relativeTime } from "./lib/studyHistory";
@@ -374,8 +373,6 @@ function App() {
         </header>
 
         <main className="app-main flex-1">
-          {view === "app" && <CameraRecovery fileName={studyDoc.file?.name} />}
-
           {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
 
           {view === "signin" && (
@@ -458,9 +455,6 @@ function App() {
               <div className="dashboard-intro flex items-start justify-between gap-4">
                 <div>
                   <h1 className="text-3xl font-semibold">Welcome, {name}.</h1>
-                  <p className="mt-3 leading-relaxed text-theme-muted">
-                    Upload a file and let's make it clear.
-                  </p>
                 </div>
               </div>
 
