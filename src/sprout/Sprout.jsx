@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { useSprout } from "./SproutContext";
 
 const IDLE_TIPS = [
@@ -9,10 +9,38 @@ const IDLE_TIPS = [
   "Not sure where to start? Pick literally anything. Momentum comes after.",
 ];
 
+// Short things Sprout says when you click it.
+const CLICK_MESSAGES = [
+  "Hi! I'm rooting for you 🌱",
+  "You're doing great.",
+  "One small step at a time.",
+  "Sip of water? 💧",
+  "Proud of you for showing up.",
+  "Deep breath. You've got this.",
+  "Tiny progress is still progress.",
+  "Stretch break? I'll wait.",
+  "Hehe, that tickles!",
+  "Let's grow together 🌿",
+  "Focus mode: activated.",
+  "You're smarter than you think.",
+  "Done is better than perfect.",
+  "I believe in you!",
+  "Keep going — you're almost there.",
+];
+
 const MOOD_ICON = { idle: null, happy: "✨", nudge: "👀", thinking: "💭" };
 
 function randomTip() {
   return IDLE_TIPS[Math.floor(Math.random() * IDLE_TIPS.length)];
+}
+
+function shuffled(items) {
+  const copy = [...items];
+  for (let i = copy.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [copy[i], copy[j]] = [copy[j], copy[i]];
+  }
+  return copy;
 }
 
 // The little floating study companion. Any part of the app can make it talk
@@ -20,8 +48,21 @@ function randomTip() {
 // offers a quiet study tip every so often when nothing else is going on.
 export default function Sprout() {
   const { message, say } = useSprout();
-  const [tipsOpen, setTipsOpen] = useState(false);
   const idleTimerRef = useRef(null);
+  // Click messages are dealt from a shuffled deck so every click is different
+  // and nothing repeats until all of them have been shown.
+  const deckRef = useRef([]);
+  const lastClickRef = useRef(null);
+
+  function nextClickMessage() {
+    if (deckRef.current.length === 0) {
+      deckRef.current = shuffled(CLICK_MESSAGES);
+      // Don't start a new round with the message we just showed.
+      if (deckRef.current[0] === lastClickRef.current) deckRef.current.push(deckRef.current.shift());
+    }
+    lastClickRef.current = deckRef.current.shift();
+    return lastClickRef.current;
+  }
 
   useEffect(() => {
     function scheduleIdleTip() {
@@ -38,34 +79,23 @@ export default function Sprout() {
 
   return (
     <div className="fixed bottom-5 right-5 z-40 flex flex-col items-end gap-2">
-      {(message || tipsOpen) && (
+      {message && (
         <div
           role="status"
           aria-live="polite"
           className="max-w-64 rounded-2xl rounded-br-sm border border-theme-border bg-theme-surface px-4 py-3 text-sm text-theme-text shadow-lg"
         >
-          {tipsOpen ? (
-            <>
-              <p className="mb-2 font-medium">A few things that help:</p>
-              <ul className="list-disc space-y-1 pl-4">
-                {IDLE_TIPS.slice(0, 3).map((tip) => (
-                  <li key={tip}>{tip}</li>
-                ))}
-              </ul>
-            </>
-          ) : (
-            <p>
-              {MOOD_ICON[mood] && <span className="mr-1">{MOOD_ICON[mood]}</span>}
-              {message.text}
-            </p>
-          )}
+          <p>
+            {MOOD_ICON[mood] && <span className="mr-1">{MOOD_ICON[mood]}</span>}
+            {message.text}
+          </p>
         </div>
       )}
 
       <button
         type="button"
-        aria-label="Sprout, your study buddy — click for tips"
-        onClick={() => setTipsOpen((open) => !open)}
+        aria-label="Sprout, your study buddy — click to say hi"
+        onClick={() => say(nextClickMessage(), "happy", 4000)}
         className={`group relative size-20 cursor-pointer rounded-full bg-transparent p-0 transition-transform duration-200 hover:scale-105 ${
           mood === "nudge" ? "animate-sprout-shake" : "animate-sprout-bob"
         }`}
@@ -80,9 +110,12 @@ export default function Sprout() {
             <circle cx="76" cy="34" r="10" fill="var(--sprout-ear, var(--accent))" />
           </g>
           {/* round panda ears on top of the head, only shown by themes that ask for them */}
+          {/* (light rim + inner ear so they still show against a dark background) */}
           <g className="sprout-panda-ears">
-            <circle cx="26" cy="27" r="12" fill="var(--sprout-ear, var(--accent))" />
-            <circle cx="74" cy="27" r="12" fill="var(--sprout-ear, var(--accent))" />
+            <circle cx="26" cy="27" r="12" fill="var(--sprout-ear, var(--accent))" stroke="var(--sprout-ear-rim, none)" strokeWidth="2.5" />
+            <circle cx="74" cy="27" r="12" fill="var(--sprout-ear, var(--accent))" stroke="var(--sprout-ear-rim, none)" strokeWidth="2.5" />
+            <circle cx="26" cy="27" r="5.5" fill="var(--sprout-ear-inner, transparent)" />
+            <circle cx="74" cy="27" r="5.5" fill="var(--sprout-ear-inner, transparent)" />
           </g>
           {/* head */}
           <circle cx="50" cy="52" r="32" fill="var(--sprout-body, var(--accent))" stroke="var(--sprout-outline, none)" strokeWidth="2.5" />
@@ -106,8 +139,8 @@ export default function Sprout() {
           {/* nose */}
           <circle cx="50" cy="60" r="2.6" fill="#1a1a1a" />
           {/* paws */}
-          <ellipse cx="36" cy="102" rx="7" ry="5" fill="var(--sprout-ear, var(--accent))" />
-          <ellipse cx="64" cy="102" rx="7" ry="5" fill="var(--sprout-ear, var(--accent))" />
+          <ellipse cx="36" cy="102" rx="7" ry="5" fill="var(--sprout-ear, var(--accent))" stroke="var(--sprout-ear-rim, none)" strokeWidth="2" />
+          <ellipse cx="64" cy="102" rx="7" ry="5" fill="var(--sprout-ear, var(--accent))" stroke="var(--sprout-ear-rim, none)" strokeWidth="2" />
         </svg>
       </button>
     </div>
