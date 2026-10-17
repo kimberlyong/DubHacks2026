@@ -38,7 +38,23 @@ export function useDocument() {
     }
   }, []);
 
+  // Same as upload(), but for text that already arrived as text (e.g. from
+  // the Canvas extension) instead of a File the user picked.
+  const loadText = useCallback((text, fileName) => {
+    const request = ++requestRef.current;
+    abortRef.current?.abort();
+
+    const documentId = crypto.randomUUID();
+    const file = { name: fileName || "Canvas page" };
+    setDoc({ file, documentId, text, status: "ready", error: null });
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+    registerDocument({ documentId, fileName: file.name, text }, controller.signal).catch(() => {});
+    return request === requestRef.current;
+  }, []);
+
   useEffect(() => () => abortRef.current?.abort(), []);
 
-  return { ...doc, upload, remove };
+  return { ...doc, upload, loadText, remove };
 }
