@@ -10,7 +10,7 @@ export default function StudyHistory({ entries, onResume }) {
   const [latest, ...rest] = entries;
 
   return (
-    <div className="mt-6 border border-dashed border-theme-border p-4">
+    <div className="mt-6 rounded-xl border border-dashed border-theme-border p-4">
       <p className="text-sm text-theme-muted">Picking up where you left off?</p>
       <button
         type="button"

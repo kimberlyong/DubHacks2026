@@ -22,7 +22,7 @@ export default function SummarySlider({ level, onChange }) {
           aria-valuetext={current.name}
           aria-describedby="summary-level-description"
           onChange={(e) => onChange(Number(e.target.value))}
-          className={`h-4 w-full cursor-pointer appearance-none bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-theme-accent [&::-webkit-slider-runnable-track]:h-1 [&::-webkit-slider-runnable-track]:bg-theme-border [&::-moz-range-track]:h-1 [&::-moz-range-track]:bg-theme-border ${thumb}`}
+          className={`h-4 w-full cursor-pointer appearance-none bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-theme-accent [&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-theme-border [&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-theme-border ${thumb}`}
         />
         {/* px-2 matches half the thumb width so ticks line up with thumb centers */}
         <div aria-hidden="true" className="flex justify-between px-2">

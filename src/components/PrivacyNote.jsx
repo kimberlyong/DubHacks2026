@@ -26,6 +26,7 @@ export default function PrivacyNote() {
           <li>History and settings (theme, text size, recent files) live only in your browser's local storage — we never see them.</li>
           <li>Content pulled in from the Canvas extension sits on the server for up to 10 minutes and is deleted the moment it's loaded.</li>
           <li>Nothing is logged, stored in a database, or shared with anyone else.</li>
+          <li>Camera check-ins (optional, off by default) run entirely on your device — no video or image ever leaves your browser.</li>
         </ul>
       )}
     </div>

@@ -14,11 +14,11 @@ export default function SummaryDisplay({ status, summary, error, onRetry }) {
 
   if (status === "error") {
     return (
-      <div role="alert" className="border border-theme-urgent bg-theme-urgent-t p-4">
+      <div role="alert" className="rounded-lg border border-theme-urgent bg-theme-urgent-t p-4">
         <p className="text-theme-urgent">{error}</p>
         <button
           type="button"
-          className="mt-3 flex cursor-pointer items-center gap-2 border border-theme-border px-3 py-1"
+          className="mt-3 flex cursor-pointer items-center gap-2 rounded-lg border border-theme-border px-3 py-1"
           onClick={onRetry}
         >
           <RotateCcw aria-hidden="true" className="size-4" />
