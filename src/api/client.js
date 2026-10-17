@@ -22,6 +22,9 @@ export const fetchSummary = ({ documentId, text, level }, signal) =>
 export const fetchKeyTerms = ({ documentId, text }, signal) =>
   post("/key-terms", { documentId, text }, signal).then((d) => d.terms);
 
+export const fetchPlan = ({ documentId, text, minutes, energy }, signal) =>
+  post("/plan", { documentId, text, minutes, energy }, signal).then((d) => d.steps);
+
 // Starts the Backboard assistant/thread for this document.
 export const registerDocument = ({ documentId, fileName, text }, signal) =>
   post("/documents", { documentId, fileName, text }, signal);

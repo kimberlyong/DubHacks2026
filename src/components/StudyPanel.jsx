@@ -8,6 +8,7 @@ import AskQuestions from "./study/AskQuestions";
 import Flashcards from "./study/Flashcards";
 import KeyTerms from "./study/KeyTerms";
 import Outline from "./study/Outline";
+import Plan from "./study/Plan";
 import PracticeQuiz from "./study/PracticeQuiz";
 
 const FOCUSABLE =
@@ -109,6 +110,7 @@ export default function StudyPanel({ open, fileName, documentId, text, onClose }
 
           {mode && (
             <section aria-label="Study tool">
+              {mode === "plan" && <Plan documentId={documentId} text={text} />}
               {mode === "keyTerms" && <KeyTerms documentId={documentId} text={text} />}
               {mode === "flashcards" && <Flashcards />}
               {mode === "quiz" && <PracticeQuiz />}

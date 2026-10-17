@@ -79,6 +79,53 @@ export async function summarize({ documentId, text, level, signal }) {
   );
 }
 
+export const ENERGY_LEVELS = ["low", "medium", "high"];
+
+// Breaks the document into a short, ordered list of small steps sized to
+// fit the student's stated time and energy — feature #1 from the brief:
+// "upload a reading... pick your time and energy, and get it broken into
+// small steps."
+export async function plan({ documentId, text, minutes, energy, signal }) {
+  validateText(text);
+  const mins = Number(minutes);
+  if (!Number.isFinite(mins) || mins < 5 || mins > 240) {
+    throw new ApiError(400, "Pick a number of minutes between 5 and 240.");
+  }
+  if (!ENERGY_LEVELS.includes(energy)) {
+    throw new ApiError(400, `Energy must be one of: ${ENERGY_LEVELS.join(", ")}.`);
+  }
+
+  const source = await getSource(documentId, text, signal);
+  const energyNote = {
+    low: "Keep each step small and low-effort — short reading chunks, simple recall questions, nothing that requires heavy focus to start.",
+    medium: "Normal-sized steps are fine — a mix of reading and a bit of active recall per step.",
+    high: "The student has good energy right now — steps can be a little more substantial and can include synthesis, not just reading.",
+  }[energy];
+
+  const raw = await generate(
+    `Break this document into a short ordered study plan that fits in about ${mins} minutes total. ${energyNote}\n` +
+      `Make each step small enough to start without dread — a concrete, doable chunk (e.g. "Read section 2 on X" or "Answer: what does Y mean?"), not a vague instruction like "study the material". ` +
+      `Use 3-8 steps, whichever fits the time. Each step's minutes should be realistic (3-20 each) and the total should be close to ${mins}. ` +
+      `Respond with JSON only: an array of objects {"title": string (under 60 chars), "minutes": number, "instruction": string (one sentence, concrete, what to actually do)}.\n\n` +
+      `Document:\n---\n${source}`,
+    { json: true, signal },
+  );
+
+  try {
+    const steps = JSON.parse(raw);
+    if (!Array.isArray(steps) || steps.length === 0) throw new Error("not an array");
+    return steps
+      .filter((s) => s && typeof s.title === "string" && typeof s.instruction === "string")
+      .map(({ title, minutes: m, instruction }) => ({
+        title,
+        minutes: Number.isFinite(Number(m)) ? Math.max(1, Math.round(Number(m))) : null,
+        instruction,
+      }));
+  } catch {
+    throw new ApiError(502, "Couldn't read the plan the model returned. Please retry.");
+  }
+}
+
 export async function keyTerms({ documentId, text, signal }) {
   validateText(text);
   const source = await getSource(documentId, text, signal);
