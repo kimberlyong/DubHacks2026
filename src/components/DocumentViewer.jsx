@@ -102,7 +102,7 @@ function PdfBody({ file }) {
     setPage(n);
   }
 
-  const frame = "h-[75vh] border border-black dark:border-white";
+  const frame = "h-[85vh] border border-black dark:border-white";
   if (failed) return <p className="text-sm">Couldn't preview this PDF.</p>;
   if (!pdf) return <p className="text-sm">Loading document…</p>;
 
@@ -194,7 +194,7 @@ function DocumentBody({ file, text }) {
     };
   }, [file, ext]);
 
-  const frame = "h-[75vh] w-full rounded-lg border border-theme-border overflow-hidden";
+  const frame = "h-[85vh] w-full rounded-lg border border-theme-border overflow-hidden";
 
   if (ext === ".pdf") return <PdfBody file={file} />;
   if (ext === ".docx" && docxHtml) {
@@ -214,7 +214,7 @@ function DocumentBody({ file, text }) {
       tabIndex={0}
       role="region"
       aria-label="Document text"
-      className="max-h-[75vh] overflow-y-auto whitespace-pre-wrap break-words rounded-lg border border-theme-border bg-theme-surface p-4 leading-relaxed"
+      className="max-h-[85vh] overflow-y-auto whitespace-pre-wrap break-words rounded-lg border border-theme-border bg-theme-surface p-4 leading-relaxed"
     >
       {text}
     </div>
