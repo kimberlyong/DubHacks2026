@@ -4,7 +4,7 @@ import { config } from "./config.js";
 import { ApiError } from "./gemini.js";
 import { chat, registerDocument } from "./backboard.js";
 import { buildFlowchart, findImages } from "./visualize.js";
-import { keyTerms, summarize, summarizeAll, validateText } from "./study.js";
+import { keyTerms, plan, summarize, summarizeAll, validateText } from "./study.js";
 
 const app = express();
 app.use(express.json({ limit: "3mb" }));
@@ -75,6 +75,12 @@ app.post("/api/key-terms", route(async (req, res) => {
   const { documentId, text } = req.body ?? {};
   requireId(documentId);
   return { terms: await keyTerms({ documentId, text, signal: abortOnClose(req, res) }) };
+}));
+
+app.post("/api/plan", route(async (req, res) => {
+  const { documentId, text, minutes, energy } = req.body ?? {};
+  requireId(documentId);
+  return { steps: await plan({ documentId, text, minutes, energy, signal: abortOnClose(req, res) }) };
 }));
 
 // Starts a Backboard assistant + thread for the document (runs in the background).

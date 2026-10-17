@@ -6,6 +6,7 @@ import AskQuestions from "./study/AskQuestions";
 import Flashcards from "./study/Flashcards";
 import KeyTerms from "./study/KeyTerms";
 import Outline from "./study/Outline";
+import Plan from "./study/Plan";
 import PracticeQuiz from "./study/PracticeQuiz";
 import Visualizer from "./study/Visualizer";
 
@@ -45,6 +46,7 @@ export default function StudyPanel({ fileName, documentId, text, mode, onModeCha
 
         {mode && (
           <section aria-label="Study tool">
+            {mode === "plan" && <Plan documentId={documentId} text={text} />}
             {mode === "keyTerms" && <KeyTerms documentId={documentId} text={text} />}
             {mode === "flashcards" && <Flashcards />}
             {mode === "visualizer" && <Visualizer documentId={documentId} text={text} />}
