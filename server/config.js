@@ -32,7 +32,7 @@ export const config = {
   geminiModel: process.env.GEMINI_MODEL || "gemini-3.8-flash",
   // Backboard's docs don't list Gemini model ids; set this to a name returned by
   // GET /models/provider/google. Defaults to the same model as above.
-  backboardModel: process.env.BACKBOARD_GEMINI_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash",
+  backboardModel: process.env.BACKBOARD_GEMINI_MODEL || process.env.GEMINI_MODEL || "gemini-3.8-flash",
   backboardBaseUrl: process.env.BACKBOARD_BASE_URL || "https://app.backboard.io/api",
   maxTextChars: 1_000_000,
   minTextChars: 20,

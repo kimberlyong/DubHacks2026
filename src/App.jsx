@@ -23,6 +23,7 @@ function App() {
   const [textSize, setTextSize] = useState(getSavedTextSize);
   const studyDoc = useDocument();
   const [panelOpen, setPanelOpen] = useState(false);
+  const [extractError, setExtractError] = useState(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
 
@@ -89,6 +90,33 @@ function App() {
   useEffect(() => {
     if (studyDoc.status === "ready") setPanelOpen(true);
   }, [studyDoc.documentId, studyDoc.status]);
+
+  // Pick up content handed off by the Canvas extension: it opens this app
+  // with ?extract=<id>, and the text is waiting at /api/extract/:id.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const id = url.searchParams.get("extract");
+    if (!id) return;
+    url.searchParams.delete("extract");
+    window.history.replaceState({}, "", url);
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/extract/${encodeURIComponent(id)}`);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error ?? "That extracted page could not be loaded.");
+        if (!name) {
+          setName("there");
+          localStorage.setItem("recap-name", "there");
+        }
+        studyDoc.loadText(data.text, data.fileName);
+      } catch (err) {
+        setExtractError(err.message);
+      }
+    })();
+    // Runs once on mount; studyDoc.loadText is stable (useCallback).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const today = new Intl.DateTimeFormat(undefined, {
     weekday: "short",
@@ -220,6 +248,12 @@ function App() {
                   Sign out
                 </button>
               </div>
+
+              {extractError && (
+                <p role="alert" className="mt-4 text-red-700 dark:text-red-400">
+                  {extractError}
+                </p>
+              )}
 
               <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <article className="border border-black p-5 dark:border-white">
