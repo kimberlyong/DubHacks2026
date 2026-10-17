@@ -38,10 +38,10 @@ function DocumentBody({ file, text }) {
     };
   }, [file, ext]);
 
-  const frame = "h-[75vh] w-full border border-black dark:border-white";
+  const frame = "h-[75vh] w-full border border-theme-border";
 
   if (ext === ".pdf" && pdfUrl) {
-    return <iframe title={file.name} src={pdfUrl} className={`${frame} bg-white`} />;
+    return <iframe title={file.name} src={pdfUrl} className={`${frame} bg-theme-surface`} />;
   }
   if (ext === ".docx" && docxHtml) {
     // Sandboxed with no permissions so nothing inside the document can run script.
@@ -50,7 +50,7 @@ function DocumentBody({ file, text }) {
         title={file.name}
         sandbox=""
         srcDoc={`<style>${DOC_STYLE}</style>${docxHtml}`}
-        className={`${frame} bg-white`}
+        className={`${frame} bg-theme-surface`}
       />
     );
   }
@@ -63,7 +63,7 @@ function DocumentBody({ file, text }) {
       tabIndex={0}
       role="region"
       aria-label="Document text"
-      className="max-h-[75vh] overflow-y-auto whitespace-pre-wrap break-words border border-black p-4 leading-relaxed dark:border-white"
+      className="max-h-[75vh] overflow-y-auto whitespace-pre-wrap break-words border border-theme-border bg-theme-surface p-4 leading-relaxed"
     >
       {text}
     </div>
@@ -80,14 +80,14 @@ export default function DocumentViewer({ file, text, onReplace, onRemove }) {
   }
 
   return (
-    <article className="border border-black p-5 dark:border-white">
+    <article className="border border-theme-border bg-theme-surface p-5">
       <header className="mb-4 flex items-start justify-between gap-3">
         <h2 className="min-w-0 break-all text-xl font-semibold">{file.name}</h2>
         <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="flex cursor-pointer items-center gap-1 border border-black px-2 py-1 text-sm focus-visible:outline-2 focus-visible:outline-black dark:border-white dark:focus-visible:outline-white"
+            className="flex cursor-pointer items-center gap-1 border border-theme-border px-2 py-1 text-sm"
           >
             <FileUp aria-hidden="true" className="size-4" />
             Upload new
@@ -96,7 +96,7 @@ export default function DocumentViewer({ file, text, onReplace, onRemove }) {
             type="button"
             aria-label={`Remove ${file.name}`}
             onClick={onRemove}
-            className="cursor-pointer p-1 focus-visible:outline-2 focus-visible:outline-black dark:focus-visible:outline-white"
+            className="cursor-pointer p-1"
           >
             <X aria-hidden="true" className="size-5" />
           </button>

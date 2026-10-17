@@ -26,8 +26,8 @@ export default function StudyOptions({ activeMode, loadingMode, onSelect }) {
               disabled={loading}
               aria-pressed={activeMode === id}
               onClick={() => onSelect(id)}
-              className={`flex cursor-pointer items-center gap-2 border border-black px-3 py-2 text-left hover:bg-neutral-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black disabled:cursor-not-allowed disabled:opacity-50 dark:border-white dark:hover:bg-neutral-900 dark:focus-visible:outline-white ${
-                activeMode === id ? "bg-black text-white hover:bg-black dark:bg-white dark:text-black dark:hover:bg-white" : ""
+              className={`flex cursor-pointer items-center gap-2 border border-theme-border px-3 py-2 text-left hover:bg-theme-border/20 disabled:cursor-not-allowed disabled:opacity-50 ${
+                activeMode === id ? "bg-theme-accent text-theme-on-accent hover:bg-theme-accent" : ""
               }`}
             >
               <Icon aria-hidden="true" className={`size-4 shrink-0 ${loading ? "animate-pulse" : ""}`} />

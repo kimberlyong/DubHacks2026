@@ -15,8 +15,8 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
   return (
     <div>
       <div
-        className={`flex flex-col items-center gap-2 border border-dashed border-black p-6 text-center dark:border-white ${
-          dragging ? "bg-neutral-100 dark:bg-neutral-900" : ""
+        className={`flex flex-col items-center gap-2 border border-dashed border-theme-border p-6 text-center ${
+          dragging ? "bg-theme-border/20" : ""
         }`}
         onDragOver={(e) => {
           e.preventDefault();
@@ -33,7 +33,7 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
         <p>Drag a file here, or</p>
         <button
           type="button"
-          className="cursor-pointer border border-black bg-black px-3 py-2 text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black dark:border-white dark:bg-white dark:text-black dark:focus-visible:outline-white"
+          className="cursor-pointer border border-theme-accent bg-theme-accent px-3 py-2 text-theme-on-accent"
           onClick={() => inputRef.current?.click()}
         >
           {file ? "Replace file" : "Choose a file"}
@@ -47,7 +47,7 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
           accept={ACCEPTED_EXTENSIONS.join(",")}
           onChange={(e) => handleFiles(e.target.files)}
         />
-        <p className="text-sm text-neutral-600 dark:text-neutral-300">PDF, DOCX, TXT, or MD · up to 10 MB</p>
+        <p className="text-sm text-theme-muted">PDF, DOCX, TXT, or MD · up to 10 MB</p>
       </div>
 
       <div aria-live="polite" className="mt-3 text-sm">
@@ -58,7 +58,7 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
           </p>
         )}
         {status === "error" && (
-          <p role="alert" className="text-red-700 dark:text-red-400">
+          <p role="alert" className="bg-theme-urgent-t text-theme-urgent">
             {error}
           </p>
         )}
@@ -68,7 +68,7 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
             <span className="min-w-0 break-all">{file.name}</span>
             <button
               type="button"
-              className="ml-auto shrink-0 cursor-pointer p-1 focus-visible:outline-2 focus-visible:outline-black dark:focus-visible:outline-white"
+              className="ml-auto shrink-0 cursor-pointer p-1"
               aria-label={`Remove ${file.name}`}
               onClick={onRemove}
             >

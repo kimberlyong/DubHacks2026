@@ -26,19 +26,19 @@ export default function StudyPanel({ fileName, documentId, text }) {
   return (
     <aside
       aria-labelledby="study-panel-title"
-      className="flex flex-col border border-black bg-white text-black dark:border-white dark:bg-black dark:text-white"
+      className="flex flex-col border border-theme-border bg-theme-surface text-theme-text"
     >
-      <header className="border-b border-black p-5 dark:border-white">
+      <header className="border-b border-theme-border p-5">
         <h2 id="study-panel-title" className="text-xl font-semibold">
           Study panel
         </h2>
-        <p className="break-all text-sm text-neutral-600 dark:text-neutral-300">{fileName}</p>
+        <p className="break-all text-sm text-theme-muted">{fileName}</p>
       </header>
 
       <div className="space-y-6 p-5">
         <SummarySlider level={level} onChange={setLevel} />
         {text.length < 300 && (
-          <p className="text-sm text-neutral-600 dark:text-neutral-300">
+          <p className="text-sm text-theme-muted">
             This document is very short, so summaries may be close to the original.
           </p>
         )}

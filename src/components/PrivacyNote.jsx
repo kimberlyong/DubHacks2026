@@ -7,20 +7,20 @@ export default function PrivacyNote() {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="mt-5 rounded-xl border border-black/10 bg-black/[0.02] p-4 text-sm dark:border-white/10 dark:bg-white/[0.03]">
+    <div className="mt-5 rounded-xl border border-theme-border bg-theme-surface p-4 text-sm">
       <p className="font-medium">🔒 Your files aren't collected or sold.</p>
-      <p className="mt-1 text-neutral-600 dark:text-neutral-300">
+      <p className="mt-1 text-theme-muted">
         Reading and summarizing happens for your session only.{" "}
         <button
           type="button"
           onClick={() => setOpen((o) => !o)}
-          className="cursor-pointer bg-transparent p-0 font-medium text-accent-dark underline dark:text-accent"
+          className="cursor-pointer bg-transparent p-0 font-medium text-theme-accent underline"
         >
           {open ? "Hide details" : "See exactly what happens to your data"}
         </button>
       </p>
       {open && (
-        <ul className="mt-3 list-disc space-y-1.5 pl-4 text-neutral-600 dark:text-neutral-300">
+        <ul className="mt-3 list-disc space-y-1.5 pl-4 text-theme-muted">
           <li>Your file is read inside your browser — it's never uploaded as a file.</li>
           <li>The extracted text is sent to Gemini only to generate your summary, key terms, or answers.</li>
           <li>History and settings (theme, text size, recent files) live only in your browser's local storage — we never see them.</li>

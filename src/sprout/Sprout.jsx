@@ -42,7 +42,7 @@ export default function Sprout() {
         <div
           role="status"
           aria-live="polite"
-          className="max-w-64 rounded-2xl rounded-br-sm border border-neutral-200 bg-white px-4 py-3 text-sm text-neutral-800 shadow-lg dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100"
+          className="max-w-64 rounded-2xl rounded-br-sm border border-theme-border bg-theme-surface px-4 py-3 text-sm text-theme-text shadow-lg"
         >
           {tipsOpen ? (
             <>
@@ -72,18 +72,18 @@ export default function Sprout() {
       >
         <svg viewBox="0 0 100 110" className="size-full drop-shadow-md">
           {/* body */}
-          <ellipse cx="50" cy="92" rx="22" ry="14" fill="var(--color-accent-dark)" />
+          <ellipse cx="50" cy="92" rx="22" ry="14" fill="var(--accent)" />
           {/* one floppy ear (left), one small round ear (right) — asymmetric on purpose */}
-          <path d="M28 40 Q6 44 10 66 Q14 78 30 68 Z" fill="var(--color-accent)" />
-          <circle cx="76" cy="34" r="10" fill="var(--color-accent)" />
+          <path d="M28 40 Q6 44 10 66 Q14 78 30 68 Z" fill="var(--accent)" />
+          <circle cx="76" cy="34" r="10" fill="var(--accent)" />
           {/* head */}
-          <circle cx="50" cy="52" r="32" fill="var(--color-accent)" />
+          <circle cx="50" cy="52" r="32" fill="var(--accent)" />
           {/* sprout leaves on top of head */}
-          <path d="M46 22 Q38 6 50 2 Q52 16 46 22 Z" fill="#7cc576" />
-          <path d="M54 22 Q64 8 52 2 Q48 16 54 22 Z" fill="#9ad794" />
+          <path d="M46 22 Q38 6 50 2 Q52 16 46 22 Z" fill="var(--action)" />
+          <path d="M54 22 Q64 8 52 2 Q48 16 54 22 Z" fill="var(--accent)" />
           {/* cheeks */}
-          <circle cx="29" cy="58" r="5.5" fill="var(--color-accent-dark)" opacity="0.5" />
-          <circle cx="71" cy="58" r="5.5" fill="var(--color-accent-dark)" opacity="0.5" />
+          <circle cx="29" cy="58" r="5.5" fill="var(--text)" opacity="0.5" />
+          <circle cx="71" cy="58" r="5.5" fill="var(--text)" opacity="0.5" />
           {/* snout patch */}
           <ellipse cx="50" cy="62" rx="13" ry="9" fill="white" opacity="0.92" />
           {/* eyes (blink via CSS animation) */}
@@ -92,8 +92,8 @@ export default function Sprout() {
           {/* nose */}
           <circle cx="50" cy="60" r="2.6" fill="#1a1a1a" />
           {/* paws */}
-          <ellipse cx="36" cy="102" rx="7" ry="5" fill="var(--color-accent-dark)" />
-          <ellipse cx="64" cy="102" rx="7" ry="5" fill="var(--color-accent-dark)" />
+          <ellipse cx="36" cy="102" rx="7" ry="5" fill="var(--accent)" />
+          <ellipse cx="64" cy="102" rx="7" ry="5" fill="var(--accent)" />
         </svg>
       </button>
     </div>
