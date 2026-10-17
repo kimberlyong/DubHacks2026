@@ -12,6 +12,11 @@ import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
 import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
+import {
+  EXTENSION_READY_MESSAGES,
+  UPLOAD_READY_MESSAGES,
+  pick,
+} from "./sprout/messages";
 import { useSprout } from "./sprout/SproutContext";
 
 const textSizes = {
@@ -139,9 +144,9 @@ function App() {
     setHistory(getHistory());
     if (justExtractedRef.current) {
       justExtractedRef.current = false;
-      say("Nice, I grabbed that for you! Ready when you are. ✨", "happy");
+      say(pick(EXTENSION_READY_MESSAGES), "happy");
     } else {
-      say("Got it — let's break this down. 🌱", "happy");
+      say(pick(UPLOAD_READY_MESSAGES), "happy");
     }
   }, [studyDoc.documentId, studyDoc.status, say]);
 
@@ -285,7 +290,7 @@ function App() {
               }}
               className="cursor-pointer bg-transparent p-0 font-bold text-inherit"
             >
-              recap
+              clarity
             </button>
           </div>
           <div className="flex items-center gap-4">
@@ -369,21 +374,15 @@ function App() {
         </header>
 
         <main className="app-main flex-1">
-<<<<<<< HEAD
+          {view === "app" && <CameraRecovery fileName={studyDoc.file?.name} />}
+
           {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
-=======
-          {view === "app" && (
-            <CameraRecovery fileName={studyDoc.file?.name} />
-          )}
-          
-          {view === "home" && <Homepage onGetStarted={() => setView("signin")} />}
->>>>>>> ce36ea486939f9f447654d9ffa3425b910d427fd
 
           {view === "signin" && (
             <section className="signin-section mx-auto max-w-xl py-18">
               <h1 className="signin-title text-3xl font-semibold">Welcome</h1>
               <p className="my-3 mb-5 leading-relaxed text-theme-muted">
-                Sign in to upload your notes and create a recap.
+                Sign in to upload your notes and start studying.
               </p>
               <form onSubmit={handleSignIn}>
                 <label className="mb-2 block" htmlFor="name-input">
@@ -460,7 +459,7 @@ function App() {
                 <div>
                   <h1 className="text-3xl font-semibold">Welcome, {name}.</h1>
                   <p className="mt-3 leading-relaxed text-theme-muted">
-                    Upload a file, then create a recap.
+                    Upload a file and let's make it clear.
                   </p>
                 </div>
               </div>
@@ -544,7 +543,7 @@ function App() {
         </main>
 
         <footer className="site-footer border-t border-theme-border py-4 text-sm text-theme-muted">
-          Recap
+          Clarity
         </footer>
       </div>
       {view === "app" && <Sprout />}

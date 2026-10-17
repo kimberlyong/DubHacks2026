@@ -2,6 +2,7 @@ import { RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePlan } from "../../hooks/usePlan";
 import { savePlan } from "../../lib/savedPlans";
+import { PLAN_DONE_MESSAGES, PLAN_SAVED_MESSAGES, pick } from "../../sprout/messages";
 import { useSprout } from "../../sprout/SproutContext";
 
 const MINUTE_OPTIONS = [15, 30, 45, 60];
@@ -73,7 +74,7 @@ export default function Plan({ documentId, text, fileName }) {
       next.has(index) ? next.delete(index) : next.add(index);
       saveProgress(documentId, next);
       if (steps && next.size === steps.length && prev.size !== steps.length) {
-        say("You finished your plan! That's the whole thing done. 🎉", "happy");
+        say(pick(PLAN_DONE_MESSAGES), "celebrate");
       }
       return next;
     });
@@ -136,7 +137,7 @@ export default function Plan({ documentId, text, fileName }) {
       done: [...done],
     });
     setSaved(true);
-    say("Plan saved — you'll find it under Plans. 📌", "happy");
+    say(pick(PLAN_SAVED_MESSAGES), "happy");
   }
 
   function handleReset() {

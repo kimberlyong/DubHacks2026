@@ -13,7 +13,7 @@ export default function Homepage({ onGetStarted }) {
       <p className="homepage-kicker mb-3 inline-block rounded-full bg-theme-surface px-3 py-1 text-sm font-medium text-theme-accent">
         Built for how ADHD brains actually study
       </p>
-      <h1 className="homepage-title text-4xl font-semibold sm:text-5xl">Recap</h1>
+      <h1 className="homepage-title text-4xl font-semibold sm:text-5xl">Clarity</h1>
       <p className="homepage-description mt-4 max-w-md text-lg leading-relaxed text-theme-muted">
         Big reading assignments, broken into small, doable pieces — with a friendly companion
         keeping you company along the way.

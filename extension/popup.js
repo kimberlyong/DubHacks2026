@@ -42,7 +42,7 @@ button.addEventListener("click", async () => {
       throw new Error(result?.error || "Couldn't find readable content on this page.");
     }
 
-    setStatus(`Found ${result.type.toLowerCase()}: "${result.title}". Sending to Recap…`);
+    setStatus(`Found ${result.type.toLowerCase()}: "${result.title}". Sending to Clarity…`);
 
     const res = await fetch(`${API_URL}/api/extract`, {
       method: "POST",
@@ -53,7 +53,7 @@ button.addEventListener("click", async () => {
     if (!res.ok) throw new Error(data.error ?? `Request failed (${res.status}).`);
 
     await chrome.tabs.create({ url: `${APP_URL}/?extract=${encodeURIComponent(data.id)}` });
-    setStatus("Sent! Opening Recap…");
+    setStatus("Sent! Opening Clarity…");
   } catch (err) {
     setStatus(err.message, true);
   } finally {

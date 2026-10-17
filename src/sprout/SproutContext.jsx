@@ -2,7 +2,9 @@ import { createContext, useCallback, useContext, useRef, useState } from "react"
 
 const SproutContext = createContext(null);
 
-const DEFAULT_DURATION_MS = 4500;
+// Longer messages stay up longer so there's time to read them.
+const MIN_DURATION_MS = 4500;
+const MS_PER_CHAR = 65;
 
 // Shared across the app (and meant for other features to plug into — e.g.
 // the camera/distraction-detection piece can call sprout.say("...", "nudge")
@@ -11,7 +13,7 @@ export function SproutProvider({ children }) {
   const [message, setMessage] = useState(null); // { text, mood } | null
   const timeoutRef = useRef(null);
 
-  const say = useCallback((text, mood = "idle", duration = DEFAULT_DURATION_MS) => {
+  const say = useCallback((text, mood = "idle", duration = Math.max(MIN_DURATION_MS, text.length * MS_PER_CHAR)) => {
     clearTimeout(timeoutRef.current);
     setMessage({ text, mood });
     if (duration) timeoutRef.current = setTimeout(() => setMessage(null), duration);

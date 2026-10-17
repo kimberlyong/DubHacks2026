@@ -1,5 +1,6 @@
 import { Heart, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { streakMessage } from "../../sprout/messages";
 import { useSprout } from "../../sprout/SproutContext";
 import { gradeTyped } from "./grading";
 import { HEIGHT, MAX_LIVES, QUESTION_EVERY, WIDTH, createRunner } from "./runner";
@@ -213,7 +214,7 @@ export default function SproutRunner({ questions, type, onExit }) {
   function handleAnswered(correct) {
     if (correct) {
       streakRef.current += 1;
-      if (streakRef.current % 3 === 0) say(`${streakRef.current} in a row — you're on fire! 🔥`, "happy");
+      if (streakRef.current % 3 === 0) say(streakMessage(streakRef.current), "happy");
     } else {
       streakRef.current = 0;
     }
