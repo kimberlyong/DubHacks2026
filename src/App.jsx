@@ -4,10 +4,12 @@ import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
 import PrivacyNote from "./components/PrivacyNote";
 import DocumentViewer from "./components/DocumentViewer";
+import GamePage from "./components/game/GamePage";
+import SavedPlans from "./components/SavedPlans";
 import StudyPanel from "./components/StudyPanel";
+import CameraRecovery from "./components/CameraRecovery";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
-import { useFaceRecovery } from "./hooks/useFaceRecovery";
 import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
 import { useSprout } from "./sprout/SproutContext";
@@ -20,11 +22,10 @@ const textSizes = {
 
 const themes = [
   { id: "sand", label: "Warm" },
-  { id: "blush", label: "Pink" },
   { id: "mauve", label: "Purple" },
   { id: "sky", label: "Blue" },
-  { id: "mist", label: "Black & white" },
   { id: "dusk", label: "Dark" },
+  { id: "mist", label: "Black & white" },
 ];
 
 function getSavedTheme() {
@@ -65,16 +66,6 @@ function App() {
   const navRef = useRef(null);
   const [page, setPage] = useState("study");
   const [studyMode, setStudyMode] = useState(null);
-
-  // Camera-based focus check-ins. Runs entirely in the browser (no frame is
-  // ever uploaded); Sprout is the only thing that reacts — a quiet nudge
-  // while the student's attention has drifted, and a warmer welcome once
-  // they've actually settled back in.
-  const { enabled: cameraEnabled, setEnabled: setCameraEnabled, status: cameraStatus, error: cameraError } =
-    useFaceRecovery({
-      onDistracted: () => say("Hey, I'm here whenever you're ready to come back. 👀", "nudge"),
-      onReturn: () => say("Welcome back! Let's pick up where you left off. 🌱", "happy"),
-    });
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -118,7 +109,6 @@ function App() {
     setNameInput("");
     handleRemoveFile();
     localStorage.removeItem("recap-name");
-    setCameraEnabled(false);
     setView("home");
   }
 
@@ -199,15 +189,27 @@ function App() {
       setPage("history");
       return;
     }
+    if (target === "plans" || target === "game") {
+      setPage(target);
+      return;
+    }
     setPage("study");
-    // "home" = upload/overview with no tool open
-    setStudyMode(target === "home" ? null : target);
+    // "home" = the Welcome page: upload + past files, no document or tool open
+    if (target === "home") {
+      handleRemoveFile();
+      setHistory(getHistory());
+      setStudyMode(null);
+      return;
+    }
+    setStudyMode(target);
   }
 
   const navItems = [
     { id: "home", label: "Home", needsDoc: false },
     { id: "flashcards", label: "Flashcards", needsDoc: true },
     { id: "ask", label: "Chatbot", needsDoc: true },
+    { id: "game", label: "Game", needsDoc: true },
+    { id: "plans", label: "Plans", needsDoc: false },
     { id: "history", label: "Past documents", needsDoc: false },
   ];
 
@@ -250,8 +252,8 @@ function App() {
                     {navItems.map((item) => {
                       const disabled = item.needsDoc && !ready;
                       const active =
-                        item.id === "history"
-                          ? page === "history"
+                        item.id === "history" || item.id === "plans" || item.id === "game"
+                          ? page === item.id
                           : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
                       return (
                         <button
@@ -290,6 +292,15 @@ function App() {
             {view === "app" && (
               <span className="text-sm text-theme-muted max-[420px]:hidden">{today}</span>
             )}
+            {view === "app" && (
+              <button
+                className="cursor-pointer whitespace-nowrap rounded-lg border border-theme-border bg-theme-surface px-3 py-1 text-sm text-theme-text"
+                type="button"
+                onClick={handleSignOut}
+              >
+                Sign out
+              </button>
+            )}
             <div className="relative" ref={settingsRef}>
               <button
                 type="button"
@@ -307,6 +318,7 @@ function App() {
                   id="settings-panel"
                   className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text shadow-lg"
                 >
+
                   <fieldset>
                     <legend className="mb-2">Color theme</legend>
                     <div className="grid grid-cols-2 gap-2">
@@ -315,6 +327,8 @@ function App() {
                           key={id}
                           type="button"
                           className={`rounded-lg border border-theme-border px-2 py-1 ${
+                            id === "mist" ? "col-span-2" : ""
+                          } ${
                             theme === id
                               ? "bg-theme-accent text-theme-on-accent"
                               : "bg-theme-surface text-theme-text"
@@ -347,33 +361,23 @@ function App() {
                       ))}
                     </div>
                   </fieldset>
-                  {view === "app" && (
-                    <fieldset className="mt-4">
-                      <legend className="mb-2">Camera check-ins</legend>
-                      <button
-                        type="button"
-                        className={`w-full rounded-lg border border-theme-border px-2 py-1 ${
-                          cameraEnabled ? "bg-theme-accent text-theme-on-accent" : "bg-theme-surface text-theme-text"
-                        }`}
-                        aria-pressed={cameraEnabled}
-                        onClick={() => setCameraEnabled((on) => !on)}
-                      >
-                        {cameraEnabled ? "On — Sprout's watching for you" : "Off — turn on Sprout's check-ins"}
-                      </button>
-                      <p className="mt-2 text-xs text-theme-muted">
-                        {cameraEnabled ? cameraStatus : "Processed on your device only — nothing is uploaded."}
-                      </p>
-                      {cameraError && <p className="mt-1 text-xs text-theme-urgent">{cameraError}</p>}
-                    </fieldset>
-                  )}
                 </div>
               )}
             </div>
+
           </div>
         </header>
 
         <main className="app-main flex-1">
+<<<<<<< HEAD
+          {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
+=======
+          {view === "app" && (
+            <CameraRecovery fileName={studyDoc.file?.name} />
+          )}
+          
           {view === "home" && <Homepage onGetStarted={() => setView("signin")} />}
+>>>>>>> ce36ea486939f9f447654d9ffa3425b910d427fd
 
           {view === "signin" && (
             <section className="signin-section mx-auto max-w-xl py-18">
@@ -409,6 +413,18 @@ function App() {
               <PrivacyNote />
             </section>
           )}
+
+          {view === "app" && page === "plans" && <SavedPlans />}
+
+          {view === "app" && page === "game" &&
+            (ready ? (
+              <GamePage documentId={studyDoc.documentId} text={studyDoc.text} fileName={studyDoc.file.name} />
+            ) : (
+              <section className="py-18">
+                <h1 className="text-3xl font-semibold">Sprout Run</h1>
+                <p className="mt-3 text-theme-muted">Upload a document first, then come back to play.</p>
+              </section>
+            ))}
 
           {view === "app" && page === "history" && (
             <section className="py-18">
@@ -447,13 +463,6 @@ function App() {
                     Upload a file, then create a recap.
                   </p>
                 </div>
-                <button
-                  className="cursor-pointer whitespace-nowrap rounded-lg border border-theme-border bg-theme-surface px-3 py-2 text-theme-text"
-                  type="button"
-                  onClick={handleSignOut}
-                >
-                  Sign out
-                </button>
               </div>
 
               {studyDoc.error && (
@@ -479,7 +488,7 @@ function App() {
                       documentId={studyDoc.documentId}
                       text={studyDoc.text}
                       mode={studyMode}
-                      onModeChange={setStudyMode}
+                      onModeChange={(id) => (id === "game" ? setPage("game") : setStudyMode(id))}
                     />
                   </>
                 ) : (
@@ -496,6 +505,7 @@ function App() {
                         />
                       </div>
                     </article>
+
 
                     <article className="dashboard-card rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
                       <h2 className="text-xl font-semibold">Past files</h2>
@@ -521,6 +531,7 @@ function App() {
                           ))}
                         </ul>
                       )}
+
                     </article>
                   </>
                 )}

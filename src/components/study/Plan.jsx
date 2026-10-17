@@ -1,6 +1,7 @@
 import { RotateCcw } from "lucide-react";
 import { useEffect, useState } from "react";
 import { usePlan } from "../../hooks/usePlan";
+import { savePlan } from "../../lib/savedPlans";
 import { useSprout } from "../../sprout/SproutContext";
 
 const MINUTE_OPTIONS = [15, 30, 45, 60];
@@ -56,8 +57,9 @@ function ChipGroup({ options, value, onChange, getLabel = (o) => o }) {
   );
 }
 
-export default function Plan({ documentId, text }) {
+export default function Plan({ documentId, text, fileName }) {
   const { steps, params, status, error, generate, reset } = usePlan({ documentId, text });
+  const [saved, setSaved] = useState(false);
   const [minutes, setMinutes] = useState(30);
   const [energy, setEnergy] = useState("medium");
   const [done, setDone] = useState(() => loadProgress(documentId));
@@ -125,6 +127,23 @@ export default function Plan({ documentId, text }) {
 
   const doneCount = steps.filter((_, i) => done.has(i)).length;
 
+  function handleSave() {
+    savePlan({
+      fileName,
+      minutes: params.minutes,
+      energy: params.energy,
+      steps,
+      done: [...done],
+    });
+    setSaved(true);
+    say("Plan saved — you'll find it under Plans. 📌", "happy");
+  }
+
+  function handleReset() {
+    setSaved(false);
+    reset();
+  }
+
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -132,13 +151,23 @@ export default function Plan({ documentId, text }) {
           {params.minutes} min · {ENERGY_OPTIONS.find((o) => o.id === params.energy)?.label ?? params.energy} energy ·{" "}
           {doneCount}/{steps.length} done
         </p>
-        <button
-          type="button"
-          onClick={reset}
-          className="cursor-pointer bg-transparent p-0 text-sm font-medium text-accent-dark underline dark:text-accent"
-        >
-          Make a new plan
-        </button>
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            disabled={saved}
+            onClick={handleSave}
+            className="cursor-pointer rounded-lg border border-accent-dark bg-accent px-3 py-1 text-sm text-white disabled:cursor-default disabled:opacity-60"
+          >
+            {saved ? "Saved ✓" : "Save plan"}
+          </button>
+          <button
+            type="button"
+            onClick={handleReset}
+            className="cursor-pointer bg-transparent p-0 text-sm font-medium text-accent-dark underline dark:text-accent"
+          >
+            Make a new plan
+          </button>
+        </div>
       </div>
 
       <ol className="space-y-2">

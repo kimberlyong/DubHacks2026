@@ -4,7 +4,7 @@ import { config } from "./config.js";
 import { ApiError } from "./gemini.js";
 import { chat, registerDocument } from "./backboard.js";
 import { buildFlowchart, findImages } from "./visualize.js";
-import { flashcards, keyTerms, plan, summarize, summarizeAll, validateText } from "./study.js";
+import { flashcards, gameQuestions, keyTerms, plan, summarize, summarizeAll, validateText } from "./study.js";
 
 const app = express();
 app.use(express.json({ limit: "3mb" }));
@@ -87,6 +87,12 @@ app.post("/api/plan", route(async (req, res) => {
   const { documentId, text, minutes, energy } = req.body ?? {};
   requireId(documentId);
   return { steps: await plan({ documentId, text, minutes, energy, signal: abortOnClose(req, res) }) };
+}));
+
+app.post("/api/game-questions", route(async (req, res) => {
+  const { documentId, text, type } = req.body ?? {};
+  requireId(documentId);
+  return { questions: await gameQuestions({ documentId, text, type, signal: abortOnClose(req, res) }) };
 }));
 
 // Starts a Backboard assistant + thread for the document (runs in the background).

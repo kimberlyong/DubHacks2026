@@ -167,6 +167,78 @@ export async function keyTerms({ documentId, text, signal }) {
   }
 }
 
+export const GAME_QUESTION_TYPES = ["multiple", "short", "vocab"];
+
+// Questions for the runner game, in one of three styles. Every question has
+// the same base shape — {question, answer} — plus `choices` + `answerIndex`
+// (multiple choice) or `keywords` (short answer) so the client can grade it.
+export async function gameQuestions({ documentId, text, type, signal }) {
+  validateText(text);
+  if (!GAME_QUESTION_TYPES.includes(type)) {
+    throw new ApiError(400, `Type must be one of: ${GAME_QUESTION_TYPES.join(", ")}.`);
+  }
+
+  if (type === "vocab") {
+    const terms = await keyTerms({ documentId, text, signal });
+    if (terms.length === 0) throw new ApiError(502, "Couldn't find any vocab in this document.");
+    return terms.map(({ term, definition }) => ({
+      question: definition,
+      answer: term,
+      keywords: [term],
+    }));
+  }
+
+  const source = await getSource(documentId, text, signal);
+  const spec =
+    type === "multiple"
+      ? `multiple choice. Each item: {"question": string, "choices": array of exactly 4 short strings, "answerIndex": number 0-3 (the correct choice; vary its position)}. Wrong choices should be plausible but clearly wrong according to the document.`
+      : `short answer, answerable in a word or one short phrase. Each item: {"question": string, "answer": string (the ideal short answer), "keywords": array of 1-3 lowercase words that any correct answer must contain}.`;
+
+  const raw = await generate(
+    `Write 12 ${spec}\nQuestions must be about the document's content (not trivia about the document itself), self-contained, and ordered from easier to harder.\n` +
+      `Respond with JSON only: an array of these objects.\n\nDocument:\n---\n${source}`,
+    { json: true, signal },
+  );
+
+  try {
+    const items = JSON.parse(raw);
+    if (!Array.isArray(items)) throw new Error("not an array");
+    const questions =
+      type === "multiple"
+        ? items
+            .filter(
+              (q) =>
+                q &&
+                typeof q.question === "string" &&
+                Array.isArray(q.choices) &&
+                q.choices.length === 4 &&
+                q.choices.every((c) => typeof c === "string") &&
+                Number.isInteger(q.answerIndex) &&
+                q.answerIndex >= 0 &&
+                q.answerIndex < 4,
+            )
+            .map(({ question, choices, answerIndex }) => ({
+              question,
+              choices,
+              answerIndex,
+              answer: choices[answerIndex],
+            }))
+        : items
+            .filter((q) => q && typeof q.question === "string" && typeof q.answer === "string")
+            .map(({ question, answer, keywords }) => ({
+              question,
+              answer,
+              keywords: Array.isArray(keywords)
+                ? keywords.filter((k) => typeof k === "string" && k.trim()).map((k) => k.toLowerCase())
+                : [],
+            }));
+    if (questions.length === 0) throw new Error("no usable questions");
+    return questions;
+  } catch {
+    throw new ApiError(502, "Couldn't read the questions the model returned. Please retry.");
+  }
+}
+
 export async function flashcards({ documentId, text, signal }) {
   validateText(text);
   const source = await getSource(documentId, text, signal);
@@ -195,5 +267,8 @@ export async function flashcards({ documentId, text, signal }) {
     return cards;
   } catch {
     throw new ApiError(502, "Couldn't read the flashcards the model returned. Please retry.");
+  }
+}
+
   }
 }
