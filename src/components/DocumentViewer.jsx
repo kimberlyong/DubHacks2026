@@ -38,7 +38,7 @@ function DocumentBody({ file, text }) {
     };
   }, [file, ext]);
 
-  const frame = "h-[75vh] w-full border border-theme-border";
+  const frame = "h-[75vh] w-full rounded-lg border border-theme-border overflow-hidden";
 
   if (ext === ".pdf" && pdfUrl) {
     return <iframe title={file.name} src={pdfUrl} className={`${frame} bg-theme-surface`} />;
@@ -63,7 +63,7 @@ function DocumentBody({ file, text }) {
       tabIndex={0}
       role="region"
       aria-label="Document text"
-      className="max-h-[75vh] overflow-y-auto whitespace-pre-wrap break-words border border-theme-border bg-theme-surface p-4 leading-relaxed"
+      className="max-h-[75vh] overflow-y-auto whitespace-pre-wrap break-words rounded-lg border border-theme-border bg-theme-surface p-4 leading-relaxed"
     >
       {text}
     </div>
@@ -80,14 +80,14 @@ export default function DocumentViewer({ file, text, onReplace, onRemove }) {
   }
 
   return (
-    <article className="border border-theme-border bg-theme-surface p-5">
+    <article className="rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
       <header className="mb-4 flex items-start justify-between gap-3">
         <h2 className="min-w-0 break-all text-xl font-semibold">{file.name}</h2>
         <div className="flex shrink-0 items-center gap-1">
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="flex cursor-pointer items-center gap-1 border border-theme-border px-2 py-1 text-sm"
+            className="flex cursor-pointer items-center gap-1 rounded-lg border border-theme-border px-2 py-1 text-sm"
           >
             <FileUp aria-hidden="true" className="size-4" />
             Upload new

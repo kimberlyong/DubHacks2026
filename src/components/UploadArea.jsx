@@ -15,7 +15,7 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
   return (
     <div>
       <div
-        className={`flex flex-col items-center gap-2 border border-dashed border-theme-border p-6 text-center ${
+        className={`flex flex-col items-center gap-2 rounded-xl border border-dashed border-theme-border p-6 text-center ${
           dragging ? "bg-theme-border/20" : ""
         }`}
         onDragOver={(e) => {
@@ -33,7 +33,7 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
         <p>Drag a file here, or</p>
         <button
           type="button"
-          className="cursor-pointer border border-theme-accent bg-theme-accent px-3 py-2 text-theme-on-accent"
+          className="cursor-pointer rounded-lg border border-theme-accent bg-theme-accent px-3 py-2 text-theme-on-accent"
           onClick={() => inputRef.current?.click()}
         >
           {file ? "Replace file" : "Choose a file"}
@@ -58,7 +58,7 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
           </p>
         )}
         {status === "error" && (
-          <p role="alert" className="bg-theme-urgent-t text-theme-urgent">
+          <p role="alert" className="rounded-lg bg-theme-urgent-t px-3 py-2 text-theme-urgent">
             {error}
           </p>
         )}

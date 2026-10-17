@@ -15,18 +15,19 @@ const textSizes = {
 };
 
 const themes = [
-  { id: "mist", label: "Black & white (default)" },
+  { id: "sand", label: "Warm (default)" },
   { id: "blush", label: "Blush" },
   { id: "mauve", label: "Mauve" },
   { id: "sky", label: "Light blue" },
   { id: "dusk", label: "Dusk (dark)" },
+  { id: "mist", label: "Black & white" },
 ];
 
 function getSavedTheme() {
   const savedTheme = localStorage.getItem("recap-theme");
   if (themes.some(({ id }) => id === savedTheme)) return savedTheme;
   if (savedTheme === "dark") return "dusk";
-  return "mist";
+  return "sand";
 }
 
 function getSavedTextSize() {
@@ -155,7 +156,7 @@ function App() {
                 aria-label="Select color theme"
                 value={theme}
                 onChange={(event) => handleThemeChange(event.target.value)}
-                className="max-w-36 cursor-pointer border border-theme-border bg-theme-surface px-2 py-1 text-theme-text"
+                className="max-w-36 cursor-pointer rounded-lg border border-theme-border bg-theme-surface px-2 py-1 text-theme-text"
               >
                 {themes.map(({ id, label }) => (
                   <option key={id} value={id}>
@@ -182,7 +183,7 @@ function App() {
                 {settingsOpen && (
                   <div
                     id="settings-panel"
-                    className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text"
+                    className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text shadow-lg"
                   >
                     <fieldset className="mt-4">
                       <legend className="mb-2">Text size</legend>
@@ -239,7 +240,7 @@ function App() {
                     className="w-full min-w-0 rounded-lg border border-theme-border bg-theme-surface px-2 py-2 text-theme-text placeholder:text-theme-muted"
                   />
                   <button
-                    className="rounded-lg border border-theme-accent bg-theme-accent px-3 py-2 text-theme-on-accent"
+                    className="cursor-pointer rounded-lg border border-theme-accent bg-theme-accent px-3 py-2 text-theme-on-accent"
                     type="submit"
                   >
                     Sign in
@@ -260,7 +261,7 @@ function App() {
                   </p>
                 </div>
                 <button
-                  className="whitespace-nowrap rounded-lg border border-theme-border bg-theme-surface px-3 py-2 text-theme-text"
+                  className="cursor-pointer whitespace-nowrap rounded-lg border border-theme-border bg-theme-surface px-3 py-2 text-theme-text"
                   type="button"
                   onClick={handleSignOut}
                 >
@@ -278,7 +279,7 @@ function App() {
               <StudyHistory entries={history} onResume={handleResumeHistory} />
 
               <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <article className="border border-theme-border bg-theme-surface p-5">
+                <article className="rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
                   <h2 className="text-xl font-semibold">Upload a file</h2>
                   <div className="mt-4">
                     <UploadArea
@@ -291,13 +292,13 @@ function App() {
                   </div>
                 </article>
 
-                <article className="border border-theme-border bg-theme-surface p-5">
+                <article className="rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
                   <h2 className="text-xl font-semibold">Create a recap</h2>
                   <p className="my-4 text-theme-muted">
                     Make a summary of your uploaded file.
                   </p>
                   <button
-                    className="border border-theme-border bg-theme-surface px-3 py-2 text-theme-text disabled:cursor-not-allowed disabled:opacity-50"
+                    className="cursor-pointer rounded-lg border border-theme-border bg-theme-surface px-3 py-2 text-theme-text disabled:cursor-not-allowed disabled:opacity-50"
                     type="button"
                     disabled={studyDoc.status !== "ready"}
                     onClick={() => setPanelOpen(true)}
