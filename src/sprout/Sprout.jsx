@@ -66,34 +66,48 @@ export default function Sprout() {
         type="button"
         aria-label="Sprout, your study buddy — click for tips"
         onClick={() => setTipsOpen((open) => !open)}
-        className={`group relative size-16 cursor-pointer rounded-full bg-transparent p-0 transition-transform duration-200 hover:scale-105 ${
+        className={`group relative size-20 cursor-pointer rounded-full bg-transparent p-0 transition-transform duration-200 hover:scale-105 ${
           mood === "nudge" ? "animate-sprout-shake" : "animate-sprout-bob"
         }`}
       >
+        {/* Colors come from --sprout-* vars when a theme sets them (see index.css), else the accent. */}
         <svg viewBox="0 0 100 110" className="size-full drop-shadow-md">
           {/* body */}
-          <ellipse cx="50" cy="92" rx="22" ry="14" fill="var(--accent)" />
+          <ellipse cx="50" cy="92" rx="22" ry="14" fill="var(--sprout-body, var(--accent))" stroke="var(--sprout-outline, none)" strokeWidth="2.5" />
           {/* one floppy ear (left), one small round ear (right) — asymmetric on purpose */}
-          <path d="M28 40 Q6 44 10 66 Q14 78 30 68 Z" fill="var(--accent)" />
-          <circle cx="76" cy="34" r="10" fill="var(--accent)" />
+          <g className="sprout-ears">
+            <path d="M28 40 Q6 44 10 66 Q14 78 30 68 Z" fill="var(--sprout-ear, var(--accent))" />
+            <circle cx="76" cy="34" r="10" fill="var(--sprout-ear, var(--accent))" />
+          </g>
+          {/* round panda ears on top of the head, only shown by themes that ask for them */}
+          <g className="sprout-panda-ears">
+            <circle cx="26" cy="27" r="12" fill="var(--sprout-ear, var(--accent))" />
+            <circle cx="74" cy="27" r="12" fill="var(--sprout-ear, var(--accent))" />
+          </g>
           {/* head */}
-          <circle cx="50" cy="52" r="32" fill="var(--accent)" />
+          <circle cx="50" cy="52" r="32" fill="var(--sprout-body, var(--accent))" stroke="var(--sprout-outline, none)" strokeWidth="2.5" />
           {/* sprout leaves on top of head */}
-          <path d="M46 22 Q38 6 50 2 Q52 16 46 22 Z" fill="var(--action)" />
-          <path d="M54 22 Q64 8 52 2 Q48 16 54 22 Z" fill="var(--accent)" />
+          <path d="M46 22 Q38 6 50 2 Q52 16 46 22 Z" fill="var(--sprout-leaf, var(--action))" />
+          <path d="M54 22 Q64 8 52 2 Q48 16 54 22 Z" fill="var(--sprout-leaf-2, var(--accent))" />
           {/* cheeks */}
-          <circle cx="29" cy="58" r="5.5" fill="var(--text)" opacity="0.5" />
-          <circle cx="71" cy="58" r="5.5" fill="var(--text)" opacity="0.5" />
+          <circle cx="29" cy="58" r="5.5" fill="var(--sprout-cheek, var(--text))" opacity="var(--sprout-cheek-opacity, 0.5)" />
+          <circle cx="71" cy="58" r="5.5" fill="var(--sprout-cheek, var(--text))" opacity="var(--sprout-cheek-opacity, 0.5)" />
           {/* snout patch */}
           <ellipse cx="50" cy="62" rx="13" ry="9" fill="white" opacity="0.92" />
-          {/* eyes (blink via CSS animation) */}
-          <ellipse className="animate-sprout-blink" cx="40" cy="48" rx="4" ry="5.5" fill="#1a1a1a" />
-          <ellipse className="animate-sprout-blink" cx="60" cy="48" rx="4" ry="5.5" fill="#1a1a1a" />
+          {/* eyes (blink via CSS animation), each with a little sparkle */}
+          <g className="animate-sprout-blink">
+            <ellipse cx="40" cy="48" rx="4" ry="5.5" fill="#1a1a1a" />
+            <circle cx="41.5" cy="46" r="1.5" fill="white" />
+          </g>
+          <g className="animate-sprout-blink">
+            <ellipse cx="60" cy="48" rx="4" ry="5.5" fill="#1a1a1a" />
+            <circle cx="61.5" cy="46" r="1.5" fill="white" />
+          </g>
           {/* nose */}
           <circle cx="50" cy="60" r="2.6" fill="#1a1a1a" />
           {/* paws */}
-          <ellipse cx="36" cy="102" rx="7" ry="5" fill="var(--accent)" />
-          <ellipse cx="64" cy="102" rx="7" ry="5" fill="var(--accent)" />
+          <ellipse cx="36" cy="102" rx="7" ry="5" fill="var(--sprout-ear, var(--accent))" />
+          <ellipse cx="64" cy="102" rx="7" ry="5" fill="var(--sprout-ear, var(--accent))" />
         </svg>
       </button>
     </div>
