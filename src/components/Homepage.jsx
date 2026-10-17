@@ -1,8 +1,10 @@
+import { FileUp, Puzzle, Sprout, TextSearch } from "lucide-react";
+
 const FEATURES = [
-  { icon: "📄", title: "Upload anything", body: "A reading, slides, or notes — pick your time and energy, and it's broken into small steps." },
-  { icon: "🧩", title: "Canvas extension", body: "Pull an assignment, syllabus, or lecture page straight out of Canvas with one click." },
-  { icon: "🔎", title: "Simplify on demand", body: "Slide from a quick overview to the full detail, or select any sentence for an explanation." },
-  { icon: "🌱", title: "Sprout's got you", body: "A quiet study companion with tips, encouragement, and a nudge when it's time to refocus." },
+  { icon: FileUp, title: "Upload anything", body: "A reading, slides, or notes — pick your time and energy, and it's broken into small steps." },
+  { icon: Puzzle, title: "Canvas extension", body: "Pull an assignment, syllabus, or lecture page straight out of Canvas with one click." },
+  { icon: TextSearch, title: "Simplify on demand", body: "Slide from a quick overview to the full detail, or select any sentence for an explanation." },
+  { icon: Sprout, title: "Sprout's got you", body: "A quiet study companion with tips, encouragement, and a nudge when it's time to refocus." },
 ];
 
 export default function Homepage({ onGetStarted }) {
@@ -27,7 +29,7 @@ export default function Homepage({ onGetStarted }) {
       <div className="homepage-features mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2">
         {FEATURES.map((f) => (
           <article key={f.title} className="homepage-feature rounded-xl border border-theme-border p-4">
-            <div className="homepage-feature-icon text-2xl" aria-hidden="true">{f.icon}</div>
+            <f.icon className="homepage-feature-icon" aria-hidden="true" />
             <h2 className="homepage-feature-title mt-2 font-semibold">{f.title}</h2>
             <p className="homepage-feature-body mt-1 text-sm text-theme-muted">{f.body}</p>
           </article>

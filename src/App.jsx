@@ -1,3 +1,4 @@
+import { Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
@@ -18,13 +19,12 @@ const textSizes = {
 };
 
 const themes = [
-  { id: "mist", label: "Black & white (default)" },
-  { id: "sand", label: "Warm (default)" },
-  { id: "blush", label: "Blush" },
-  { id: "mauve", label: "Mauve" },
-  { id: "sky", label: "Light blue" },
-  { id: "dusk", label: "Dusk (dark)" },
+  { id: "sand", label: "Warm" },
+  { id: "blush", label: "Pink" },
+  { id: "mauve", label: "Purple" },
+  { id: "sky", label: "Blue" },
   { id: "mist", label: "Black & white" },
+  { id: "dusk", label: "Dark" },
 ];
 
 function getSavedTheme() {
@@ -276,66 +276,71 @@ function App() {
             </button>
           </div>
           <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 text-sm text-theme-muted">
-              <span className="max-[520px]:hidden">Color theme</span>
-              <select
-                aria-label="Select color theme"
-                value={theme}
-                onChange={(event) => handleThemeChange(event.target.value)}
-                className="max-w-36 cursor-pointer rounded-lg border border-theme-border bg-theme-surface px-2 py-1 text-theme-text"
-              >
-                {themes.map(({ id, label }) => (
-                  <option key={`${id}-${label}`} value={id}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
             {view === "app" && (
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-theme-muted max-[420px]:hidden">
-                {today}
-              </span>
-              <div className="relative" ref={settingsRef}>
-                <button
-                  type="button"
-                  className="cursor-pointer bg-transparent py-1 text-inherit"
-                  aria-expanded={settingsOpen}
-                  aria-controls="settings-panel"
-                  onClick={() => setSettingsOpen((open) => !open)}
-                >
-                  Settings
-                </button>
-                {settingsOpen && (
-                  <div
-                    id="settings-panel"
-                    className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text shadow-lg"
-                  >
-                    <fieldset className="mt-4">
-                      <legend className="mb-2">Text size</legend>
-                      <div className="flex gap-2">
-                        {Object.keys(textSizes).map((option) => (
-                          <button
-                            key={option}
-                            type="button"
-                            className={`flex-1 rounded-lg border border-theme-border px-2 py-1 capitalize ${
-                              textSize === option
-                                ? "bg-theme-accent text-theme-on-accent"
-                                : "bg-theme-surface text-theme-text"
-                            }`}
-                            aria-pressed={textSize === option}
-                            onClick={() => handleTextSizeChange(option)}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    </fieldset>
-                  </div>
-                )}
-              </div>
-              </div>
+              <span className="text-sm text-theme-muted max-[420px]:hidden">{today}</span>
             )}
+            <div className="relative" ref={settingsRef}>
+              <button
+                type="button"
+                aria-label="Settings"
+                title="Settings"
+                className="flex cursor-pointer items-center bg-transparent p-1 text-inherit"
+                aria-expanded={settingsOpen}
+                aria-controls="settings-panel"
+                onClick={() => setSettingsOpen((open) => !open)}
+              >
+                <Settings aria-hidden="true" className="size-6" />
+              </button>
+              {settingsOpen && (
+                <div
+                  id="settings-panel"
+                  className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text shadow-lg"
+                >
+
+                  <fieldset>
+                    <legend className="mb-2">Color theme</legend>
+                    <div className="grid grid-cols-2 gap-2">
+                      {themes.map(({ id, label }) => (
+                        <button
+                          key={id}
+                          type="button"
+                          className={`rounded-lg border border-theme-border px-2 py-1 ${
+                            theme === id
+                              ? "bg-theme-accent text-theme-on-accent"
+                              : "bg-theme-surface text-theme-text"
+                          }`}
+                          aria-pressed={theme === id}
+                          onClick={() => handleThemeChange(id)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <fieldset className="mt-4">
+                    <legend className="mb-2">Text size</legend>
+                    <div className="flex gap-2">
+                      {Object.keys(textSizes).map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          className={`flex-1 rounded-lg border border-theme-border px-2 py-1 capitalize ${
+                            textSize === option
+                              ? "bg-theme-accent text-theme-on-accent"
+                              : "bg-theme-surface text-theme-text"
+                          }`}
+                          aria-pressed={textSize === option}
+                          onClick={() => handleTextSizeChange(option)}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                </div>
+              )}
+            </div>
+
           </div>
         </header>
 
@@ -435,7 +440,7 @@ function App() {
 
               <ExtensionBanner />
 
-              <div className={`dashboard-cards mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-2" : ""}`}>
+              <div className={`dashboard-cards mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-[3fr_2fr]" : "lg:grid-cols-2"}`}>
                 {ready ? (
                   <>
                     <DocumentViewer
@@ -468,27 +473,32 @@ function App() {
                       </div>
                     </article>
 
-                    <article className="dashboard-card border border-theme-border bg-theme-surface p-5">
-                      <h2 className="text-xl font-semibold">Create a recap</h2>
-                      <p className="my-4 text-theme-muted">
-                        Make a summary of your uploaded file.
-                      </p>
-                      <button
-                        className="border border-theme-border bg-theme-surface px-3 py-2 text-theme-text disabled:cursor-not-allowed disabled:opacity-50"
-                        type="button"
-                        disabled={studyDoc.status !== "ready"}
-                        onClick={() => setStudyMode("ask")}
-                      >
-                        Open study panel
-                      </button>
-                      <p
-                        className="mt-3 text-sm text-theme-muted"
-                        aria-live="polite"
-                      >
-                        {studyDoc.status === "ready"
-                          ? "Your file is ready to study."
-                          : "Your recap starts with an upload."}
-                      </p>
+
+                    <article className="dashboard-card rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
+                      <h2 className="text-xl font-semibold">Past files</h2>
+                      {history.length === 0 ? (
+                        <p className="mt-4 text-theme-muted">
+                          Nothing here yet. Files you upload will show up here.
+                        </p>
+                      ) : (
+                        <ul className="mt-4 max-h-96 space-y-2 overflow-y-auto">
+                          {history.map((entry) => (
+                            <li key={entry.fileName + entry.savedAt}>
+                              <button
+                                type="button"
+                                onClick={() => handleResumeHistory(entry)}
+                                className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-theme-border px-4 py-3 text-left hover:bg-theme-border/20"
+                              >
+                                <span className="min-w-0 truncate font-medium">{entry.fileName}</span>
+                                <span className="shrink-0 text-xs text-theme-muted">
+                                  {relativeTime(entry.savedAt)}
+                                </span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
+
                     </article>
                   </>
                 )}
