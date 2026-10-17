@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import StudyPanel from "./components/StudyPanel";
+import UploadArea from "./components/UploadArea";
+import { useDocument } from "./hooks/useDocument";
 
 const textSizes = {
   small: "text-sm",
@@ -18,8 +21,8 @@ function App() {
     () => (localStorage.getItem("recap-theme") === "dark" ? "dark" : "light"),
   );
   const [textSize, setTextSize] = useState(getSavedTextSize);
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [recapStatus, setRecapStatus] = useState("Your recap starts with an upload.");
+  const studyDoc = useDocument();
+  const [panelOpen, setPanelOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
 
@@ -58,8 +61,7 @@ function App() {
   function handleSignOut() {
     setName("");
     setNameInput("");
-    setSelectedFile(null);
-    setRecapStatus("Your recap starts with an upload.");
+    handleRemoveFile();
     localStorage.removeItem("recap-name");
   }
 
@@ -73,25 +75,20 @@ function App() {
     localStorage.setItem("recap-size", nextSize);
   }
 
-  function handleFileChange(event) {
-    const file = event.target.files?.[0];
-    if (!file) {
-      return;
-    }
-
-    setSelectedFile(file);
-    setRecapStatus("Your file is ready for a recap.");
+  async function handleSelectFile(file) {
+    setPanelOpen(false);
+    await studyDoc.upload(file);
   }
 
-  function handleCreateRecap() {
-    if (!selectedFile) {
-      return;
-    }
-
-    setRecapStatus(
-      "Upload complete. Recap generation can be connected to your service here.",
-    );
+  function handleRemoveFile() {
+    setPanelOpen(false);
+    studyDoc.remove();
   }
+
+  // Open the panel as soon as a document finishes extracting.
+  useEffect(() => {
+    if (studyDoc.status === "ready") setPanelOpen(true);
+  }, [studyDoc.documentId, studyDoc.status]);
 
   const today = new Intl.DateTimeFormat(undefined, {
     weekday: "short",
@@ -227,32 +224,15 @@ function App() {
               <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <article className="border border-black p-5 dark:border-white">
                   <h2 className="text-xl font-semibold">Upload a file</h2>
-                  <p className="my-4 text-neutral-600 dark:text-neutral-300">
-                    Choose a document to get started.
-                  </p>
-                  <label
-                    className="inline-block cursor-pointer border border-black bg-black px-3 py-2 text-white dark:border-white dark:bg-white dark:text-black"
-                    htmlFor="file-input"
-                  >
-                    Choose a file
-                  </label>
-                  <input
-                    className="sr-only"
-                    id="file-input"
-                    type="file"
-                    accept=".pdf,.txt,.doc,.docx,.md"
-                    onChange={handleFileChange}
-                  />
-                  <p
-                    className={`mt-3 break-all text-sm ${
-                      selectedFile
-                        ? "text-black dark:text-white"
-                        : "text-neutral-600 dark:text-neutral-300"
-                    }`}
-                    aria-live="polite"
-                  >
-                    {selectedFile?.name ?? "PDF, DOCX, TXT, or MD"}
-                  </p>
+                  <div className="mt-4">
+                    <UploadArea
+                      file={studyDoc.file}
+                      status={studyDoc.status}
+                      error={studyDoc.error}
+                      onSelect={handleSelectFile}
+                      onRemove={handleRemoveFile}
+                    />
+                  </div>
                 </article>
 
                 <article className="border border-black p-5 dark:border-white">
@@ -263,16 +243,18 @@ function App() {
                   <button
                     className="border border-black bg-white px-3 py-2 text-black disabled:cursor-not-allowed disabled:opacity-50 dark:border-white dark:bg-black dark:text-white"
                     type="button"
-                    disabled={!selectedFile}
-                    onClick={handleCreateRecap}
+                    disabled={studyDoc.status !== "ready"}
+                    onClick={() => setPanelOpen(true)}
                   >
-                    Create a recap
+                    Open study panel
                   </button>
                   <p
                     className="mt-3 text-sm text-neutral-600 dark:text-neutral-300"
                     aria-live="polite"
                   >
-                    {recapStatus}
+                    {studyDoc.status === "ready"
+                      ? "Your file is ready to study."
+                      : "Your recap starts with an upload."}
                   </p>
                 </article>
               </div>
@@ -287,6 +269,16 @@ function App() {
           Recap
         </footer>
       </div>
+      {studyDoc.status === "ready" && (
+        <StudyPanel
+          key={studyDoc.documentId}
+          open={panelOpen}
+          fileName={studyDoc.file.name}
+          documentId={studyDoc.documentId}
+          text={studyDoc.text}
+          onClose={() => setPanelOpen(false)}
+        />
+      )}
     </div>
   );
 }
