@@ -1,4 +1,4 @@
-import { Settings } from "lucide-react";
+import { Check, Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
@@ -25,11 +25,12 @@ const textSizes = {
 };
 
 const themes = [
-  { id: "sand", label: "Warm" },
-  { id: "mauve", label: "Purple" },
-  { id: "sky", label: "Blue" },
-  { id: "dusk", label: "Dark" },
-  { id: "mist", label: "Black & white" },
+  // bg + accent are only for the little swatch in the settings menu.
+  { id: "sand", label: "Warm", bg: "#faf6f0", accent: "#c0753f" },
+  { id: "mauve", label: "Purple", bg: "#f7eef1", accent: "#a9829c" },
+  { id: "sky", label: "Blue", bg: "#edf6fc", accent: "#4e84a8" },
+  { id: "dusk", label: "Dark", bg: "#1e2328", accent: "#78aee8" },
+  { id: "mist", label: "Black & white", bg: "#ffffff", accent: "#000000" },
 ];
 
 function getSavedTheme() {
@@ -210,8 +211,6 @@ function App() {
 
   const navItems = [
     { id: "home", label: "Home", needsDoc: false },
-    { id: "flashcards", label: "Flashcards", needsDoc: true },
-    { id: "ask", label: "Chatbot", needsDoc: true },
     { id: "game", label: "Game", needsDoc: true },
     { id: "plans", label: "Plans", needsDoc: false },
     { id: "history", label: "Past documents", needsDoc: false },
@@ -324,38 +323,45 @@ function App() {
                 >
 
                   <fieldset>
-                    <legend className="mb-2">Color theme</legend>
-                    <div className="grid grid-cols-2 gap-2">
-                      {themes.map(({ id, label }) => (
+                    <legend className="mb-2 text-sm font-semibold">Theme</legend>
+                    <div className="flex flex-col gap-1">
+                      {themes.map(({ id, label, bg, accent }) => (
                         <button
                           key={id}
                           type="button"
-                          className={`rounded-lg border border-theme-border px-2 py-1 ${
-                            id === "mist" ? "col-span-2" : ""
-                          } ${
+                          className={`flex w-full cursor-pointer items-center gap-3 rounded-lg border px-2 py-1.5 text-left ${
                             theme === id
-                              ? "bg-theme-accent text-theme-on-accent"
-                              : "bg-theme-surface text-theme-text"
+                              ? "border-theme-accent bg-theme-border/30"
+                              : "border-transparent bg-transparent hover:bg-theme-border/30"
                           }`}
                           aria-pressed={theme === id}
                           onClick={() => handleThemeChange(id)}
                         >
-                          {label}
+                          <span
+                            aria-hidden="true"
+                            className="relative size-6 shrink-0 overflow-hidden rounded-full border border-theme-border"
+                            style={{ background: bg }}
+                          >
+                            <span className="absolute bottom-0 right-0 size-3 rounded-tl-full" style={{ background: accent }} />
+                          </span>
+                          <span className="flex-1">{label}</span>
+                          {theme === id && <Check aria-hidden="true" className="size-4 text-theme-accent" />}
                         </button>
                       ))}
                     </div>
                   </fieldset>
-                  <fieldset className="mt-4">
-                    <legend className="mb-2">Text size</legend>
-                    <div className="flex gap-2">
+                  <fieldset className="mt-4 border-t border-theme-border pt-4">
+                    <legend className="sr-only">Text size</legend>
+                    <p aria-hidden="true" className="mb-2 text-sm font-semibold">Text size</p>
+                    <div className="flex rounded-lg border border-theme-border p-0.5">
                       {Object.keys(textSizes).map((option) => (
                         <button
                           key={option}
                           type="button"
-                          className={`flex-1 rounded-lg border border-theme-border px-2 py-1 capitalize ${
+                          className={`flex-1 cursor-pointer rounded-md px-2 py-1 text-sm capitalize ${
                             textSize === option
                               ? "bg-theme-accent text-theme-on-accent"
-                              : "bg-theme-surface text-theme-text"
+                              : "bg-transparent text-theme-text hover:bg-theme-border/30"
                           }`}
                           aria-pressed={textSize === option}
                           onClick={() => handleTextSizeChange(option)}
@@ -377,10 +383,7 @@ function App() {
 
           {view === "signin" && (
             <section className="signin-section mx-auto max-w-xl py-18">
-              <h1 className="signin-title text-3xl font-semibold">Welcome</h1>
-              <p className="my-3 mb-5 leading-relaxed text-theme-muted">
-                Sign in to upload your notes and start studying.
-              </p>
+              <h1 className="signin-title mb-5 text-3xl font-semibold">Welcome</h1>
               <form onSubmit={handleSignIn}>
                 <label className="mb-2 block" htmlFor="name-input">
                   Name
@@ -529,9 +532,6 @@ function App() {
                   </>
                 )}
               </div>
-              <p className="mt-5 text-sm text-theme-muted">
-                Files stay in this browser demo.
-              </p>
             </section>
           )}
         </main>

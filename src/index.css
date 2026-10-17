@@ -630,7 +630,8 @@ select:focus-visible {
   border-radius: 999px;
 }
 
-.app-main > section:not(.homepage) .flashcard-face {
+.app-main > section:not(.homepage) .flashcard-face,
+.app-main > section:not(.homepage) .card-button {
   border-radius: 1rem;
 }
 

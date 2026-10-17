@@ -1,7 +1,7 @@
 import { FileUp, Puzzle, Sprout, TextSearch } from "lucide-react";
 
 const FEATURES = [
-  { icon: FileUp, title: "Upload anything", body: "A reading, slides, or notes — pick your time and energy, and it's broken into small steps." },
+  { icon: FileUp, title: "Upload anything", body: "A reading, slides, or notes. Pick your time and energy, and it's broken into small steps." },
   { icon: Puzzle, title: "Canvas extension", body: "Pull an assignment, syllabus, or lecture page straight out of Canvas with one click." },
   { icon: TextSearch, title: "Simplify on demand", body: "Slide from a quick overview to the full detail, or select any sentence for an explanation." },
   { icon: Sprout, title: "Sprout's got you", body: "A quiet study companion with tips, encouragement, and a nudge when it's time to refocus." },
@@ -15,7 +15,7 @@ export default function Homepage({ onGetStarted }) {
       </p>
       <h1 className="homepage-title text-4xl font-semibold sm:text-5xl">Clarity</h1>
       <p className="homepage-description mt-4 max-w-md text-lg leading-relaxed text-theme-muted">
-        Big reading assignments, broken into small, doable pieces — with a friendly companion
+        Big reading assignments, broken into small, doable pieces, with a friendly companion
         keeping you company along the way.
       </p>
       <button

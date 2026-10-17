@@ -269,6 +269,3 @@ export async function flashcards({ documentId, text, signal }) {
     throw new ApiError(502, "Couldn't read the flashcards the model returned. Please retry.");
   }
 }
-
-  }
-}

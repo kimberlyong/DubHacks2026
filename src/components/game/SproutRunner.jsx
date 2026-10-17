@@ -54,7 +54,7 @@ function QuestionCard({ question, type, number, onDone }) {
   return (
     <div className="rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
       <p className="text-sm text-theme-muted">
-        Checkpoint {number} — answer to keep running
+        Checkpoint {number}
       </p>
       <h2 className="mt-1 text-lg font-semibold">
         {type === "vocab" ? "Which term matches this definition?" : question.question}
