@@ -196,13 +196,7 @@ function DocumentBody({ file, text }) {
 
   const frame = "h-[75vh] w-full border border-theme-border";
 
-<<<<<<< Updated upstream
-  if (ext === ".pdf" && pdfUrl) {
-    return <iframe title={file.name} src={pdfUrl} className={`${frame} bg-theme-surface`} />;
-  }
-=======
   if (ext === ".pdf") return <PdfBody file={file} />;
->>>>>>> Stashed changes
   if (ext === ".docx" && docxHtml) {
     // Sandboxed with no permissions so nothing inside the document can run script.
     return (

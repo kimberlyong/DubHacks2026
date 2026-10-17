@@ -2,22 +2,13 @@ import { useEffect, useRef, useState } from "react";
 import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
 import PrivacyNote from "./components/PrivacyNote";
-<<<<<<< Updated upstream
-=======
-import StudyHistory from "./components/StudyHistory";
 import DocumentViewer from "./components/DocumentViewer";
->>>>>>> Stashed changes
 import StudyPanel from "./components/StudyPanel";
-import StudyHistory from "./components/StudyHistory";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
-<<<<<<< Updated upstream
-import { getHistory } from "./lib/studyHistory";
-=======
 import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
 import { useSprout } from "./sprout/SproutContext";
->>>>>>> Stashed changes
 
 const textSizes = {
   small: "text-sm",
@@ -65,15 +56,12 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
   const [history, setHistory] = useState(getHistory);
-<<<<<<< Updated upstream
-=======
   const { say } = useSprout();
   const justExtractedRef = useRef(false);
   const [navOpen, setNavOpen] = useState(false);
   const navRef = useRef(null);
   const [page, setPage] = useState("study");
   const [studyMode, setStudyMode] = useState(null);
->>>>>>> Stashed changes
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -133,11 +121,6 @@ function App() {
   async function handleSelectFile(file) {
     await studyDoc.upload(file);
     setHistory(getHistory());
-  }
-
-  function handleResumeHistory(entry) {
-    studyDoc.loadText(entry.text, entry.fileName, entry.source);
-    setPanelOpen(true);
   }
 
   function handleRemoveFile() {
@@ -226,40 +209,9 @@ function App() {
       className={`min-h-screen bg-theme-bg text-theme-text ${textSizes[textSize]}`}
     >
       <div
-<<<<<<< Updated upstream
-        className={`mx-auto flex min-h-screen w-full flex-col px-6 ${studyDoc.status === "ready" && name ? "max-w-7xl" : "max-w-4xl"}`}
-      >
-        <header className="flex min-h-16 items-center justify-between border-b border-theme-border">
-          <button
-            type="button"
-            onClick={() => setView(name ? "app" : "home")}
-            className="cursor-pointer bg-transparent p-0 font-bold text-inherit"
-          >
-            recap
-          </button>
-          <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 text-sm text-theme-muted">
-              <span className="max-[520px]:hidden">Color theme</span>
-              <select
-                aria-label="Select color theme"
-                value={theme}
-                onChange={(event) => handleThemeChange(event.target.value)}
-                className="max-w-36 cursor-pointer border border-theme-border bg-theme-surface px-2 py-1 text-theme-text"
-              >
-                {themes.map(({ id, label }) => (
-                  <option key={id} value={id}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            {view === "app" && (
-              <div className="flex items-center gap-4">
-              <span className="text-sm text-theme-muted max-[420px]:hidden">
-=======
         className={`mx-auto flex min-h-screen w-full flex-col px-6 ${ready && view === "app" ? "max-w-7xl" : "max-w-4xl"}`}
       >
-        <header className="flex min-h-16 items-center justify-between border-b border-black dark:border-white">
+        <header className="flex min-h-16 items-center justify-between border-b border-theme-border">
           <div className="flex items-center gap-4">
             {view === "app" && (
               <div className="relative" ref={navRef}>
@@ -279,7 +231,7 @@ function App() {
                   <nav
                     id="nav-menu"
                     aria-label="Pages"
-                    className="absolute left-0 top-full z-10 mt-2 w-56 rounded-xl border border-black bg-white p-2 text-black dark:border-white dark:bg-black dark:text-white"
+                    className="absolute left-0 top-full z-10 mt-2 w-56 rounded-xl border border-theme-border bg-theme-surface p-2 text-theme-text"
                   >
                     {navItems.map((item) => {
                       const disabled = item.needsDoc && !ready;
@@ -297,8 +249,8 @@ function App() {
                           onClick={() => navigate(item.id)}
                           className={`block w-full rounded-lg px-3 py-2 text-left disabled:cursor-not-allowed disabled:opacity-40 ${
                             active
-                              ? "bg-black text-white dark:bg-white dark:text-black"
-                              : "bg-transparent hover:bg-black/5 dark:hover:bg-white/10"
+                              ? "bg-theme-accent text-theme-on-accent"
+                              : "bg-transparent hover:bg-theme-border/30"
                           }`}
                         >
                           {item.label}
@@ -320,10 +272,25 @@ function App() {
               recap
             </button>
           </div>
-          {view === "app" && (
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-neutral-600 dark:text-neutral-300 max-[420px]:hidden">
->>>>>>> Stashed changes
+          <div className="flex items-center gap-4">
+            <label className="flex items-center gap-2 text-sm text-theme-muted">
+              <span className="max-[520px]:hidden">Color theme</span>
+              <select
+                aria-label="Select color theme"
+                value={theme}
+                onChange={(event) => handleThemeChange(event.target.value)}
+                className="max-w-36 cursor-pointer border border-theme-border bg-theme-surface px-2 py-1 text-theme-text"
+              >
+                {themes.map(({ id, label }) => (
+                  <option key={id} value={id}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {view === "app" && (
+              <div className="flex items-center gap-4">
+                <span className="text-sm text-theme-muted max-[420px]:hidden">
                 {today}
               </span>
               <div className="relative" ref={settingsRef}>
@@ -411,7 +378,7 @@ function App() {
             <section className="py-18">
               <h1 className="text-3xl font-semibold">Past documents</h1>
               {history.length === 0 ? (
-                <p className="mt-3 text-neutral-600 dark:text-neutral-300">
+                <p className="mt-3 text-theme-muted">
                   Nothing here yet. Upload a document and it will show up here.
                 </p>
               ) : (
@@ -440,13 +407,8 @@ function App() {
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h1 className="text-3xl font-semibold">Welcome, {name}.</h1>
-<<<<<<< Updated upstream
                   <p className="mt-3 leading-relaxed text-theme-muted">
-                    Upload a file to read it next to your study panel.
-=======
-                  <p className="mt-3 leading-relaxed text-neutral-600 dark:text-neutral-300">
                     Upload a file, then create a recap.
->>>>>>> Stashed changes
                   </p>
                 </div>
                 <button
@@ -465,46 +427,7 @@ function App() {
               )}
 
               <ExtensionBanner />
-              <StudyHistory entries={history} onResume={handleResumeHistory} />
 
-<<<<<<< Updated upstream
-              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <article className="border border-theme-border bg-theme-surface p-5">
-                  <h2 className="text-xl font-semibold">Upload a file</h2>
-                  <div className="mt-4">
-                    <UploadArea
-                      file={studyDoc.file}
-                      status={studyDoc.status}
-                      error={studyDoc.error}
-                      onSelect={handleSelectFile}
-                      onRemove={handleRemoveFile}
-                    />
-                  </div>
-                </article>
-
-                <article className="border border-theme-border bg-theme-surface p-5">
-                  <h2 className="text-xl font-semibold">Create a recap</h2>
-                  <p className="my-4 text-theme-muted">
-                    Make a summary of your uploaded file.
-                  </p>
-                  <button
-                    className="border border-theme-border bg-theme-surface px-3 py-2 text-theme-text disabled:cursor-not-allowed disabled:opacity-50"
-                    type="button"
-                    disabled={studyDoc.status !== "ready"}
-                    onClick={() => setPanelOpen(true)}
-                  >
-                    Open study panel
-                  </button>
-                  <p
-                    className="mt-3 text-sm text-theme-muted"
-                    aria-live="polite"
-                  >
-                    {studyDoc.status === "ready"
-                      ? "Your file is ready to study."
-                      : "Your recap starts with an upload."}
-                  </p>
-                </article>
-=======
               <div className={`mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-2" : ""}`}>
                 {ready ? (
                   <DocumentViewer
@@ -514,7 +437,7 @@ function App() {
                     onRemove={handleRemoveFile}
                   />
                 ) : (
-                  <article className="rounded-xl border border-black p-5 dark:border-white">
+                  <article className="rounded-xl border border-theme-border bg-theme-surface p-5">
                     <h2 className="text-xl font-semibold">Upload a file</h2>
                     <div className="mt-4">
                       <UploadArea
@@ -538,7 +461,6 @@ function App() {
                     onModeChange={setStudyMode}
                   />
                 )}
->>>>>>> Stashed changes
               </div>
               <p className="mt-5 text-sm text-theme-muted">
                 Files stay in this browser demo.
