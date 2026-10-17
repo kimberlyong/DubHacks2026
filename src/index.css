@@ -22,27 +22,6 @@
   --reflect-t: #eee;
 }
 
-[data-theme="blush"] {
-  color-scheme: light;
-  --bg: #f4ebe1;
-  --surface: #faf5ee;
-  --text: #2e0509;
-  --muted: #6b4a4a;
-  --border: #e0bfc8;
-  --accent: #be8272;
-  --on-accent: #2e0509;
-  --urgent: #8a2f2b;
-  --urgent-t: #f2d3d0;
-  --concept: #3f5f82;
-  --concept-t: #d9e3ec;
-  --action: #56602f;
-  --action-t: #dde3c2;
-  --review: #7a5a10;
-  --review-t: #f3e2b8;
-  --reflect: #7a4a6a;
-  --reflect-t: #ebd5e3;
-}
-
 [data-theme="mauve"] {
   color-scheme: light;
   --bg: #f7eef1;
