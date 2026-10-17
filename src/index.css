@@ -41,12 +41,13 @@
   --review-t: #eee;
   --reflect: #111;
   --reflect-t: #eee;
-  /* Sprout as a little panda instead of a solid black blob */
+  /* Sprout as a panda cub instead of a solid black blob */
   --sprout-body: #fff;
   --sprout-outline: #1a1a1a;
   --sprout-ear: #1a1a1a;
   --sprout-ear-rim: #fff;
   --sprout-ear-inner: #f5a3b5;
+  --sprout-ear-inner-opacity: 1;
   --sprout-leaf: #6a6a6a;
   --sprout-leaf-2: #b5b5b5;
   --sprout-cheek: #f5a3b5;
@@ -747,16 +748,6 @@ input,
 @keyframes sprout-blink {
   0%, 92%, 100% { transform: scaleY(1); }
   96% { transform: scaleY(0.1); }
-}
-
-.sprout-panda-ears {
-  display: none;
-}
-[data-theme="mist"] .sprout-ears {
-  display: none;
-}
-[data-theme="mist"] .sprout-panda-ears {
-  display: inline;
 }
 
 .animate-sprout-bob {

@@ -100,23 +100,17 @@ export default function Sprout() {
           mood === "nudge" ? "animate-sprout-shake" : "animate-sprout-bob"
         }`}
       >
-        {/* Colors come from --sprout-* vars when a theme sets them (see index.css), else the accent. */}
+        {/* Sprout is a little bear cub with a sprout growing on its head. Colors come from
+            --sprout-* vars when a theme sets them (see index.css), else the theme accent. */}
         <svg viewBox="0 0 100 110" className="size-full drop-shadow-md">
-          {/* body */}
+          {/* body + belly */}
           <ellipse cx="50" cy="92" rx="22" ry="14" fill="var(--sprout-body, var(--accent))" stroke="var(--sprout-outline, none)" strokeWidth="2.5" />
-          {/* one floppy ear (left), one small round ear (right) — asymmetric on purpose */}
-          <g className="sprout-ears">
-            <path d="M28 40 Q6 44 10 66 Q14 78 30 68 Z" fill="var(--sprout-ear, var(--accent))" />
-            <circle cx="76" cy="34" r="10" fill="var(--sprout-ear, var(--accent))" />
-          </g>
-          {/* round panda ears on top of the head, only shown by themes that ask for them */}
-          {/* (light rim + inner ear so they still show against a dark background) */}
-          <g className="sprout-panda-ears">
-            <circle cx="26" cy="27" r="12" fill="var(--sprout-ear, var(--accent))" stroke="var(--sprout-ear-rim, none)" strokeWidth="2.5" />
-            <circle cx="74" cy="27" r="12" fill="var(--sprout-ear, var(--accent))" stroke="var(--sprout-ear-rim, none)" strokeWidth="2.5" />
-            <circle cx="26" cy="27" r="5.5" fill="var(--sprout-ear-inner, transparent)" />
-            <circle cx="74" cy="27" r="5.5" fill="var(--sprout-ear-inner, transparent)" />
-          </g>
+          <ellipse cx="50" cy="94" rx="12" ry="8" fill="white" opacity="0.35" />
+          {/* round ears (rim + inner ear keep them visible on any background) */}
+          <circle cx="25" cy="28" r="11" fill="var(--sprout-ear, var(--accent))" stroke="var(--sprout-ear-rim, none)" strokeWidth="2.5" />
+          <circle cx="75" cy="28" r="11" fill="var(--sprout-ear, var(--accent))" stroke="var(--sprout-ear-rim, none)" strokeWidth="2.5" />
+          <circle cx="25" cy="28" r="5.5" fill="var(--sprout-ear-inner, white)" opacity="var(--sprout-ear-inner-opacity, 0.4)" />
+          <circle cx="75" cy="28" r="5.5" fill="var(--sprout-ear-inner, white)" opacity="var(--sprout-ear-inner-opacity, 0.4)" />
           {/* head */}
           <circle cx="50" cy="52" r="32" fill="var(--sprout-body, var(--accent))" stroke="var(--sprout-outline, none)" strokeWidth="2.5" />
           {/* sprout leaves on top of head */}
@@ -125,8 +119,8 @@ export default function Sprout() {
           {/* cheeks */}
           <circle cx="29" cy="58" r="5.5" fill="var(--sprout-cheek, var(--text))" opacity="var(--sprout-cheek-opacity, 0.5)" />
           <circle cx="71" cy="58" r="5.5" fill="var(--sprout-cheek, var(--text))" opacity="var(--sprout-cheek-opacity, 0.5)" />
-          {/* snout patch */}
-          <ellipse cx="50" cy="62" rx="13" ry="9" fill="white" opacity="0.92" />
+          {/* muzzle */}
+          <ellipse cx="50" cy="63" rx="13" ry="10" fill="white" opacity="0.92" />
           {/* eyes (blink via CSS animation), each with a little sparkle */}
           <g className="animate-sprout-blink">
             <ellipse cx="40" cy="48" rx="4" ry="5.5" fill="#1a1a1a" />
@@ -136,8 +130,9 @@ export default function Sprout() {
             <ellipse cx="60" cy="48" rx="4" ry="5.5" fill="#1a1a1a" />
             <circle cx="61.5" cy="46" r="1.5" fill="white" />
           </g>
-          {/* nose */}
-          <circle cx="50" cy="60" r="2.6" fill="#1a1a1a" />
+          {/* bear nose + little smile */}
+          <path d="M45 58.5 Q50 56 55 58.5 Q53 63 50 63.5 Q47 63 45 58.5 Z" fill="#1a1a1a" />
+          <path d="M50 63.5 Q48.5 67.5 45.5 66 M50 63.5 Q51.5 67.5 54.5 66" fill="none" stroke="#1a1a1a" strokeWidth="1.5" strokeLinecap="round" />
           {/* paws */}
           <ellipse cx="36" cy="102" rx="7" ry="5" fill="var(--sprout-ear, var(--accent))" stroke="var(--sprout-ear-rim, none)" strokeWidth="2" />
           <ellipse cx="64" cy="102" rx="7" ry="5" fill="var(--sprout-ear, var(--accent))" stroke="var(--sprout-ear-rim, none)" strokeWidth="2" />
