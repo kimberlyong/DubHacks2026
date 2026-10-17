@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { Lightbulb, X } from "lucide-react";
 import { useState } from "react";
 
 const DISMISS_KEY = "recap-ext-banner-dismissed";
@@ -18,7 +18,7 @@ export default function ExtensionBanner() {
     <div className="mt-4 flex items-start justify-between gap-3 rounded-xl border border-theme-accent bg-theme-surface p-4">
       <div className="min-w-0">
         <p className="font-medium">
-          <span className="mr-1">💡</span>
+          <Lightbulb aria-hidden="true" className="mr-1 inline size-4 align-[-0.15em] text-theme-accent" />
           There's a Canvas extension that grabs your readings automatically.
         </p>
         {open ? (

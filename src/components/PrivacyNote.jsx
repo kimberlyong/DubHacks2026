@@ -1,3 +1,4 @@
+import { LockKeyhole } from "lucide-react";
 import { useState } from "react";
 
 // Honest, specific privacy copy — describes what the code actually does,
@@ -8,7 +9,10 @@ export default function PrivacyNote() {
 
   return (
     <div className="mt-5 rounded-xl border border-theme-border bg-theme-surface p-4 text-sm">
-      <p className="font-medium">🔒 Your files aren't collected or sold.</p>
+      <p className="font-medium">
+        <LockKeyhole aria-hidden="true" className="mr-1 inline size-4 align-[-0.15em] text-theme-accent" />
+        Your files aren't collected or sold.
+      </p>
       <p className="mt-1 text-theme-muted">
         Reading and summarizing happens for your session only.{" "}
         <button
