@@ -296,7 +296,7 @@ function App() {
                 className="max-w-36 cursor-pointer rounded-lg border border-theme-border bg-theme-surface px-2 py-1 text-theme-text"
               >
                 {themes.map(({ id, label }) => (
-                  <option key={id} value={id}>
+                  <option key={`${id}-${label}`} value={id}>
                     {label}
                   </option>
                 ))}
@@ -459,7 +459,7 @@ function App() {
 
               <ExtensionBanner />
 
-              <div className={`mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-2" : ""}`}>
+              <div className={`dashboard-cards mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-2" : ""}`}>
                 {ready ? (
                   <>
                     <DocumentViewer
@@ -479,7 +479,7 @@ function App() {
                   </>
                 ) : (
                   <>
-                    <article className="rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
+                    <article className="dashboard-card rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
                       <h2 className="text-xl font-semibold">Upload a file</h2>
                       <div className="mt-4">
                         <UploadArea
@@ -516,7 +516,6 @@ function App() {
                     </article>
                   </>
                 )}
-              </div>
               </div>
               <p className="mt-5 text-sm text-theme-muted">
                 Files stay in this browser demo.

@@ -447,6 +447,11 @@ select:focus-visible {
   min-height: 210px;
   border: 1px solid var(--border);
   border-radius: 0.35rem;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 31px,
+    color-mix(in srgb, var(--border) 18%, transparent) 32px
+  );
   box-shadow: 3px 3px 0 var(--border);
 }
 
@@ -467,8 +472,9 @@ select:focus-visible {
   width: 2.5rem;
   height: 1.1rem;
   transform: translateX(-50%) rotate(-3deg);
-  border: 1px solid var(--border);
-  background: color-mix(in srgb, var(--surface) 75%, var(--bg));
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+  box-shadow: 1px 1px 1px color-mix(in srgb, var(--text) 12%, transparent);
   content: "";
   opacity: 0.9;
 }
@@ -488,7 +494,25 @@ select:focus-visible {
   margin-bottom: clamp(3rem, 8vw, 7rem);
   border: 1px solid var(--border);
   background: var(--surface);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 31px,
+    color-mix(in srgb, var(--border) 18%, transparent) 32px
+  );
   box-shadow: 5px 5px 0 var(--bg), 6px 6px 0 var(--border);
+}
+
+.signin-section::before {
+  position: absolute;
+  top: -0.7rem;
+  left: 50%;
+  width: 3.5rem;
+  height: 1.2rem;
+  transform: translateX(-50%) rotate(-2deg);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+  box-shadow: 1px 1px 1px color-mix(in srgb, var(--text) 12%, transparent);
+  content: "";
 }
 
 .signin-title,
@@ -499,7 +523,30 @@ select:focus-visible {
 }
 
 .dashboard-intro {
+  position: relative;
   border-bottom-style: dashed;
+  border: 1px solid var(--border);
+  padding: clamp(1.25rem, 3vw, 2rem);
+  background: var(--surface);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 31px,
+    color-mix(in srgb, var(--border) 18%, transparent) 32px
+  );
+  box-shadow: 4px 4px 0 var(--border);
+}
+
+.dashboard-intro::before {
+  position: absolute;
+  top: -0.65rem;
+  right: 18%;
+  width: 3rem;
+  height: 1.1rem;
+  transform: rotate(3deg);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  background: color-mix(in srgb, var(--accent) 18%, var(--surface));
+  box-shadow: 1px 1px 1px color-mix(in srgb, var(--text) 12%, transparent);
+  content: "";
 }
 
 .dashboard-intro h1 {
@@ -507,9 +554,19 @@ select:focus-visible {
 }
 
 .dashboard-cards {
+  align-items: start;
   gap: clamp(1.5rem, 4vw, 3rem);
   border: 0;
   background: transparent;
+}
+
+.dashboard-cards > article {
+  min-width: 0;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0 31px,
+    color-mix(in srgb, var(--border) 18%, transparent) 32px
+  );
 }
 
 .dashboard-card {
@@ -567,6 +624,10 @@ select:focus-visible {
   .homepage-features {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
+  .dashboard-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 640px) {
@@ -598,6 +659,10 @@ select:focus-visible {
     min-height: auto;
     margin-top: 4rem;
     padding: 2.5rem 1.5rem;
+  }
+
+  .homepage::before {
+    transform: none;
   }
 
   .homepage::after {
@@ -637,6 +702,10 @@ select:focus-visible {
     flex-wrap: wrap;
   }
 
+  .dashboard-intro::before {
+    right: 1.5rem;
+  }
+
   .homepage-feature:nth-child(n) {
     transform: none;
   }
@@ -651,8 +720,6 @@ select,
 input,
 .theme-surface {
   transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
-}
-}
 }
 
 @keyframes sprout-bob {
