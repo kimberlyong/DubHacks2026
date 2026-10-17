@@ -2,37 +2,40 @@
 import { useEffect, useRef, useState } from "react";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 
-export function useFaceRecovery() {
+export function useFaceRecovery({ onDistracted, onReturn } = {}) {
   const [enabled, setEnabled] = useState(false);
   const [status, setStatus] = useState("Camera off");
-  const [showRecovery, setShowRecovery] = useState(false);
   const [error, setError] = useState("");
+  const [showRecovery, setShowRecovery] = useState(false);
 
-  const videoRef = useRef(null);
   const streamRef = useRef(null);
   const landmarkerRef = useRef(null);
   const timerRef = useRef(null);
-
   const snoozedUntilRef = useRef(0);
-
-function snoozeRecovery() {
-  snoozedUntilRef.current = performance.now() + 5 * 60 * 1000;
-  setStatus("🧠 Got it! We'll snooze for 5 minutes. Keep those ideas flowing!");
-}
-
   const popupOpenRef = useRef(false);
+  const callbacksRef = useRef({ onDistracted, onReturn });
+  callbacksRef.current = { onDistracted, onReturn };
+
+  function snoozeRecovery() {
+    snoozedUntilRef.current = performance.now() + 5 * 60 * 1000;
+    setShowRecovery(false);
+    setStatus("Snoozed for 5 minutes");
+  }
 
   useEffect(() => {
     popupOpenRef.current = showRecovery;
   }, [showRecovery]);
 
   useEffect(() => {
-    if (!enabled) return;
+    if (!enabled) {
+      setShowRecovery(false);
+      return;
+    }
 
     let cancelled = false;
     let distractedSince = null;
-    let lastPopup = -Infinity;
     let readyForNextPopup = true;
+    let lastPopup = -Infinity;
 
     async function startCamera() {
       try {
@@ -48,15 +51,12 @@ function snoozeRecovery() {
           stream.getTracks().forEach((track) => track.stop());
           return;
         }
-
         streamRef.current = stream;
 
         const video = document.createElement("video");
         video.muted = true;
         video.playsInline = true;
         video.srcObject = stream;
-        videoRef.current = video;
-
         await video.play();
 
         if (cancelled) return;
@@ -92,8 +92,7 @@ function snoozeRecovery() {
           const now = performance.now();
           const result = landmarker.detectForVideo(video, now);
           const face = result.faceLandmarks?.[0];
-          const blendshapes =
-            result.faceBlendshapes?.[0]?.categories ?? [];
+          const blendshapes = result.faceBlendshapes?.[0]?.categories ?? [];
 
           let distracted = false;
           let reason = "Facing screen";
@@ -103,10 +102,7 @@ function snoozeRecovery() {
             reason = "Face not visible";
           } else {
             const scores = Object.fromEntries(
-              blendshapes.map((item) => [
-                item.categoryName,
-                item.score,
-              ])
+              blendshapes.map((item) => [item.categoryName, item.score])
             );
 
             const eyesClosed =
@@ -119,7 +115,6 @@ function snoozeRecovery() {
 
             const eyeCenterX = (leftEye.x + rightEye.x) / 2;
             const eyeWidth = Math.abs(rightEye.x - leftEye.x);
-
             const headTurn =
               eyeWidth > 0.01
                 ? Math.abs((nose.x - eyeCenterX) / eyeWidth)
@@ -127,7 +122,6 @@ function snoozeRecovery() {
 
             const forehead = face[10];
             const chin = face[152];
-
             const faceHeight = Math.abs(chin.y - forehead.y);
             const eyeCenterY = (leftEye.y + rightEye.y) / 2;
 
@@ -137,8 +131,7 @@ function snoozeRecovery() {
                 : 0;
 
             const lookingUpOrDown =
-              verticalPosition < 0.12 ||
-              verticalPosition > 0.38;
+              verticalPosition < 0.12 || verticalPosition > 0.38;
 
             if (eyesClosed) {
               distracted = true;
@@ -152,23 +145,20 @@ function snoozeRecovery() {
           setStatus(reason);
 
           if (distracted) {
-            if (distractedSince === null) {
-              distractedSince = now;
-            }
-
-            const awayFor = now - distractedSince;
+            if (distractedSince === null) distractedSince = now;
 
             if (
-              awayFor >= 5000 &&
+              now - distractedSince >= 5000 &&
               readyForNextPopup &&
               !popupOpenRef.current &&
               now >= snoozedUntilRef.current &&
               now - lastPopup >= 30000
-              ) {
+            ) {
               popupOpenRef.current = true;
               setShowRecovery(true);
               lastPopup = now;
               readyForNextPopup = false;
+              callbacksRef.current.onDistracted?.(reason);
             }
           } else {
             distractedSince = null;
@@ -188,14 +178,8 @@ function snoozeRecovery() {
     return () => {
       cancelled = true;
       clearInterval(timerRef.current);
-
-      streamRef.current
-        ?.getTracks()
-        .forEach((track) => track.stop());
-
+      streamRef.current?.getTracks().forEach((track) => track.stop());
       streamRef.current = null;
-      videoRef.current = null;
-
       landmarkerRef.current?.close();
       landmarkerRef.current = null;
     };
@@ -205,9 +189,9 @@ function snoozeRecovery() {
     enabled,
     setEnabled,
     status,
+    error,
     showRecovery,
     setShowRecovery,
     snoozeRecovery,
-    error,
   };
 }

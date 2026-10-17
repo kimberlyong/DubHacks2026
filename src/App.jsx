@@ -4,8 +4,8 @@ import Homepage from "./components/Homepage";
 import PrivacyNote from "./components/PrivacyNote";
 import DocumentViewer from "./components/DocumentViewer";
 import StudyPanel from "./components/StudyPanel";
-import UploadArea from "./components/UploadArea";
 import CameraRecovery from "./components/CameraRecovery";
+import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
 import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
@@ -18,6 +18,7 @@ const textSizes = {
 };
 
 const themes = [
+  { id: "mist", label: "Black & white (default)" },
   { id: "sand", label: "Warm (default)" },
   { id: "blush", label: "Blush" },
   { id: "mauve", label: "Mauve" },
@@ -211,9 +212,9 @@ function App() {
       className={`min-h-screen bg-theme-bg text-theme-text ${textSizes[textSize]}`}
     >
       <div
-        className={`mx-auto flex min-h-screen w-full flex-col px-6 ${ready && view === "app" ? "max-w-7xl" : "max-w-4xl"}`}
+        className={`app-shell mx-auto flex min-h-screen w-full flex-col px-6 ${studyDoc.status === "ready" && (view === "app" || name) ? "max-w-7xl" : "max-w-4xl"}`}
       >
-        <header className="flex min-h-16 items-center justify-between border-b border-theme-border">
+        <header className="site-header flex min-h-16 items-center justify-between border-b border-theme-border">
           <div className="flex items-center gap-4">
             {view === "app" && (
               <div className="relative" ref={navRef}>
@@ -284,7 +285,7 @@ function App() {
                 className="max-w-36 cursor-pointer rounded-lg border border-theme-border bg-theme-surface px-2 py-1 text-theme-text"
               >
                 {themes.map(({ id, label }) => (
-                  <option key={id} value={id}>
+                  <option key={`${id}-${label}`} value={id}>
                     {label}
                   </option>
                 ))}
@@ -338,16 +339,16 @@ function App() {
           </div>
         </header>
 
-        <main className="flex-1">
+        <main className="app-main flex-1">
           {view === "app" && (
             <CameraRecovery fileName={studyDoc.file?.name} />
           )}
-
+          
           {view === "home" && <Homepage onGetStarted={() => setView("signin")} />}
 
           {view === "signin" && (
-            <section className="mx-auto max-w-xl py-18">
-              <h1 className="text-3xl font-semibold">Welcome</h1>
+            <section className="signin-section mx-auto max-w-xl py-18">
+              <h1 className="signin-title text-3xl font-semibold">Welcome</h1>
               <p className="my-3 mb-5 leading-relaxed text-theme-muted">
                 Sign in to upload your notes and create a recap.
               </p>
@@ -409,8 +410,8 @@ function App() {
           )}
 
           {view === "app" && page === "study" && (
-            <section className="py-18">
-              <div className="flex items-start justify-between gap-4">
+            <section className="dashboard-section py-18">
+              <div className="dashboard-intro flex items-start justify-between gap-4">
                 <div>
                   <h1 className="text-3xl font-semibold">Welcome, {name}.</h1>
                   <p className="mt-3 leading-relaxed text-theme-muted">
@@ -434,38 +435,62 @@ function App() {
 
               <ExtensionBanner />
 
-              <div className={`mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-2" : ""}`}>
+              <div className={`dashboard-cards mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-2" : ""}`}>
                 {ready ? (
-                  <DocumentViewer
-                    file={studyDoc.file}
-                    text={studyDoc.text}
-                    onReplace={handleSelectFile}
-                    onRemove={handleRemoveFile}
-                  />
+                  <>
+                    <DocumentViewer
+                      file={studyDoc.file}
+                      text={studyDoc.text}
+                      onReplace={handleSelectFile}
+                      onRemove={handleRemoveFile}
+                    />
+                    <StudyPanel
+                      key={studyDoc.documentId}
+                      fileName={studyDoc.file.name}
+                      documentId={studyDoc.documentId}
+                      text={studyDoc.text}
+                      mode={studyMode}
+                      onModeChange={setStudyMode}
+                    />
+                  </>
                 ) : (
-                  <article className="rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
-                    <h2 className="text-xl font-semibold">Upload a file</h2>
-                    <div className="mt-4">
-                      <UploadArea
-                        file={studyDoc.file}
-                        status={studyDoc.status}
-                        error={studyDoc.error}
-                        onSelect={handleSelectFile}
-                        onRemove={handleRemoveFile}
-                      />
-                    </div>
-                  </article>
-                )}
+                  <>
+                    <article className="dashboard-card rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
+                      <h2 className="text-xl font-semibold">Upload a file</h2>
+                      <div className="mt-4">
+                        <UploadArea
+                          file={studyDoc.file}
+                          status={studyDoc.status}
+                          error={studyDoc.error}
+                          onSelect={handleSelectFile}
+                          onRemove={handleRemoveFile}
+                        />
+                      </div>
+                    </article>
 
-                {ready && (
-                  <StudyPanel
-                    key={studyDoc.documentId}
-                    fileName={studyDoc.file.name}
-                    documentId={studyDoc.documentId}
-                    text={studyDoc.text}
-                    mode={studyMode}
-                    onModeChange={setStudyMode}
-                  />
+                    <article className="dashboard-card border border-theme-border bg-theme-surface p-5">
+                      <h2 className="text-xl font-semibold">Create a recap</h2>
+                      <p className="my-4 text-theme-muted">
+                        Make a summary of your uploaded file.
+                      </p>
+                      <button
+                        className="border border-theme-border bg-theme-surface px-3 py-2 text-theme-text disabled:cursor-not-allowed disabled:opacity-50"
+                        type="button"
+                        disabled={studyDoc.status !== "ready"}
+                        onClick={() => setStudyMode("ask")}
+                      >
+                        Open study panel
+                      </button>
+                      <p
+                        className="mt-3 text-sm text-theme-muted"
+                        aria-live="polite"
+                      >
+                        {studyDoc.status === "ready"
+                          ? "Your file is ready to study."
+                          : "Your recap starts with an upload."}
+                      </p>
+                    </article>
+                  </>
                 )}
               </div>
               <p className="mt-5 text-sm text-theme-muted">
@@ -475,7 +500,7 @@ function App() {
           )}
         </main>
 
-        <footer className="border-t border-theme-border py-4 text-sm text-theme-muted">
+        <footer className="site-footer border-t border-theme-border py-4 text-sm text-theme-muted">
           Recap
         </footer>
       </div>
