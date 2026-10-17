@@ -1,3 +1,158 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:where(.dark, .dark *));
+:root,
+[data-theme="mist"] {
+  color-scheme: light;
+  --bg: #f4f2e2;
+  --surface: #faf9ef;
+  --text: #243040;
+  --muted: #4f5e70;
+  --border: #c0cfb0;
+  --accent: #5b6e8a;
+  --on-accent: #fff;
+  --urgent: #9a4437;
+  --urgent-t: #f3dad2;
+  --concept: #3f5f8a;
+  --concept-t: #dce4ec;
+  --action: #4f6b3a;
+  --action-t: #dce8cc;
+  --review: #7a5a10;
+  --review-t: #f1e6bf;
+  --reflect: #5f5a8c;
+  --reflect-t: #e2e0f0;
+}
+
+[data-theme="blush"] {
+  color-scheme: light;
+  --bg: #f4ebe1;
+  --surface: #faf5ee;
+  --text: #2e0509;
+  --muted: #6b4a4a;
+  --border: #e0bfc8;
+  --accent: #be8272;
+  --on-accent: #2e0509;
+  --urgent: #8a2f2b;
+  --urgent-t: #f2d3d0;
+  --concept: #3f5f82;
+  --concept-t: #d9e3ec;
+  --action: #56602f;
+  --action-t: #dde3c2;
+  --review: #7a5a10;
+  --review-t: #f3e2b8;
+  --reflect: #7a4a6a;
+  --reflect-t: #ebd5e3;
+}
+
+[data-theme="mauve"] {
+  color-scheme: light;
+  --bg: #f7eef1;
+  --surface: #fffafb;
+  --text: #3b2b30;
+  --muted: #6a5560;
+  --border: #e5cbd8;
+  --accent: #a9829c;
+  --on-accent: #2b1d26;
+  --urgent: #9a3550;
+  --urgent-t: #f8d3dd;
+  --concept: #4a5c8c;
+  --concept-t: #dce1f0;
+  --action: #4f6b4a;
+  --action-t: #dde8d6;
+  --review: #7d5a3c;
+  --review-t: #eedfcf;
+  --reflect: #7a4f73;
+  --reflect-t: #ebd6ea;
+}
+
+[data-theme="dusk"] {
+  color-scheme: dark;
+  --bg: #1e2328;
+  --surface: #272d33;
+  --text: #e6e9eb;
+  --muted: #a9b3bb;
+  --border: #3a424a;
+  --accent: #8fbfa9;
+  --on-accent: #14201b;
+  --urgent: #f0a596;
+  --urgent-t: #43292a;
+  --concept: #9cc4e8;
+  --concept-t: #243545;
+  --action: #9ed3ac;
+  --action-t: #24392b;
+  --review: #e8c770;
+  --review-t: #3f3622;
+  --reflect: #c5b1e8;
+  --reflect-t: #342c45;
+}
+
+@theme inline {
+  --color-theme-bg: var(--bg);
+  --color-theme-surface: var(--surface);
+  --color-theme-text: var(--text);
+  --color-theme-muted: var(--muted);
+  --color-theme-border: var(--border);
+  --color-theme-accent: var(--accent);
+  --color-theme-on-accent: var(--on-accent);
+  --color-theme-urgent: var(--urgent);
+  --color-theme-urgent-t: var(--urgent-t);
+  --color-theme-concept: var(--concept);
+  --color-theme-concept-t: var(--concept-t);
+  --color-theme-action: var(--action);
+  --color-theme-action-t: var(--action-t);
+  --color-theme-review: var(--review);
+  --color-theme-review-t: var(--review-t);
+  --color-theme-reflect: var(--reflect);
+  --color-theme-reflect-t: var(--reflect-t);
+  --color-accent: var(--accent);
+  --color-accent-dark: var(--accent);
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  line-height: 1.6;
+  transition: background 0.25s, color 0.25s;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@keyframes sprout-bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+@keyframes sprout-shake {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-6deg); }
+  75% { transform: rotate(6deg); }
+}
+@keyframes sprout-blink {
+  0%, 92%, 100% { transform: scaleY(1); }
+  96% { transform: scaleY(0.1); }
+}
+
+.animate-sprout-bob {
+  animation: sprout-bob 3s ease-in-out infinite;
+}
+.animate-sprout-shake {
+  animation: sprout-shake 0.4s ease-in-out infinite;
+}
+.animate-sprout-blink {
+  animation: sprout-blink 4.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-sprout-bob,
+  .animate-sprout-shake,
+  .animate-sprout-blink {
+    animation: none;
+  }
+}

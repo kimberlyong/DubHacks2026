@@ -9,8 +9,8 @@ export default function KeyTerms({ documentId, text }) {
       <div role="status" aria-label="Extracting key terms" className="animate-pulse space-y-4 motion-reduce:animate-none">
         {[0, 1, 2, 3].map((i) => (
           <div key={i} className="space-y-2">
-            <div className="h-4 w-1/3 bg-neutral-300 dark:bg-neutral-700" />
-            <div className="h-4 w-full bg-neutral-300 dark:bg-neutral-700" />
+            <div className="h-4 w-1/3 bg-theme-border" />
+            <div className="h-4 w-full bg-theme-border" />
           </div>
         ))}
       </div>
@@ -19,9 +19,9 @@ export default function KeyTerms({ documentId, text }) {
 
   if (error) {
     return (
-      <div role="alert" className="border border-red-700 p-4 dark:border-red-400">
-        <p className="text-red-700 dark:text-red-400">{error}</p>
-        <button type="button" className="mt-3 flex cursor-pointer items-center gap-2 border border-black px-3 py-1 dark:border-white" onClick={retry}>
+      <div role="alert" className="border border-theme-urgent bg-theme-urgent-t p-4">
+        <p className="text-theme-urgent">{error}</p>
+        <button type="button" className="mt-3 flex cursor-pointer items-center gap-2 border border-theme-border px-3 py-1" onClick={retry}>
           <RotateCcw aria-hidden="true" className="size-4" />
           Retry
         </button>
@@ -36,7 +36,7 @@ export default function KeyTerms({ documentId, text }) {
       {terms.map(({ term, definition }) => (
         <div key={term}>
           <dt className="font-semibold">{term}</dt>
-          <dd className="text-neutral-700 dark:text-neutral-300">{definition}</dd>
+          <dd className="text-theme-muted">{definition}</dd>
         </div>
       ))}
     </dl>

@@ -1,8 +1,13 @@
 import { useEffect, useRef, useState } from "react";
+import ExtensionBanner from "./components/ExtensionBanner";
+import Homepage from "./components/Homepage";
+import PrivacyNote from "./components/PrivacyNote";
 import StudyPanel from "./components/StudyPanel";
+import StudyHistory from "./components/StudyHistory";
 import UploadArea from "./components/UploadArea";
 import CameraRecovery from "./components/CameraRecovery";
 import { useDocument } from "./hooks/useDocument";
+import { getHistory } from "./lib/studyHistory";
 
 const textSizes = {
   small: "text-sm",
@@ -10,22 +15,45 @@ const textSizes = {
   large: "text-lg",
 };
 
+const themes = [
+  { id: "mist", label: "Mist (default)" },
+  { id: "blush", label: "Blush" },
+  { id: "mauve", label: "Mauve" },
+  { id: "dusk", label: "Dusk (dark)" },
+];
+
+function getSavedTheme() {
+  const savedTheme = localStorage.getItem("recap-theme");
+  if (themes.some(({ id }) => id === savedTheme)) return savedTheme;
+  if (savedTheme === "dark") return "dusk";
+  return "mist";
+}
+
 function getSavedTextSize() {
   const savedSize = localStorage.getItem("recap-size");
   return Object.hasOwn(textSizes, savedSize) ? savedSize : "medium";
 }
 
+// A visitor has one of three views. Signed-in users (name already saved, or
+// the Canvas extension just handed off a page) skip straight to the app —
+// the homepage and sign-in step are only for a first-time visit.
+function getInitialView() {
+  const hasExtractParam = new URL(window.location.href).searchParams.has("extract");
+  const hasName = Boolean(localStorage.getItem("recap-name"));
+  return hasExtractParam || hasName ? "app" : "home";
+}
+
 function App() {
+  const [view, setView] = useState(getInitialView);
   const [name, setName] = useState(() => localStorage.getItem("recap-name") ?? "");
   const [nameInput, setNameInput] = useState("");
-  const [theme, setTheme] = useState(
-    () => (localStorage.getItem("recap-theme") === "dark" ? "dark" : "light"),
-  );
+  const [theme, setTheme] = useState(getSavedTheme);
   const [textSize, setTextSize] = useState(getSavedTextSize);
   const studyDoc = useDocument();
   const [panelOpen, setPanelOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
+  const [history, setHistory] = useState(getHistory);
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -37,6 +65,7 @@ function App() {
     function handleKeyDown(event) {
       if (event.key === "Escape") {
         setSettingsOpen(false);
+        setPanelOpen(false);
       }
     }
 
@@ -57,6 +86,7 @@ function App() {
 
     setName(trimmedName);
     localStorage.setItem("recap-name", trimmedName);
+    setView("app");
   }
 
   function handleSignOut() {
@@ -64,6 +94,7 @@ function App() {
     setNameInput("");
     handleRemoveFile();
     localStorage.removeItem("recap-name");
+    setView("home");
   }
 
   function handleThemeChange(nextTheme) {
@@ -77,12 +108,16 @@ function App() {
   }
 
   async function handleSelectFile(file) {
-    setPanelOpen(false);
     await studyDoc.upload(file);
+    setHistory(getHistory());
+  }
+
+  function handleResumeHistory(entry) {
+    studyDoc.loadText(entry.text, entry.fileName, entry.source);
+    setPanelOpen(true);
   }
 
   function handleRemoveFile() {
-    setPanelOpen(false);
     studyDoc.remove();
   }
 
@@ -99,84 +134,93 @@ function App() {
 
   return (
     <div
-      className={`min-h-screen bg-white text-black dark:bg-black dark:text-white ${textSizes[textSize]}`}
+      data-theme={theme}
+      className={`min-h-screen bg-theme-bg text-theme-text ${textSizes[textSize]}`}
     >
-      <div className="mx-auto flex min-h-screen w-full max-w-4xl flex-col px-6">
-        <header className="flex min-h-16 items-center justify-between border-b border-black dark:border-white">
-          <a className="font-bold text-inherit no-underline" href="#">
+      <div
+        className={`mx-auto flex min-h-screen w-full flex-col px-6 ${studyDoc.status === "ready" && name ? "max-w-7xl" : "max-w-4xl"}`}
+      >
+        <header className="flex min-h-16 items-center justify-between border-b border-theme-border">
+          <button
+            type="button"
+            onClick={() => setView(name ? "app" : "home")}
+            className="cursor-pointer bg-transparent p-0 font-bold text-inherit"
+          >
             recap
-          </a>
+          </button>
           <div className="flex items-center gap-4">
-            <span className="text-sm text-neutral-600 dark:text-neutral-300 max-[420px]:hidden">
-              {today}
-            </span>
-            <div className="relative" ref={settingsRef}>
-              <button
-                type="button"
-                className="cursor-pointer bg-transparent py-1 text-inherit"
-                aria-expanded={settingsOpen}
-                aria-controls="settings-panel"
-                onClick={() => setSettingsOpen((open) => !open)}
+            <label className="flex items-center gap-2 text-sm text-theme-muted">
+              <span className="max-[520px]:hidden">Color theme</span>
+              <select
+                aria-label="Select color theme"
+                value={theme}
+                onChange={(event) => handleThemeChange(event.target.value)}
+                className="max-w-36 cursor-pointer border border-theme-border bg-theme-surface px-2 py-1 text-theme-text"
               >
-                Settings
-              </button>
-              {settingsOpen && (
-                <div
-                  id="settings-panel"
-                  className="absolute right-0 top-full z-10 mt-2 w-64 border border-black bg-white p-4 text-black dark:border-white dark:bg-black dark:text-white"
+                {themes.map(({ id, label }) => (
+                  <option key={id} value={id}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            {view === "app" && (
+              <div className="flex items-center gap-4">
+              <span className="text-sm text-theme-muted max-[420px]:hidden">
+                {today}
+              </span>
+              <div className="relative" ref={settingsRef}>
+                <button
+                  type="button"
+                  className="cursor-pointer bg-transparent py-1 text-inherit"
+                  aria-expanded={settingsOpen}
+                  aria-controls="settings-panel"
+                  onClick={() => setSettingsOpen((open) => !open)}
                 >
-                  <fieldset>
-                    <legend className="mb-2">Appearance</legend>
-                    <div className="flex gap-2">
-                      {["light", "dark"].map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          className={`flex-1 border border-black px-2 py-1 capitalize dark:border-white ${
-                            theme === option
-                              ? "bg-black text-white dark:bg-white dark:text-black"
-                              : "bg-white text-black dark:bg-black dark:text-white"
-                          }`}
-                          aria-pressed={theme === option}
-                          onClick={() => handleThemeChange(option)}
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                  </fieldset>
-                  <fieldset className="mt-4">
-                    <legend className="mb-2">Text size</legend>
-                    <div className="flex gap-2">
-                      {Object.keys(textSizes).map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          className={`flex-1 border border-black px-2 py-1 capitalize dark:border-white ${
-                            textSize === option
-                              ? "bg-black text-white dark:bg-white dark:text-black"
-                              : "bg-white text-black dark:bg-black dark:text-white"
-                          }`}
-                          aria-pressed={textSize === option}
-                          onClick={() => handleTextSizeChange(option)}
-                        >
-                          {option}
-                        </button>
-                      ))}
-                    </div>
-                  </fieldset>
-                </div>
-              )}
-            </div>
+                  Settings
+                </button>
+                {settingsOpen && (
+                  <div
+                    id="settings-panel"
+                    className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text"
+                  >
+                    <fieldset className="mt-4">
+                      <legend className="mb-2">Text size</legend>
+                      <div className="flex gap-2">
+                        {Object.keys(textSizes).map((option) => (
+                          <button
+                            key={option}
+                            type="button"
+                            className={`flex-1 rounded-lg border border-theme-border px-2 py-1 capitalize ${
+                              textSize === option
+                                ? "bg-theme-accent text-theme-on-accent"
+                                : "bg-theme-surface text-theme-text"
+                            }`}
+                            aria-pressed={textSize === option}
+                            onClick={() => handleTextSizeChange(option)}
+                          >
+                            {option}
+                          </button>
+                        ))}
+                      </div>
+                    </fieldset>
+                  </div>
+                )}
+              </div>
+              </div>
+            )}
           </div>
         </header>
 
         <main className="flex-1">
-        <CameraRecovery />
-          {!name ? (
+          <CameraRecovery />
+
+          {view === "home" && <Homepage onGetStarted={() => setView("signin")} />}
+
+          {view === "signin" && (
             <section className="mx-auto max-w-xl py-18">
               <h1 className="text-3xl font-semibold">Welcome</h1>
-              <p className="my-3 mb-7 leading-relaxed text-neutral-600 dark:text-neutral-300">
+              <p className="my-3 mb-5 leading-relaxed text-theme-muted">
                 Sign in to upload your notes and create a recap.
               </p>
               <form onSubmit={handleSignIn}>
@@ -194,28 +238,31 @@ function App() {
                     required
                     value={nameInput}
                     onChange={(event) => setNameInput(event.target.value)}
-                    className="w-full min-w-0 border border-black bg-white px-2 py-2 text-black placeholder:text-neutral-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black dark:border-white dark:bg-black dark:text-white dark:focus-visible:outline-white"
+                    className="w-full min-w-0 rounded-lg border border-theme-border bg-theme-surface px-2 py-2 text-theme-text placeholder:text-theme-muted"
                   />
                   <button
-                    className="border border-black bg-black px-3 py-2 text-white dark:border-white dark:bg-white dark:text-black"
+                    className="rounded-lg border border-theme-accent bg-theme-accent px-3 py-2 text-theme-on-accent"
                     type="submit"
                   >
                     Sign in
                   </button>
                 </div>
               </form>
+              <PrivacyNote />
             </section>
-          ) : (
+          )}
+
+          {view === "app" && (
             <section className="py-18">
               <div className="flex items-start justify-between gap-4">
                 <div>
                   <h1 className="text-3xl font-semibold">Welcome, {name}.</h1>
-                  <p className="mt-3 leading-relaxed text-neutral-600 dark:text-neutral-300">
-                    Upload a file, then create a recap.
+                  <p className="mt-3 leading-relaxed text-theme-muted">
+                    Upload a file to read it next to your study panel.
                   </p>
                 </div>
                 <button
-                  className="whitespace-nowrap border border-black bg-white px-3 py-2 text-black dark:border-white dark:bg-black dark:text-white"
+                  className="whitespace-nowrap rounded-lg border border-theme-border bg-theme-surface px-3 py-2 text-theme-text"
                   type="button"
                   onClick={handleSignOut}
                 >
@@ -223,8 +270,17 @@ function App() {
                 </button>
               </div>
 
+              {studyDoc.error && (
+                <p role="alert" className="mt-4 text-theme-urgent">
+                  {studyDoc.error}
+                </p>
+              )}
+
+              <ExtensionBanner />
+              <StudyHistory entries={history} onResume={handleResumeHistory} />
+
               <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <article className="border border-black p-5 dark:border-white">
+                <article className="border border-theme-border bg-theme-surface p-5">
                   <h2 className="text-xl font-semibold">Upload a file</h2>
                   <div className="mt-4">
                     <UploadArea
@@ -237,13 +293,13 @@ function App() {
                   </div>
                 </article>
 
-                <article className="border border-black p-5 dark:border-white">
+                <article className="border border-theme-border bg-theme-surface p-5">
                   <h2 className="text-xl font-semibold">Create a recap</h2>
-                  <p className="my-4 text-neutral-600 dark:text-neutral-300">
+                  <p className="my-4 text-theme-muted">
                     Make a summary of your uploaded file.
                   </p>
                   <button
-                    className="border border-black bg-white px-3 py-2 text-black disabled:cursor-not-allowed disabled:opacity-50 dark:border-white dark:bg-black dark:text-white"
+                    className="border border-theme-border bg-theme-surface px-3 py-2 text-theme-text disabled:cursor-not-allowed disabled:opacity-50"
                     type="button"
                     disabled={studyDoc.status !== "ready"}
                     onClick={() => setPanelOpen(true)}
@@ -251,7 +307,7 @@ function App() {
                     Open study panel
                   </button>
                   <p
-                    className="mt-3 text-sm text-neutral-600 dark:text-neutral-300"
+                    className="mt-3 text-sm text-theme-muted"
                     aria-live="polite"
                   >
                     {studyDoc.status === "ready"
@@ -260,14 +316,14 @@ function App() {
                   </p>
                 </article>
               </div>
-              <p className="mt-5 text-sm text-neutral-600 dark:text-neutral-300">
+              <p className="mt-5 text-sm text-theme-muted">
                 Files stay in this browser demo.
               </p>
             </section>
           )}
         </main>
 
-        <footer className="border-t border-black py-4 text-sm text-neutral-600 dark:border-white dark:text-neutral-300">
+        <footer className="border-t border-theme-border py-4 text-sm text-theme-muted">
           Recap
         </footer>
       </div>

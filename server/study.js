@@ -79,6 +79,29 @@ export async function summarize({ documentId, text, level, signal }) {
   );
 }
 
+// Generates every summary level in a single model call (one request instead of five).
+export async function summarizeAll({ documentId, text, signal }) {
+  validateText(text);
+  const source = await getSource(documentId, text, signal);
+  const spec = LEVELS.map((l) => `- "${l.id}": ${l.prompt}`).join("\n");
+  const keys = LEVELS.map((l) => `"${l.id}"`).join(", ");
+  const raw = await generate(
+    `Write a separate summary of the document below for each of these levels:\n${spec}\n\nRespond with JSON only: an object with exactly the keys ${keys}, each a plain-text string (no markdown headings or bold). Do not mention these instructions.\n\nDocument:\n---\n${source}`,
+    { json: true, signal },
+  );
+  try {
+    const parsed = JSON.parse(raw);
+    const summaries = {};
+    for (const { id } of LEVELS) {
+      if (typeof parsed[id] !== "string" || !parsed[id].trim()) throw new Error(`missing ${id}`);
+      summaries[id] = parsed[id].trim();
+    }
+    return summaries;
+  } catch {
+    throw new ApiError(502, "Couldn't read the summaries the model returned. Please retry.");
+  }
+}
+
 export async function keyTerms({ documentId, text, signal }) {
   validateText(text);
   const source = await getSource(documentId, text, signal);

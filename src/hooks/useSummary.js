@@ -1,46 +1,28 @@
 import { useCallback, useEffect, useState } from "react";
-import { fetchSummary } from "../api/client";
+import { fetchAllSummaries } from "../api/client";
 import { DEFAULT_LEVEL, LEVELS } from "../lib/levels";
 
-const DEBOUNCE_MS = 400;
-
-// Mount with key={documentId} so the cache resets for each document.
+// Fetches every summary level in one request, so moving the slider is instant.
+// Mount with key={documentId} so state resets for each document.
 export function useSummary({ documentId, text }) {
-  const [level, setLevel] = useState(DEFAULT_LEVEL); // follows the slider immediately
-  const [settled, setSettled] = useState(DEFAULT_LEVEL); // level after debounce
-  const [cache, setCache] = useState({}); // level index -> summary
-  const [failure, setFailure] = useState(null); // { level, message }
+  const [level, setLevel] = useState(DEFAULT_LEVEL);
+  const [summaries, setSummaries] = useState(null); // level id -> summary
+  const [error, setError] = useState(null);
   const [attempt, setAttempt] = useState(0);
 
-  const isCached = level in cache;
-
   useEffect(() => {
-    if (level in cache) {
-      setSettled(level);
-      return;
-    }
-    const timer = setTimeout(() => setSettled(level), DEBOUNCE_MS);
-    return () => clearTimeout(timer);
-  }, [level, cache]);
-
-  useEffect(() => {
-    if (settled in cache) return;
     const controller = new AbortController();
-    setFailure(null);
-    fetchSummary({ documentId, text, level: LEVELS[settled].id }, controller.signal)
-      .then((summary) => setCache((c) => ({ ...c, [settled]: summary })))
+    setError(null);
+    fetchAllSummaries({ documentId, text }, controller.signal)
+      .then(setSummaries)
       .catch((err) => {
-        if (err.name !== "AbortError") setFailure({ level: settled, message: err.message });
+        if (err.name !== "AbortError") setError(err.message);
       });
     return () => controller.abort();
-    // cache is intentionally omitted: it only changes when this request resolves
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settled, attempt, documentId, text]);
+  }, [documentId, text, attempt]);
 
   const retry = useCallback(() => setAttempt((a) => a + 1), []);
 
-  const error = !isCached && settled === level && failure?.level === level ? failure.message : null;
-  const status = isCached ? "ready" : error ? "error" : "loading";
-
-  return { level, setLevel, summary: cache[level] ?? "", status, error, retry };
+  const status = summaries ? "ready" : error ? "error" : "loading";
+  return { level, setLevel, summary: summaries?.[LEVELS[level].id] ?? "", status, error, retry };
 }
