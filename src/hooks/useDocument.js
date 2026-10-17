@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { registerDocument } from "../api/client";
 import { extractText } from "../lib/extractText";
+import { addToHistory } from "../lib/studyHistory";
 
 const EMPTY = { file: null, documentId: null, text: "", status: "idle", error: null };
 
@@ -27,6 +28,7 @@ export function useDocument() {
       if (request !== requestRef.current) return; // superseded by a newer upload
       const documentId = crypto.randomUUID();
       setDoc({ file, documentId, text, status: "ready", error: null });
+      addToHistory({ fileName: file.name, text, source: "upload" });
 
       // Fire-and-forget: sets up the Backboard thread for "Ask Questions".
       const controller = new AbortController();
@@ -38,7 +40,24 @@ export function useDocument() {
     }
   }, []);
 
+  // Same as upload(), but for text that already arrived as text (e.g. from
+  // the Canvas extension) instead of a File the user picked.
+  const loadText = useCallback((text, fileName, source = "extension") => {
+    const request = ++requestRef.current;
+    abortRef.current?.abort();
+
+    const documentId = crypto.randomUUID();
+    const file = { name: fileName || "Canvas page" };
+    setDoc({ file, documentId, text, status: "ready", error: null });
+    addToHistory({ fileName: file.name, text, source });
+
+    const controller = new AbortController();
+    abortRef.current = controller;
+    registerDocument({ documentId, fileName: file.name, text }, controller.signal).catch(() => {});
+    return request === requestRef.current;
+  }, []);
+
   useEffect(() => () => abortRef.current?.abort(), []);
 
-  return { ...doc, upload, remove };
+  return { ...doc, upload, loadText, remove };
 }

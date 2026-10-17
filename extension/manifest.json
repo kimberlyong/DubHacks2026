@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "Recap for Canvas",
+  "version": "0.1.0",
+  "description": "Pulls the lecture, syllabus, or assignment off a Canvas page and sends it to Recap.",
+  "permissions": ["activeTab", "scripting"],
+  "host_permissions": ["http://localhost:8787/*", "http://localhost:5173/*"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Extract this page for Recap"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.instructure.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}
