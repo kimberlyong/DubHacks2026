@@ -4,6 +4,8 @@ import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
 import PrivacyNote from "./components/PrivacyNote";
 import DocumentViewer from "./components/DocumentViewer";
+import GamePage from "./components/game/GamePage";
+import SavedPlans from "./components/SavedPlans";
 import StudyPanel from "./components/StudyPanel";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
@@ -20,11 +22,10 @@ const textSizes = {
 
 const themes = [
   { id: "sand", label: "Warm" },
-  { id: "blush", label: "Pink" },
   { id: "mauve", label: "Purple" },
   { id: "sky", label: "Blue" },
-  { id: "mist", label: "Black & white" },
   { id: "dusk", label: "Dark" },
+  { id: "mist", label: "Black & white" },
 ];
 
 function getSavedTheme() {
@@ -199,15 +200,27 @@ function App() {
       setPage("history");
       return;
     }
+    if (target === "plans" || target === "game") {
+      setPage(target);
+      return;
+    }
     setPage("study");
-    // "home" = upload/overview with no tool open
-    setStudyMode(target === "home" ? null : target);
+    // "home" = the Welcome page: upload + past files, no document or tool open
+    if (target === "home") {
+      handleRemoveFile();
+      setHistory(getHistory());
+      setStudyMode(null);
+      return;
+    }
+    setStudyMode(target);
   }
 
   const navItems = [
     { id: "home", label: "Home", needsDoc: false },
     { id: "flashcards", label: "Flashcards", needsDoc: true },
     { id: "ask", label: "Chatbot", needsDoc: true },
+    { id: "game", label: "Game", needsDoc: true },
+    { id: "plans", label: "Plans", needsDoc: false },
     { id: "history", label: "Past documents", needsDoc: false },
   ];
 
@@ -250,8 +263,8 @@ function App() {
                     {navItems.map((item) => {
                       const disabled = item.needsDoc && !ready;
                       const active =
-                        item.id === "history"
-                          ? page === "history"
+                        item.id === "history" || item.id === "plans" || item.id === "game"
+                          ? page === item.id
                           : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
                       return (
                         <button
@@ -290,6 +303,15 @@ function App() {
             {view === "app" && (
               <span className="text-sm text-theme-muted max-[420px]:hidden">{today}</span>
             )}
+            {view === "app" && (
+              <button
+                className="cursor-pointer whitespace-nowrap rounded-lg border border-theme-border bg-theme-surface px-3 py-1 text-sm text-theme-text"
+                type="button"
+                onClick={handleSignOut}
+              >
+                Sign out
+              </button>
+            )}
             <div className="relative" ref={settingsRef}>
               <button
                 type="button"
@@ -315,6 +337,8 @@ function App() {
                           key={id}
                           type="button"
                           className={`rounded-lg border border-theme-border px-2 py-1 ${
+                            id === "mist" ? "col-span-2" : ""
+                          } ${
                             theme === id
                               ? "bg-theme-accent text-theme-on-accent"
                               : "bg-theme-surface text-theme-text"
@@ -373,7 +397,7 @@ function App() {
         </header>
 
         <main className="app-main flex-1">
-          {view === "home" && <Homepage onGetStarted={() => setView("signin")} />}
+          {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
 
           {view === "signin" && (
             <section className="signin-section mx-auto max-w-xl py-18">
@@ -409,6 +433,18 @@ function App() {
               <PrivacyNote />
             </section>
           )}
+
+          {view === "app" && page === "plans" && <SavedPlans />}
+
+          {view === "app" && page === "game" &&
+            (ready ? (
+              <GamePage documentId={studyDoc.documentId} text={studyDoc.text} fileName={studyDoc.file.name} />
+            ) : (
+              <section className="py-18">
+                <h1 className="text-3xl font-semibold">Sprout Run</h1>
+                <p className="mt-3 text-theme-muted">Upload a document first, then come back to play.</p>
+              </section>
+            ))}
 
           {view === "app" && page === "history" && (
             <section className="py-18">
@@ -447,13 +483,6 @@ function App() {
                     Upload a file, then create a recap.
                   </p>
                 </div>
-                <button
-                  className="cursor-pointer whitespace-nowrap rounded-lg border border-theme-border bg-theme-surface px-3 py-2 text-theme-text"
-                  type="button"
-                  onClick={handleSignOut}
-                >
-                  Sign out
-                </button>
               </div>
 
               {studyDoc.error && (
@@ -479,7 +508,7 @@ function App() {
                       documentId={studyDoc.documentId}
                       text={studyDoc.text}
                       mode={studyMode}
-                      onModeChange={setStudyMode}
+                      onModeChange={(id) => (id === "game" ? setPage("game") : setStudyMode(id))}
                     />
                   </>
                 ) : (

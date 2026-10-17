@@ -7,7 +7,6 @@ import Flashcards from "./study/Flashcards";
 import KeyTerms from "./study/KeyTerms";
 import Outline from "./study/Outline";
 import Plan from "./study/Plan";
-import PracticeQuiz from "./study/PracticeQuiz";
 import Visualizer from "./study/Visualizer";
 
 // Rendered with key={documentId} by the parent so all panel state resets per document.
@@ -46,11 +45,10 @@ export default function StudyPanel({ fileName, documentId, text, mode, onModeCha
 
         {mode && (
           <section aria-label="Study tool">
-            {mode === "plan" && <Plan documentId={documentId} text={text} />}
+            {mode === "plan" && <Plan documentId={documentId} text={text} fileName={fileName} />}
             {mode === "keyTerms" && <KeyTerms documentId={documentId} text={text} />}
             {mode === "flashcards" && <Flashcards />}
             {mode === "visualizer" && <Visualizer documentId={documentId} text={text} />}
-            {mode === "quiz" && <PracticeQuiz />}
             {mode === "outline" && <Outline />}
             {mode === "ask" && <AskQuestions documentId={documentId} />}
           </section>

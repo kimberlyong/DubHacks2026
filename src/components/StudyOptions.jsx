@@ -1,9 +1,9 @@
-import { BookOpen, Brain, ClipboardList, HelpCircle, ListTree, MessageCircle, Network, Target } from "lucide-react";
+import { BookOpen, Brain, ClipboardList, Gamepad2, ListTree, MessageCircle, Network, Target } from "lucide-react";
 
 export const STUDY_MODES = [
   { id: "plan", label: "Plan My Time", Icon: Target },
   { id: "flashcards", label: "Flashcards", Icon: BookOpen },
-  { id: "quiz", label: "Practice Quiz", Icon: HelpCircle },
+  { id: "game", label: "Game", Icon: Gamepad2 },
   { id: "keyTerms", label: "Key Terms & Definitions", Icon: ClipboardList },
   { id: "outline", label: "Outline / Study Guide", Icon: ListTree },
   { id: "ask", label: "Ask Questions", Icon: MessageCircle },
