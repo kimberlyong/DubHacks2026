@@ -1,3 +1,4 @@
+import { Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
@@ -18,13 +19,12 @@ const textSizes = {
 };
 
 const themes = [
-  { id: "mist", label: "Black & white (default)" },
-  { id: "sand", label: "Warm (default)" },
-  { id: "blush", label: "Blush" },
-  { id: "mauve", label: "Mauve" },
-  { id: "sky", label: "Light blue" },
-  { id: "dusk", label: "Dusk (dark)" },
+  { id: "sand", label: "Warm" },
+  { id: "blush", label: "Pink" },
+  { id: "mauve", label: "Purple" },
+  { id: "sky", label: "Blue" },
   { id: "mist", label: "Black & white" },
+  { id: "dusk", label: "Dark" },
 ];
 
 function getSavedTheme() {
@@ -287,61 +287,67 @@ function App() {
             </button>
           </div>
           <div className="flex items-center gap-4">
-            <label className="flex items-center gap-2 text-sm text-theme-muted">
-              <span className="max-[520px]:hidden">Color theme</span>
-              <select
-                aria-label="Select color theme"
-                value={theme}
-                onChange={(event) => handleThemeChange(event.target.value)}
-                className="max-w-36 cursor-pointer rounded-lg border border-theme-border bg-theme-surface px-2 py-1 text-theme-text"
-              >
-                {themes.map(({ id, label }) => (
-                  <option key={`${id}-${label}`} value={id}>
-                    {label}
-                  </option>
-                ))}
-              </select>
-            </label>
             {view === "app" && (
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-theme-muted max-[420px]:hidden">
-                {today}
-              </span>
-              <div className="relative" ref={settingsRef}>
-                <button
-                  type="button"
-                  className="cursor-pointer bg-transparent py-1 text-inherit"
-                  aria-expanded={settingsOpen}
-                  aria-controls="settings-panel"
-                  onClick={() => setSettingsOpen((open) => !open)}
+              <span className="text-sm text-theme-muted max-[420px]:hidden">{today}</span>
+            )}
+            <div className="relative" ref={settingsRef}>
+              <button
+                type="button"
+                aria-label="Settings"
+                title="Settings"
+                className="flex cursor-pointer items-center bg-transparent p-1 text-inherit"
+                aria-expanded={settingsOpen}
+                aria-controls="settings-panel"
+                onClick={() => setSettingsOpen((open) => !open)}
+              >
+                <Settings aria-hidden="true" className="size-6" />
+              </button>
+              {settingsOpen && (
+                <div
+                  id="settings-panel"
+                  className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text shadow-lg"
                 >
-                  Settings
-                </button>
-                {settingsOpen && (
-                  <div
-                    id="settings-panel"
-                    className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text shadow-lg"
-                  >
-                    <fieldset className="mt-4">
-                      <legend className="mb-2">Text size</legend>
-                      <div className="flex gap-2">
-                        {Object.keys(textSizes).map((option) => (
-                          <button
-                            key={option}
-                            type="button"
-                            className={`flex-1 rounded-lg border border-theme-border px-2 py-1 capitalize ${
-                              textSize === option
-                                ? "bg-theme-accent text-theme-on-accent"
-                                : "bg-theme-surface text-theme-text"
-                            }`}
-                            aria-pressed={textSize === option}
-                            onClick={() => handleTextSizeChange(option)}
-                          >
-                            {option}
-                          </button>
-                        ))}
-                      </div>
-                    </fieldset>
+                  <fieldset>
+                    <legend className="mb-2">Color theme</legend>
+                    <div className="grid grid-cols-2 gap-2">
+                      {themes.map(({ id, label }) => (
+                        <button
+                          key={id}
+                          type="button"
+                          className={`rounded-lg border border-theme-border px-2 py-1 ${
+                            theme === id
+                              ? "bg-theme-accent text-theme-on-accent"
+                              : "bg-theme-surface text-theme-text"
+                          }`}
+                          aria-pressed={theme === id}
+                          onClick={() => handleThemeChange(id)}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <fieldset className="mt-4">
+                    <legend className="mb-2">Text size</legend>
+                    <div className="flex gap-2">
+                      {Object.keys(textSizes).map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          className={`flex-1 rounded-lg border border-theme-border px-2 py-1 capitalize ${
+                            textSize === option
+                              ? "bg-theme-accent text-theme-on-accent"
+                              : "bg-theme-surface text-theme-text"
+                          }`}
+                          aria-pressed={textSize === option}
+                          onClick={() => handleTextSizeChange(option)}
+                        >
+                          {option}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                  {view === "app" && (
                     <fieldset className="mt-4">
                       <legend className="mb-2">Camera check-ins</legend>
                       <button
@@ -359,11 +365,10 @@ function App() {
                       </p>
                       {cameraError && <p className="mt-1 text-xs text-theme-urgent">{cameraError}</p>}
                     </fieldset>
-                  </div>
-                )}
-              </div>
-              </div>
-            )}
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </header>
 
