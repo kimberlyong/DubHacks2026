@@ -369,15 +369,11 @@ function App() {
         </header>
 
         <main className="app-main flex-1">
-<<<<<<< HEAD
-          {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
-=======
           {view === "app" && (
             <CameraRecovery fileName={studyDoc.file?.name} />
           )}
-          
-          {view === "home" && <Homepage onGetStarted={() => setView("signin")} />}
->>>>>>> ce36ea486939f9f447654d9ffa3425b910d427fd
+
+          {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
 
           {view === "signin" && (
             <section className="signin-section mx-auto max-w-xl py-18">
