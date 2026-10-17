@@ -137,9 +137,9 @@ function App() {
       className={`min-h-screen bg-theme-bg text-theme-text ${textSizes[textSize]}`}
     >
       <div
-        className={`mx-auto flex min-h-screen w-full flex-col px-6 ${studyDoc.status === "ready" && name ? "max-w-7xl" : "max-w-4xl"}`}
+        className={`app-shell mx-auto flex min-h-screen w-full flex-col px-6 ${studyDoc.status === "ready" && name ? "max-w-7xl" : "max-w-4xl"}`}
       >
-        <header className="flex min-h-16 items-center justify-between border-b border-theme-border">
+        <header className="site-header flex min-h-16 items-center justify-between border-b border-theme-border">
           <button
             type="button"
             onClick={() => setView(name ? "app" : "home")}
@@ -211,12 +211,12 @@ function App() {
           </div>
         </header>
 
-        <main className="flex-1">
+        <main className="app-main flex-1">
           {view === "home" && <Homepage onGetStarted={() => setView("signin")} />}
 
           {view === "signin" && (
-            <section className="mx-auto max-w-xl py-18">
-              <h1 className="text-3xl font-semibold">Welcome</h1>
+            <section className="signin-section mx-auto max-w-xl py-18">
+              <h1 className="signin-title text-3xl font-semibold">Welcome</h1>
               <p className="my-3 mb-5 leading-relaxed text-theme-muted">
                 Sign in to upload your notes and create a recap.
               </p>
@@ -250,8 +250,8 @@ function App() {
           )}
 
           {view === "app" && (
-            <section className="py-18">
-              <div className="flex items-start justify-between gap-4">
+            <section className="dashboard-section py-18">
+              <div className="dashboard-intro flex items-start justify-between gap-4">
                 <div>
                   <h1 className="text-3xl font-semibold">Welcome, {name}.</h1>
                   <p className="mt-3 leading-relaxed text-theme-muted">
@@ -276,8 +276,8 @@ function App() {
               <ExtensionBanner />
               <StudyHistory entries={history} onResume={handleResumeHistory} />
 
-              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                <article className="border border-theme-border bg-theme-surface p-5">
+              <div className="dashboard-cards mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                <article className="dashboard-card border border-theme-border bg-theme-surface p-5">
                   <h2 className="text-xl font-semibold">Upload a file</h2>
                   <div className="mt-4">
                     <UploadArea
@@ -290,7 +290,7 @@ function App() {
                   </div>
                 </article>
 
-                <article className="border border-theme-border bg-theme-surface p-5">
+                <article className="dashboard-card border border-theme-border bg-theme-surface p-5">
                   <h2 className="text-xl font-semibold">Create a recap</h2>
                   <p className="my-4 text-theme-muted">
                     Make a summary of your uploaded file.
@@ -320,7 +320,7 @@ function App() {
           )}
         </main>
 
-        <footer className="border-t border-theme-border py-4 text-sm text-theme-muted">
+        <footer className="site-footer border-t border-theme-border py-4 text-sm text-theme-muted">
           Recap
         </footer>
       </div>
