@@ -1,2 +1,2 @@
 # DubHacks2026
-DubHacks 2026 Project. 
+DubHacks 2026 Project!
