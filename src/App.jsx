@@ -339,7 +339,9 @@ function App() {
         </header>
 
         <main className="flex-1">
-          <CameraRecovery />
+          {view === "app" && (
+            <CameraRecovery fileName={studyDoc.file?.name} />
+          )}
 
           {view === "home" && <Homepage onGetStarted={() => setView("signin")} />}
 

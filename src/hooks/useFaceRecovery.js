@@ -1,3 +1,4 @@
+
 import { useEffect, useRef, useState } from "react";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 
@@ -12,14 +13,26 @@ export function useFaceRecovery() {
   const landmarkerRef = useRef(null);
   const timerRef = useRef(null);
 
+  const snoozedUntilRef = useRef(0);
+
+function snoozeRecovery() {
+  snoozedUntilRef.current = performance.now() + 5 * 60 * 1000;
+  setStatus("🧠 Got it! We'll snooze for 5 minutes. Keep those ideas flowing!");
+}
+
+  const popupOpenRef = useRef(false);
+
+  useEffect(() => {
+    popupOpenRef.current = showRecovery;
+  }, [showRecovery]);
+
   useEffect(() => {
     if (!enabled) return;
 
     let cancelled = false;
     let distractedSince = null;
-    let returnSince = null;
-    let needsRecovery = false;
-    let lastPopup = 0;
+    let lastPopup = -Infinity;
+    let readyForNextPopup = true;
 
     async function startCamera() {
       try {
@@ -43,11 +56,14 @@ export function useFaceRecovery() {
         video.playsInline = true;
         video.srcObject = stream;
         videoRef.current = video;
+
         await video.play();
 
+        if (cancelled) return;
+
         const vision = await FilesetResolver.forVisionTasks(
-            "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.32/wasm"
-          );
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.32/wasm"
+        );
 
         if (cancelled) return;
 
@@ -76,7 +92,8 @@ export function useFaceRecovery() {
           const now = performance.now();
           const result = landmarker.detectForVideo(video, now);
           const face = result.faceLandmarks?.[0];
-          const blendshapes = result.faceBlendshapes?.[0]?.categories ?? [];
+          const blendshapes =
+            result.faceBlendshapes?.[0]?.categories ?? [];
 
           let distracted = false;
           let reason = "Facing screen";
@@ -86,7 +103,10 @@ export function useFaceRecovery() {
             reason = "Face not visible";
           } else {
             const scores = Object.fromEntries(
-              blendshapes.map((item) => [item.categoryName, item.score])
+              blendshapes.map((item) => [
+                item.categoryName,
+                item.score,
+              ])
             );
 
             const eyesClosed =
@@ -96,48 +116,63 @@ export function useFaceRecovery() {
             const nose = face[1];
             const leftEye = face[33];
             const rightEye = face[263];
+
             const eyeCenterX = (leftEye.x + rightEye.x) / 2;
             const eyeWidth = Math.abs(rightEye.x - leftEye.x);
-            const headTurn = eyeWidth > 0.01
-              ? Math.abs((nose.x - eyeCenterX) / eyeWidth)
-              : 0;
 
-            // Estimate whether the head is tilted up or down
+            const headTurn =
+              eyeWidth > 0.01
+                ? Math.abs((nose.x - eyeCenterX) / eyeWidth)
+                : 0;
+
             const forehead = face[10];
             const chin = face[152];
+
             const faceHeight = Math.abs(chin.y - forehead.y);
             const eyeCenterY = (leftEye.y + rightEye.y) / 2;
-            const verticalPosition = faceHeight > 0.01 ? (nose.y - eyeCenterY) / faceHeight : 0;
-            const lookingUpOrDown = verticalPosition < 0.12 || verticalPosition > 0.38;
+
+            const verticalPosition =
+              faceHeight > 0.01
+                ? (nose.y - eyeCenterY) / faceHeight
+                : 0;
+
+            const lookingUpOrDown =
+              verticalPosition < 0.12 ||
+              verticalPosition > 0.38;
 
             if (eyesClosed) {
               distracted = true;
               reason = "Eyes appear closed";
             } else if (headTurn > 0.32 || lookingUpOrDown) {
-                distracted = true;
-                reason = "Looking away from screen (estimate)";
-              }
+              distracted = true;
+              reason = "Looking away from screen (estimate)";
+            }
           }
 
           setStatus(reason);
 
           if (distracted) {
-            returnSince = null;
-            if (distractedSince === null) distractedSince = now;
-            if (now - distractedSince >= 5000) needsRecovery = true;
+            if (distractedSince === null) {
+              distractedSince = now;
+            }
+
+            const awayFor = now - distractedSince;
+
+            if (
+              awayFor >= 5000 &&
+              readyForNextPopup &&
+              !popupOpenRef.current &&
+              now >= snoozedUntilRef.current &&
+              now - lastPopup >= 30000
+              ) {
+              popupOpenRef.current = true;
+              setShowRecovery(true);
+              lastPopup = now;
+              readyForNextPopup = false;
+            }
           } else {
             distractedSince = null;
-
-            if (needsRecovery) {
-              if (returnSince === null) returnSince = now;
-
-              if (now - returnSince >= 1000 && now - lastPopup >= 12000) {
-                setShowRecovery(true);
-                needsRecovery = false;
-                lastPopup = now;
-                returnSince = null;
-              }
-            }
+            readyForNextPopup = true;
           }
         }, 200);
       } catch (err) {
@@ -153,9 +188,14 @@ export function useFaceRecovery() {
     return () => {
       cancelled = true;
       clearInterval(timerRef.current);
-      streamRef.current?.getTracks().forEach((track) => track.stop());
+
+      streamRef.current
+        ?.getTracks()
+        .forEach((track) => track.stop());
+
       streamRef.current = null;
       videoRef.current = null;
+
       landmarkerRef.current?.close();
       landmarkerRef.current = null;
     };
@@ -167,6 +207,7 @@ export function useFaceRecovery() {
     status,
     showRecovery,
     setShowRecovery,
+    snoozeRecovery,
     error,
   };
 }
