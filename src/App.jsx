@@ -459,7 +459,7 @@ function App() {
 
               <ExtensionBanner />
 
-              <div className={`dashboard-cards mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-2" : ""}`}>
+              <div className={`dashboard-cards mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-[3fr_2fr]" : "lg:grid-cols-2"}`}>
                 {ready ? (
                   <>
                     <DocumentViewer
@@ -492,27 +492,30 @@ function App() {
                       </div>
                     </article>
 
-                    <article className="dashboard-card border border-theme-border bg-theme-surface p-5">
-                      <h2 className="text-xl font-semibold">Create a recap</h2>
-                      <p className="my-4 text-theme-muted">
-                        Make a summary of your uploaded file.
-                      </p>
-                      <button
-                        className="border border-theme-border bg-theme-surface px-3 py-2 text-theme-text disabled:cursor-not-allowed disabled:opacity-50"
-                        type="button"
-                        disabled={studyDoc.status !== "ready"}
-                        onClick={() => setPanelOpen(true)}
-                      >
-                        Open study panel
-                      </button>
-                      <p
-                        className="mt-3 text-sm text-theme-muted"
-                        aria-live="polite"
-                      >
-                        {studyDoc.status === "ready"
-                          ? "Your file is ready to study."
-                          : "Your recap starts with an upload."}
-                      </p>
+                    <article className="dashboard-card rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
+                      <h2 className="text-xl font-semibold">Past files</h2>
+                      {history.length === 0 ? (
+                        <p className="mt-4 text-theme-muted">
+                          Nothing here yet. Files you upload will show up here.
+                        </p>
+                      ) : (
+                        <ul className="mt-4 max-h-96 space-y-2 overflow-y-auto">
+                          {history.map((entry) => (
+                            <li key={entry.fileName + entry.savedAt}>
+                              <button
+                                type="button"
+                                onClick={() => handleResumeHistory(entry)}
+                                className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-theme-border px-4 py-3 text-left hover:bg-theme-border/20"
+                              >
+                                <span className="min-w-0 truncate font-medium">{entry.fileName}</span>
+                                <span className="shrink-0 text-xs text-theme-muted">
+                                  {relativeTime(entry.savedAt)}
+                                </span>
+                              </button>
+                            </li>
+                          ))}
+                        </ul>
+                      )}
                     </article>
                   </>
                 )}
