@@ -41,6 +41,14 @@
   --review-t: #eee;
   --reflect: #111;
   --reflect-t: #eee;
+  /* Sprout as a little panda instead of a solid black blob */
+  --sprout-body: #fff;
+  --sprout-outline: #1a1a1a;
+  --sprout-ear: #1a1a1a;
+  --sprout-leaf: #1a1a1a;
+  --sprout-leaf-2: #9a9a9a;
+  --sprout-cheek: #f5a3b5;
+  --sprout-cheek-opacity: 0.85;
 }
 
 [data-theme="mauve"] {
@@ -747,6 +755,7 @@ input,
 }
 .animate-sprout-blink {
   animation: sprout-blink 4.5s ease-in-out infinite;
+  transform-box: fill-box;
   transform-origin: center;
 }
 
