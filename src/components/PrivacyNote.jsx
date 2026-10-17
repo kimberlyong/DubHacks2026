@@ -26,7 +26,7 @@ export default function PrivacyNote() {
       {open && (
         <ul className="mt-3 list-disc space-y-1.5 pl-4 text-theme-muted">
           <li>Your file is read inside your browser — it's never uploaded as a file.</li>
-          <li>The extracted text is sent to Gemini only to generate your summary, key terms, or answers.</li>
+          <li>The extracted text is sent to Gemini only to generate your summary, key terms, flashcards, or answers.</li>
           <li>History and settings (theme, text size, recent files) live only in your browser's local storage — we never see them.</li>
           <li>Content pulled in from the Canvas extension sits on the server for up to 10 minutes and is deleted the moment it's loaded.</li>
           <li>Nothing is logged, stored in a database, or shared with anyone else.</li>

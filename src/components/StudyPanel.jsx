@@ -47,7 +47,7 @@ export default function StudyPanel({ fileName, documentId, text, mode, onModeCha
           <section aria-label="Study tool">
             {mode === "plan" && <Plan documentId={documentId} text={text} fileName={fileName} />}
             {mode === "keyTerms" && <KeyTerms documentId={documentId} text={text} />}
-            {mode === "flashcards" && <Flashcards />}
+            {mode === "flashcards" && <Flashcards documentId={documentId} text={text} />}
             {mode === "visualizer" && <Visualizer documentId={documentId} text={text} />}
             {mode === "outline" && <Outline />}
             {mode === "ask" && <AskQuestions documentId={documentId} />}

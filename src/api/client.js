@@ -31,6 +31,9 @@ export const fetchFlowchart = ({ documentId, text }, signal) =>
 export const fetchKeyTerms = ({ documentId, text }, signal) =>
   post("/key-terms", { documentId, text }, signal).then((d) => d.terms);
 
+export const fetchFlashcards = ({ documentId, text }, signal) =>
+  post("/flashcards", { documentId, text }, signal).then((d) => d.cards);
+
 export const fetchPlan = ({ documentId, text, minutes, energy }, signal) =>
   post("/plan", { documentId, text, minutes, energy }, signal).then((d) => d.steps);
 

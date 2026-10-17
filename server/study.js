@@ -238,3 +238,37 @@ export async function gameQuestions({ documentId, text, type, signal }) {
     throw new ApiError(502, "Couldn't read the questions the model returned. Please retry.");
   }
 }
+
+export async function flashcards({ documentId, text, signal }) {
+  validateText(text);
+  const source = await getSource(documentId, text, signal);
+  const raw = await generate(
+    `Create 8-12 useful study flashcards from this document. Focus on important concepts, definitions, relationships, and facts. Each question should be clear without relying on another card; each answer should be concise but complete. Respond with JSON only: an array of objects {"question": string, "answer": string}. Do not include markdown or information that is not supported by the document.\n\nDocument:\n---\n${source}`,
+    { json: true, signal },
+  );
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) throw new Error("not an array");
+    const cards = parsed
+      .filter(
+        (card) =>
+          card &&
+          typeof card.question === "string" &&
+          card.question.trim() &&
+          typeof card.answer === "string" &&
+          card.answer.trim(),
+      )
+      .slice(0, 20)
+      .map(({ question, answer }) => ({
+        question: question.trim().slice(0, 1000),
+        answer: answer.trim().slice(0, 2000),
+      }));
+    if (cards.length < 2) throw new Error("too few cards");
+    return cards;
+  } catch {
+    throw new ApiError(502, "Couldn't read the flashcards the model returned. Please retry.");
+  }
+}
+
+  }
+}
