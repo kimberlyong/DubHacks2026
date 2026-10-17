@@ -29,7 +29,7 @@ export const LEVELS = [
 
 export const config = {
   port: Number(process.env.PORT) || 8787,
-  geminiModel: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+  geminiModel: process.env.GEMINI_MODEL || "gemini-3.8-flash",
   // Backboard's docs don't list Gemini model ids; set this to a name returned by
   // GET /models/provider/google. Defaults to the same model as above.
   backboardModel: process.env.BACKBOARD_GEMINI_MODEL || process.env.GEMINI_MODEL || "gemini-2.5-flash",
