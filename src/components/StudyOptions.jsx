@@ -1,4 +1,4 @@
-import { BookOpen, Brain, ClipboardList, HelpCircle, ListTree, MessageCircle, Baby } from "lucide-react";
+import { BookOpen, Brain, ClipboardList, HelpCircle, ListTree, MessageCircle, Network } from "lucide-react";
 
 export const STUDY_MODES = [
   { id: "flashcards", label: "Flashcards", Icon: BookOpen },
@@ -6,7 +6,7 @@ export const STUDY_MODES = [
   { id: "keyTerms", label: "Key Terms & Definitions", Icon: ClipboardList },
   { id: "outline", label: "Outline / Study Guide", Icon: ListTree },
   { id: "ask", label: "Ask Questions", Icon: MessageCircle },
-  { id: "eli5", label: "Explain Like I'm 5", Icon: Baby },
+  { id: "visualizer", label: "Visualizer", Icon: Network },
 ];
 
 export default function StudyOptions({ activeMode, loadingMode, onSelect }) {

@@ -38,7 +38,7 @@ async function mapLimit(items, limit, fn) {
 
 // Returns the text to base final output on: the document itself when short,
 // otherwise condensed notes from each chunk.
-async function getSource(documentId, text, signal) {
+export async function getSource(documentId, text, signal) {
   if (text.length <= config.singlePassChars) return text;
 
   const cached = digestCache.get(documentId);
