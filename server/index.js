@@ -1,3 +1,4 @@
+import { randomUUID } from "crypto";
 import express from "express";
 import { config } from "./config.js";
 import { ApiError } from "./gemini.js";
@@ -74,6 +75,40 @@ app.post("/api/chat", route(async (req) => {
     throw new ApiError(400, "Enter a question (up to 4000 characters).");
   }
   return { reply: await chat(documentId, message.trim()) };
+}));
+
+// Handoff for the Canvas extension: it POSTs extracted page text here, then
+// opens the web app with the returned id so the app can pick it up. The
+// extension runs as a chrome-extension:// origin, so these two routes alone
+// allow cross-origin requests; everything else still requires same-origin.
+const EXTRACT_TTL_MS = 10 * 60_000;
+const extracted = new Map(); // id -> { fileName, text, expiresAt }
+
+app.use("/api/extract", (req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Content-Type");
+  res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
+  if (req.method === "OPTIONS") return res.sendStatus(204);
+  next();
+});
+
+app.post("/api/extract", route(async (req) => {
+  const { fileName, text } = req.body ?? {};
+  validateText(text);
+  const id = randomUUID();
+  for (const [key, value] of extracted) if (value.expiresAt < Date.now()) extracted.delete(key);
+  extracted.set(id, { fileName: String(fileName ?? "Canvas page").slice(0, 200), text, expiresAt: Date.now() + EXTRACT_TTL_MS });
+  return { id };
+}));
+
+app.get("/api/extract/:id", route(async (req) => {
+  const entry = extracted.get(req.params.id);
+  if (!entry || entry.expiresAt < Date.now()) {
+    extracted.delete(req.params.id);
+    throw new ApiError(404, "This extracted page has expired. Try extracting it again.");
+  }
+  extracted.delete(req.params.id); // one-time pickup
+  return { fileName: entry.fileName, text: entry.text };
 }));
 
 app.listen(config.port, () => console.log(`API listening on http://localhost:${config.port}`));
