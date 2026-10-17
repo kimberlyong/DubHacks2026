@@ -5,6 +5,7 @@ import PrivacyNote from "./components/PrivacyNote";
 import DocumentViewer from "./components/DocumentViewer";
 import StudyPanel from "./components/StudyPanel";
 import UploadArea from "./components/UploadArea";
+import CameraRecovery from "./components/CameraRecovery";
 import { useDocument } from "./hooks/useDocument";
 import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
@@ -338,6 +339,8 @@ function App() {
         </header>
 
         <main className="flex-1">
+          <CameraRecovery />
+
           {view === "home" && <Homepage onGetStarted={() => setView("signin")} />}
 
           {view === "signin" && (
