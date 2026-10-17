@@ -7,6 +7,8 @@ import StudyHistory from "./components/StudyHistory";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
 import { getHistory } from "./lib/studyHistory";
+import Sprout from "./sprout/Sprout";
+import { useSprout } from "./sprout/SproutContext";
 
 const textSizes = {
   small: "text-sm",
@@ -54,6 +56,9 @@ function App() {
   const [settingsOpen, setSettingsOpen] = useState(false);
   const settingsRef = useRef(null);
   const [history, setHistory] = useState(getHistory);
+  const [extractError, setExtractError] = useState(null);
+  const { say } = useSprout();
+  const justExtractedRef = useRef(false);
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -110,6 +115,7 @@ function App() {
   async function handleSelectFile(file) {
     await studyDoc.upload(file);
     setHistory(getHistory());
+    say("Got it — let's break this down. 🌱", "happy");
   }
 
   function handleResumeHistory(entry) {
@@ -121,10 +127,48 @@ function App() {
     studyDoc.remove();
   }
 
-  // Open the panel as soon as a document finishes extracting.
+  // Open the panel as soon as a document finishes extracting, and let
+  // Sprout say something about it — worded differently when it came in via
+  // the Canvas extension (see justExtractedRef, set below).
   useEffect(() => {
-    if (studyDoc.status === "ready") setPanelOpen(true);
-  }, [studyDoc.documentId, studyDoc.status]);
+    if (studyDoc.status !== "ready") return;
+    setPanelOpen(true);
+    if (justExtractedRef.current) {
+      justExtractedRef.current = false;
+      say("Nice, I grabbed that for you! Ready when you are. ✨", "happy");
+    }
+  }, [studyDoc.documentId, studyDoc.status, say]);
+
+  // Pick up content handed off by the Canvas extension: it opens this app
+  // with ?extract=<id>, and the text is waiting at /api/extract/:id.
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    const id = url.searchParams.get("extract");
+    if (!id) return;
+    url.searchParams.delete("extract");
+    window.history.replaceState({}, "", url);
+
+    (async () => {
+      try {
+        const res = await fetch(`/api/extract/${encodeURIComponent(id)}`);
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error ?? "That extracted page could not be loaded.");
+        if (!localStorage.getItem("recap-name")) {
+          setName("there");
+          localStorage.setItem("recap-name", "there");
+        }
+        setView("app");
+        justExtractedRef.current = true;
+        studyDoc.loadText(data.text, data.fileName, "extension");
+        setHistory(getHistory());
+      } catch (err) {
+        setView("app");
+        setExtractError(err.message);
+      }
+    })();
+    // Runs once on mount; studyDoc.loadText is stable (useCallback).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const today = new Intl.DateTimeFormat(undefined, {
     weekday: "short",
@@ -268,9 +312,9 @@ function App() {
                 </button>
               </div>
 
-              {studyDoc.error && (
+              {(studyDoc.error || extractError) && (
                 <p role="alert" className="mt-4 text-theme-urgent">
-                  {studyDoc.error}
+                  {studyDoc.error || extractError}
                 </p>
               )}
 
@@ -335,6 +379,7 @@ function App() {
           onClose={() => setPanelOpen(false)}
         />
       )}
+      {view === "app" && <Sprout />}
     </div>
   );
 }
