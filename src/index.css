@@ -41,18 +41,12 @@
   --review-t: #eee;
   --reflect: #111;
   --reflect-t: #eee;
-  /* Sprout as a panda cub instead of a solid black blob */
-  --sprout-body: #fff;
-  --sprout-outline: #1a1a1a;
-  --sprout-ear: #1a1a1a;
-  --sprout-ear-rim: #fff;
-  --sprout-ear-inner-opacity: 0; /* solid black panda ears */
-  --sprout-eye-patch: #1a1a1a;
-  --sprout-eye-ring: #fff;
-  --sprout-leaf: #6a6a6a;
-  --sprout-leaf-2: #b5b5b5;
-  --sprout-cheek: #f5a3b5;
-  --sprout-cheek-opacity: 0.85;
+  /* Sprout stays a brown bear cub here (the accent is black, which would make it a blob) */
+  --sprout-body: #c0753f;
+  --sprout-ear: #c0753f;
+  --sprout-leaf: #5c7a4a;
+  --sprout-leaf-2: #c0753f;
+  --sprout-cheek: #2b2420;
 }
 
 [data-theme="mauve"] {
