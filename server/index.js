@@ -2,7 +2,7 @@ import express from "express";
 import { config } from "./config.js";
 import { ApiError } from "./gemini.js";
 import { chat, registerDocument } from "./backboard.js";
-import { keyTerms, summarize, validateText } from "./study.js";
+import { keyTerms, summarize, summarizeAll, validateText } from "./study.js";
 
 const app = express();
 app.use(express.json({ limit: "3mb" }));
@@ -50,6 +50,12 @@ app.post("/api/summarize", route(async (req, res) => {
   const { documentId, text, level } = req.body ?? {};
   requireId(documentId);
   return { summary: await summarize({ documentId, text, level, signal: abortOnClose(req, res) }) };
+}));
+
+app.post("/api/summarize-all", route(async (req, res) => {
+  const { documentId, text } = req.body ?? {};
+  requireId(documentId);
+  return { summaries: await summarizeAll({ documentId, text, signal: abortOnClose(req, res) }) };
 }));
 
 app.post("/api/key-terms", route(async (req, res) => {
