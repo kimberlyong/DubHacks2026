@@ -30,6 +30,13 @@ export const LEVELS = [
 export const config = {
   port: Number(process.env.PORT) || 8787,
   geminiModel: process.env.GEMINI_MODEL || "gemini-3.8-flash",
+  // Tried in order when the main model is overloaded or unavailable.
+  geminiFallbackModels: (process.env.GEMINI_FALLBACK_MODELS || "gemini-3.5-flash,gemini-3.5-flash-lite")
+    .split(",")
+    .map((m) => m.trim())
+    .filter(Boolean),
+  geminiRetries: 1, // extra attempts per model before falling back
+  geminiCooldownMs: 60_000, // skip a model this long after it reports overloaded
   // Backboard's docs don't list Gemini model ids; set this to a name returned by
   // GET /models/provider/google. Defaults to the same model as above.
   backboardModel: process.env.BACKBOARD_GEMINI_MODEL || process.env.GEMINI_MODEL || "gemini-3.8-flash",
