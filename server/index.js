@@ -2,7 +2,8 @@ import { randomUUID } from "crypto";
 import express from "express";
 import { config } from "./config.js";
 import { ApiError } from "./gemini.js";
-import { chat, registerDocument } from "./backboard.js";
+import { chat, documentKey, loadSavedSummaries, registerDocument, saveSummaries } from "./backboard.js";
+import { readIcsCalendar } from "./calendar.js";
 import { buildFlowchart, findImages } from "./visualize.js";
 import { flashcards, gameQuestions, keyTerms, plan, summarize, summarizeAll, validateText } from "./study.js";
 

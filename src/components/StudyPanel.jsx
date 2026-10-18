@@ -2,10 +2,7 @@ import { useSummary } from "../hooks/useSummary";
 import StudyOptions from "./StudyOptions";
 import SummaryDisplay from "./SummaryDisplay";
 import SummarySlider from "./SummarySlider";
-import AskQuestions from "./study/AskQuestions";
 import Flashcards from "./study/Flashcards";
-import KeyTerms from "./study/KeyTerms";
-import Outline from "./study/Outline";
 import Plan from "./study/Plan";
 import Visualizer from "./study/Visualizer";
 
@@ -46,11 +43,8 @@ export default function StudyPanel({ fileName, documentId, text, mode, onModeCha
         {mode && (
           <section aria-label="Study tool">
             {mode === "plan" && <Plan documentId={documentId} text={text} fileName={fileName} />}
-            {mode === "keyTerms" && <KeyTerms documentId={documentId} text={text} />}
             {mode === "flashcards" && <Flashcards documentId={documentId} text={text} />}
             {mode === "visualizer" && <Visualizer documentId={documentId} text={text} />}
-            {mode === "outline" && <Outline />}
-            {mode === "ask" && <AskQuestions documentId={documentId} />}
           </section>
         )}
       </div>
