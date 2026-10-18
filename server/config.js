@@ -27,6 +27,14 @@ export const LEVELS = [
   },
 ];
 
+// Appended to every summary prompt; SummaryDisplay.jsx renders exactly this markup.
+export const SUMMARY_FORMAT =
+  "Format for easy reading: separate paragraphs with a blank line (keep each to 2-4 sentences); " +
+  "wrap key terms and important keywords in **double asterisks** to bold them; " +
+  "wrap the single main idea of each paragraph or bullet in __double underscores__ to underline it (a short phrase, not a whole sentence); " +
+  "use '- ' bullets for lists and '## ' for short section headings only when they help. " +
+  "Use no other markdown (no italics, numbered lists, tables or code).";
+
 export const config = {
   port: Number(process.env.PORT) || 8787,
   geminiModel: process.env.GEMINI_MODEL || "gemini-3.8-flash",
