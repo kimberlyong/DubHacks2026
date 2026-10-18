@@ -102,16 +102,16 @@ function PdfBody({ file }) {
     setPage(n);
   }
 
-  const frame = "h-[85vh] border border-black dark:border-white";
+  const frame = "h-[85vh] w-full min-w-0 overflow-hidden rounded-lg border border-theme-border";
   if (failed) return <p className="text-sm">Couldn't preview this PDF.</p>;
   if (!pdf) return <p className="text-sm">Loading document…</p>;
 
   const btn =
-    "flex size-7 cursor-pointer items-center justify-center border border-black disabled:cursor-not-allowed disabled:opacity-40 dark:border-white";
+    "flex size-7 cursor-pointer items-center justify-center rounded-md border border-theme-border hover:bg-theme-border/20 disabled:cursor-not-allowed disabled:opacity-40";
 
   return (
     <div className={`flex flex-col ${frame}`}>
-      <div className="flex items-center justify-between gap-3 border-b border-black px-3 py-2 text-sm dark:border-white">
+      <div className="flex items-center justify-between gap-3 border-b border-theme-border bg-theme-surface px-3 py-2 text-sm">
         <label className="flex items-center gap-1">
           Page
           <input
@@ -120,7 +120,7 @@ function PdfBody({ file }) {
             max={pdf.numPages}
             value={page}
             onChange={(e) => goToPage(e.target.value)}
-            className="w-12 border border-black bg-transparent px-1 py-0.5 text-center dark:border-white"
+            className="w-12 rounded-md border border-theme-border bg-transparent px-1 py-0.5 text-center"
           />
           of {pdf.numPages}
         </label>
@@ -152,7 +152,7 @@ function PdfBody({ file }) {
         tabIndex={0}
         role="region"
         aria-label={`${file.name} pages`}
-        className="flex-1 overflow-auto bg-neutral-200 p-3 dark:bg-neutral-800"
+        className="min-h-0 flex-1 overflow-auto bg-theme-border/25 p-3"
       >
         <div className="mx-auto flex w-max min-w-full flex-col items-center gap-3">
           {Array.from({ length: pdf.numPages }, (_, i) => (
@@ -161,7 +161,7 @@ function PdfBody({ file }) {
               ref={(el) => {
                 canvasRefs.current[i] = el;
               }}
-              className="bg-white"
+              className="bg-white shadow-sm ring-1 ring-black/10"
             />
           ))}
         </div>
@@ -214,7 +214,7 @@ function DocumentBody({ file, text }) {
       tabIndex={0}
       role="region"
       aria-label="Document text"
-      className="max-h-[85vh] overflow-y-auto whitespace-pre-wrap break-words rounded-lg border border-theme-border bg-theme-surface p-4 leading-relaxed"
+      className="h-[85vh] w-full min-w-0 overflow-y-auto whitespace-pre-wrap break-words rounded-lg border border-theme-border bg-theme-bg p-4 leading-relaxed"
     >
       {text}
     </div>
@@ -231,7 +231,7 @@ export default function DocumentViewer({ file, text, onReplace, onRemove }) {
   }
 
   return (
-    <article className="rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
+    <article className="min-w-0 rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
       <header className="mb-4 flex items-start justify-between gap-3">
         <h2 className="min-w-0 break-all text-xl font-semibold">{file.name}</h2>
         <div className="flex shrink-0 items-center gap-1">
