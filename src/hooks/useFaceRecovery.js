@@ -2,6 +2,11 @@
 import { useEffect, useRef, useState } from "react";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 
+// Looking away this long brings up the "Still with me?" popup.
+const POPUP_AFTER_MS = 4000;
+// How long you have to look back before the countdown starts over.
+const REFOCUS_MS = 1000;
+
 export function useFaceRecovery({ onDistracted, onReturn } = {}) {
   const [enabled, setEnabled] = useState(false);
   const [status, setStatus] = useState("Camera off");
@@ -34,6 +39,7 @@ export function useFaceRecovery({ onDistracted, onReturn } = {}) {
 
     let cancelled = false;
     let distractedSince = null;
+    let focusedSince = null;
     let readyForNextPopup = true;
     let lastPopup = -Infinity;
 
@@ -145,10 +151,11 @@ export function useFaceRecovery({ onDistracted, onReturn } = {}) {
           setStatus(reason);
 
           if (distracted) {
+            focusedSince = null;
             if (distractedSince === null) distractedSince = now;
 
             if (
-              now - distractedSince >= 5000 &&
+              now - distractedSince >= POPUP_AFTER_MS &&
               readyForNextPopup &&
               !popupOpenRef.current &&
               now >= snoozedUntilRef.current &&
@@ -161,8 +168,13 @@ export function useFaceRecovery({ onDistracted, onReturn } = {}) {
               callbacksRef.current.onDistracted?.(reason);
             }
           } else {
-            distractedSince = null;
-            readyForNextPopup = true;
+            // One "facing screen" frame mid-glance shouldn't restart the
+            // countdown; only a real look back (a full second) does.
+            if (focusedSince === null) focusedSince = now;
+            if (now - focusedSince >= REFOCUS_MS) {
+              distractedSince = null;
+              readyForNextPopup = true;
+            }
           }
         }, 200);
       } catch (err) {
