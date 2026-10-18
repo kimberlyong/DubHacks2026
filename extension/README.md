@@ -20,7 +20,8 @@ page and sends it straight into Clarity — no copy-paste, no file upload.
 
 ## How it works
 
-1. `content.js` runs on `*.instructure.com` pages. It looks through a
+1. `content.js` runs on Canvas pages, on `*.instructure.com` or a school's own
+   domain like `canvas.uw.edu` (the popup injects it there). It looks through a
    priority list of Canvas page types (assignment → syllabus → lecture page →
    discussion → quiz → generic content) and returns the first one with real
    text in it, along with the title, course name, and due date when present.

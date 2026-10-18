@@ -15,9 +15,9 @@ async function getActiveTab() {
 }
 
 // The content script only runs on pages matching the manifest's
-// content_scripts (instructure.com) and only loads on new page loads after
-// the extension was installed. Inject it manually as a fallback so "extract"
-// still works on a tab that was already open.
+// content_scripts and only loads on new page loads after the extension was
+// installed. Schools host Canvas on their own domains (canvas.uw.edu), so
+// inject it manually as a fallback; activeTab allows that on any site.
 async function askContentScriptToExtract(tabId) {
   try {
     return await chrome.tabs.sendMessage(tabId, { action: "extract" });
@@ -33,7 +33,7 @@ button.addEventListener("click", async () => {
 
   try {
     const tab = await getActiveTab();
-    if (!tab?.url || !/instructure\.com/.test(tab.url)) {
+    if (!tab?.url || !/^https?:/.test(tab.url)) {
       throw new Error("Open a Canvas assignment, syllabus, or page first.");
     }
 
