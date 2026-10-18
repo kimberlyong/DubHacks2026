@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Camera, CameraOff } from "lucide-react";
 import { useFaceRecovery } from "../hooks/useFaceRecovery";
 import { CAMERA_ON_MESSAGES, pick } from "../sprout/messages";
+import SproutArt from "../sprout/SproutArt";
 import { useSprout } from "../sprout/SproutContext";
 
 const MODES = [
@@ -16,6 +18,73 @@ function useSproutCameraHello(status) {
   useEffect(() => {
     if (status === "Watching for focus changes") say(pick(CAMERA_ON_MESSAGES), "happy");
   }, [status, say]);
+}
+
+// The "still here?" check in. Rendered into the themed app root rather than
+// inside the page, so the page's fade-in transform can't pull it off center
+// and the theme colors still apply.
+function RecoveryDialog({ fileName, onBack, onBreak, onThinking }) {
+  const [root, setRoot] = useState(null);
+  useEffect(() => setRoot(document.querySelector("[data-theme]") ?? document.body), []);
+
+  useEffect(() => {
+    function handleKey(event) {
+      if (event.key === "Escape") onBack();
+    }
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [onBack]);
+
+  if (!root) return null;
+  return createPortal(
+    <div
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="recovery-title"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm"
+    >
+      <div className="w-full max-w-sm rounded-2xl border border-theme-border bg-theme-surface p-6 text-theme-text shadow-2xl">
+        <SproutArt className="mx-auto size-16 animate-sprout-bob" />
+        <h3 id="recovery-title" className="mt-3 text-center text-xl font-semibold">
+          Still with me?
+        </h3>
+        <p className="mt-1 text-center text-sm text-theme-muted">
+          I noticed you looking away for a bit. Totally normal. Want to jump back in?
+        </p>
+        {fileName && (
+          <div className="mt-4 rounded-xl bg-theme-bg px-4 py-3">
+            <p className="text-xs font-medium text-theme-muted">You were reading</p>
+            <p className="mt-0.5 truncate text-sm font-medium">{fileName}</p>
+          </div>
+        )}
+        <div className="mt-5 flex flex-col gap-2">
+          <button
+            type="button"
+            autoFocus
+            onClick={onBack}
+            className="cursor-pointer rounded-lg bg-theme-accent px-4 py-2.5 text-sm font-medium text-theme-on-accent"
+          >
+            I'm back, let's focus
+          </button>
+          <button
+            type="button"
+            onClick={onBreak}
+            className="cursor-pointer rounded-lg border border-theme-border bg-transparent px-4 py-2.5 text-sm font-medium text-theme-text hover:bg-theme-border/30"
+          >
+            I need a brain break
+          </button>
+          <button
+            type="button"
+            onClick={onThinking}
+            className="cursor-pointer bg-transparent px-4 py-1.5 text-sm text-theme-muted hover:text-theme-text"
+          >
+            I'm thinking, not distracted
+          </button>
+        </div>
+      </div>
+    </div>,
+    root,
+  );
 }
 
 export default function CameraRecovery({ fileName, onBrainBreak }) {
@@ -128,57 +197,20 @@ export default function CameraRecovery({ fileName, onBrainBreak }) {
       )}
 
       {showRecovery && !onBreak && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="recovery-title"
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-        >
-          <div className="w-full max-w-md rounded-2xl bg-white p-6 text-black shadow-2xl">
-            <h3 id="recovery-title" className="text-center text-2xl font-bold">
-              Are you still here??
-            </h3>
-            <p className="my-4 text-center text-gray-600">
-              Your study buddy noticed you looking away!
-              Need a little motivation?!
-            </p>
-            {fileName && (
-              <div className="mb-5 rounded-xl bg-gray-100 p-4">
-                <p className="text-xs font-semibold uppercase text-gray-500">
-                  Your current study material
-                </p>
-                <p className="mt-1 font-medium">{fileName}</p>
-              </div>
-            )}
-            <div className="flex flex-col gap-2">
-              <button type="button" onClick={returnToStudy} className="rounded-lg bg-black px-4 py-3 text-white">
-                I'm back! Let's focus :)
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  setEnabled(false);
-                  setShowRecovery(false);
-                  onBrainBreak?.();
-                }}
-                className="rounded-lg border border-black px-4 py-3"
-              >
-                I need a brain break
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  snoozeRecovery();
-                  setShowRecovery(false);
-                  setSnoozeMessage(true);
-                }}
-                className="px-4 py-2 text-sm text-gray-500"
-              >
-                I'm thinking, not distracted!
-              </button>
-            </div>
-          </div>
-        </div>
+        <RecoveryDialog
+          fileName={fileName}
+          onBack={returnToStudy}
+          onBreak={() => {
+            setEnabled(false);
+            setShowRecovery(false);
+            onBrainBreak?.();
+          }}
+          onThinking={() => {
+            snoozeRecovery();
+            setShowRecovery(false);
+            setSnoozeMessage(true);
+          }}
+        />
       )}
     </section>
   );
