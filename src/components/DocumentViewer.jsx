@@ -35,14 +35,16 @@ function PdfBody({ file }) {
 
   useEffect(() => {
     let cancelled = false;
-    let doc = null;
+    let task = null;
     (async () => {
       try {
         const pdfjs = await import("pdfjs-dist");
         const { default: workerSrc } = await import("pdfjs-dist/build/pdf.worker.min.mjs?url");
         pdfjs.GlobalWorkerOptions.workerSrc = workerSrc;
-        doc = await pdfjs.getDocument({ data: await file.arrayBuffer() }).promise;
-        if (cancelled) doc.destroy();
+        task = pdfjs.getDocument({ data: await file.arrayBuffer() });
+        const doc = await task.promise;
+        // pdfjs v6 cleans up through the loading task (the document has no destroy()).
+        if (cancelled) task.destroy();
         else setPdf(doc);
       } catch {
         if (!cancelled) setFailed(true);
@@ -50,7 +52,7 @@ function PdfBody({ file }) {
     })();
     return () => {
       cancelled = true;
-      doc?.destroy();
+      task?.destroy();
     };
   }, [file]);
 
