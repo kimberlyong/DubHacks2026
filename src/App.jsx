@@ -14,6 +14,7 @@ import { useDocument } from "./hooks/useDocument";
 import { loadFile } from "./lib/fileStore";
 import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
+import PageErrorBoundary from "./components/PageErrorBoundary";
 import SproutArt from "./sprout/SproutArt";
 import {
   EXTENSION_READY_MESSAGES,
@@ -486,6 +487,7 @@ function App() {
             view === "app" && !(ready && page === "study") ? "mx-auto w-full max-w-6xl" : ""
           }`}
         >
+          <PageErrorBoundary key={`${view}-${page}`} onHome={() => navigate("home")}>
           {view === "app" && page === "study" && (
             <CameraRecovery
               fileName={studyDoc.file?.name}
@@ -638,6 +640,7 @@ function App() {
               </div>
             </section>
           )}
+          </PageErrorBoundary>
         </main>
         </div>
 

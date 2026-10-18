@@ -6,7 +6,21 @@ const KEY = "recap-saved-plans";
 export function getSavedPlans() {
   try {
     const raw = JSON.parse(localStorage.getItem(KEY) ?? "[]");
-    return Array.isArray(raw) ? raw : [];
+    // Skip anything malformed so one bad entry can't break the Plans page.
+    return Array.isArray(raw)
+      ? raw
+          .filter((p) => p && typeof p === "object" && Array.isArray(p.steps))
+          .map((p) => ({
+            ...p,
+            fileName: String(p.fileName ?? "Untitled"),
+            done: Array.isArray(p.done) ? p.done : [],
+            steps: p.steps.filter((s) => s && typeof s === "object").map((s) => ({
+              ...s,
+              title: String(s.title ?? ""),
+              instruction: String(s.instruction ?? ""),
+            })),
+          }))
+      : [];
   } catch {
     return [];
   }
