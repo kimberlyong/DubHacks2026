@@ -50,3 +50,7 @@ export const registerDocument = ({ documentId, fileName, text }, signal) =>
 
 export const sendChatMessage = ({ documentId, message }, signal) =>
   post("/chat", { documentId, message }, signal).then((d) => d.reply);
+
+// Quick answer about the document, straight from Gemini. history: [{ role: "user" | "assistant", text }].
+export const askQuestion = ({ documentId, text, question, history }, signal) =>
+  post("/ask", { documentId, text, question, history }, signal).then((d) => d.answer);

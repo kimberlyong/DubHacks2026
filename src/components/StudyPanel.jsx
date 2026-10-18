@@ -1,11 +1,14 @@
 import { useEffect } from "react";
 import { prefetchFlashcards } from "../hooks/useFlashcards";
+import { prefetchQuiz } from "../hooks/useQuiz";
 import { useSummary } from "../hooks/useSummary";
 import StudyOptions from "./StudyOptions";
 import SummaryDisplay from "./SummaryDisplay";
 import SummarySlider from "./SummarySlider";
+import AskQuestions from "./study/AskQuestions";
 import Flashcards from "./study/Flashcards";
 import Plan from "./study/Plan";
+import Quiz from "./study/Quiz";
 import Visualizer from "./study/Visualizer";
 
 // Rendered with key={documentId} by the parent so all panel state resets per document.
@@ -13,10 +16,12 @@ import Visualizer from "./study/Visualizer";
 export default function StudyPanel({ fileName, documentId, text, mode, onModeChange }) {
   const { level, setLevel, summary, status, error, retry } = useSummary({ documentId, text, fileName });
 
-  // Once the summary is up, make the flashcards in the background so the
-  // Flashcards tab opens instantly.
+  // Once the summary is up, make the flashcards and quiz in the background so
+  // those tabs open instantly.
   useEffect(() => {
-    if (status === "ready") prefetchFlashcards({ documentId, text });
+    if (status !== "ready") return;
+    prefetchFlashcards({ documentId, text });
+    prefetchQuiz({ documentId, text });
   }, [status, documentId, text]);
 
   function handleSelect(id) {
@@ -52,6 +57,8 @@ export default function StudyPanel({ fileName, documentId, text, mode, onModeCha
           <section aria-label="Study tool">
             {mode === "plan" && <Plan documentId={documentId} text={text} fileName={fileName} />}
             {mode === "flashcards" && <Flashcards documentId={documentId} text={text} />}
+            {mode === "quiz" && <Quiz documentId={documentId} text={text} />}
+            {mode === "ask" && <AskQuestions documentId={documentId} text={text} />}
             {mode === "visualizer" && <Visualizer documentId={documentId} text={text} />}
           </section>
         )}

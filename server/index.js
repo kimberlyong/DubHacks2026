@@ -5,7 +5,7 @@ import { ApiError } from "./gemini.js";
 import { chat, documentKey, loadSavedSummaries, registerDocument, saveSummaries } from "./backboard.js";
 import { readIcsCalendar } from "./calendar.js";
 import { buildFlowchart, findImages } from "./visualize.js";
-import { flashcards, gameQuestions, keyTerms, plan, summarize, summarizeAll, validateText } from "./study.js";
+import { ask, flashcards, gameQuestions, keyTerms, plan, summarize, summarizeAll, validateText } from "./study.js";
 
 const app = express();
 app.use(express.json({ limit: "3mb" }));
@@ -94,6 +94,12 @@ app.post("/api/plan", route(async (req, res) => {
   const { documentId, text, minutes, energy, deadline } = req.body ?? {};
   requireId(documentId);
   return { steps: await plan({ documentId, text, minutes, energy, deadline, signal: abortOnClose(req, res) }) };
+}));
+
+app.post("/api/ask", route(async (req, res) => {
+  const { documentId, text, question, history } = req.body ?? {};
+  requireId(documentId);
+  return { answer: await ask({ documentId, text, question, history, signal: abortOnClose(req, res) }) };
 }));
 
 // Reads an Apple / Outlook / Canvas / any .ics calendar link for the given range.

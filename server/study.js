@@ -277,3 +277,29 @@ export async function flashcards({ documentId, text, signal }) {
     throw new ApiError(502, "Couldn't read the flashcards the model returned. Please retry.");
   }
 }
+
+// Answers a question about the document straight from Gemini, with the last
+// few turns for follow-ups. One call, so it answers in a second or two (the
+// Backboard chat has to index the document first).
+export async function ask({ documentId, text, question, history, signal }) {
+  validateText(text);
+  if (typeof question !== "string" || !question.trim() || question.length > 2000) {
+    throw new ApiError(400, "Ask a question (up to 2000 characters).");
+  }
+  const source = await getSource(documentId, text, signal);
+  const turns = (Array.isArray(history) ? history : [])
+    .filter((t) => t && (t.role === "user" || t.role === "assistant") && typeof t.text === "string")
+    .slice(-6)
+    .map((t) => `${t.role === "user" ? "Student" : "You"}: ${t.text.slice(0, 1500)}`)
+    .join("\n");
+  return generate(
+    `You are a friendly study helper. Answer the student's question using the document below. ` +
+      `Be clear and short (2-5 sentences, or a few "- " bullets if that's easier to read), in plain words; define any hard term you use. ` +
+      `If the document doesn't cover it, say so in one sentence and give a brief general answer marked as not from the reading. ` +
+      `Plain text only, no markdown except "- " bullets.\n\n` +
+      `Document:\n---\n${source}\n---\n\n` +
+      (turns ? `Conversation so far:\n${turns}\n\n` : "") +
+      `Student: ${question.trim()}\nYou:`,
+    { signal },
+  );
+}
