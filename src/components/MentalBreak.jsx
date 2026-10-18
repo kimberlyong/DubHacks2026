@@ -1,6 +1,7 @@
-import { RotateCcw } from "lucide-react";
+import { Maximize, Minimize, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import OrbFidget from "./fidgets/OrbFidget";
+import useFullscreen from "../hooks/useFullscreen";
 
 const STRAND_COUNT = 150;
 const SEGMENTS = 28;
@@ -13,6 +14,7 @@ export default function MentalBreak() {
   const pointerRef = useRef({ down: false, x: 0, y: 0 });
   const reducedMotionRef = useRef(false);
   const [isInteracting, setIsInteracting] = useState(false);
+  const strandFullscreen = useFullscreen();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -238,16 +240,42 @@ export default function MentalBreak() {
               Take a breath and play with the strands. Press and drag anywhere to make them move.
             </p>
           </div>
-          <button
-            type="button"
-            className="mental-break-reset inline-flex shrink-0 items-center gap-2 rounded-full border border-theme-border bg-theme-surface px-4 py-2 text-sm"
-            onClick={resetStrands}
-          >
-            <RotateCcw aria-hidden="true" className="size-4" />
-            Reset
-          </button>
         </header>
-        <div className={`mental-break-canvas mt-8 ${isInteracting ? "is-interacting" : ""}`}>
+      </section>
+      <OrbFidget />
+      <section
+        ref={strandFullscreen.elementRef}
+        className={`strand-fidget-section${strandFullscreen.isFullscreen ? " is-fullscreen" : ""}`}
+        aria-labelledby="strand-fidget-title"
+      >
+        <header className="mental-break-header">
+          <h2 id="strand-fidget-title" className="text-2xl font-semibold tracking-tight sm:text-3xl">
+            Amoeba strands
+          </h2>
+          <div className="fidget-controls">
+            <button
+              type="button"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-theme-border bg-theme-surface px-4 py-2 text-sm"
+              onClick={resetStrands}
+            >
+              <RotateCcw aria-hidden="true" className="size-4" />
+              Reset
+            </button>
+            <button
+              type="button"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-theme-border bg-theme-surface px-4 py-2 text-sm"
+              onClick={strandFullscreen.toggleFullscreen}
+              aria-label={strandFullscreen.isFullscreen ? "Exit fullscreen strands" : "View strands fullscreen"}
+            >
+              {strandFullscreen.isFullscreen
+                ? <Minimize aria-hidden="true" className="size-4" />
+                : <Maximize aria-hidden="true" className="size-4" />}
+              {strandFullscreen.isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+            </button>
+          </div>
+        </header>
+        {strandFullscreen.error && <p className="fullscreen-error" role="alert">{strandFullscreen.error}</p>}
+        <div className={`mental-break-canvas mt-6 ${isInteracting ? "is-interacting" : ""}`}>
           <canvas
             ref={canvasRef}
             className="mental-break-strands"
@@ -260,7 +288,6 @@ export default function MentalBreak() {
           {isInteracting ? "Let go whenever you’re ready." : "Press, drag, and watch the motion settle."}
         </p>
       </section>
-      <OrbFidget />
     </div>
   );
 }
