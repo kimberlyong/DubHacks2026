@@ -13,7 +13,7 @@ const DEADLINE_RE =
   /\b(due|deadline|assignment|homework|hw ?\d*|p-?set|problem set|quiz|exam|midterm|final|project|essay|paper|lab report|submission|submit)\b/i;
 
 export function isDeadline(event) {
-  return DEADLINE_RE.test(event.title ?? "");
+  return Boolean(event.deadline) || DEADLINE_RE.test(event.title ?? "");
 }
 
 // Whether an event actually takes up time. Canvas-style due dates (all-day,

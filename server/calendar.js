@@ -118,6 +118,9 @@ export async function readIcsCalendar({ url: rawUrl, from, to, signal }) {
         allDay: Boolean(instance.isFullDay),
         // "Free" (transparent) events don't block time.
         busy: item.transparency !== "TRANSPARENT",
+        // Canvas's feed marks assignments in the uid ("event-assignment-123")
+        // and link, whatever the title says ("Week 3 Self Reflection").
+        deadline: /assignment/i.test(`${item.uid ?? ""} ${item.url?.val ?? item.url ?? ""}`),
       });
     }
   }
