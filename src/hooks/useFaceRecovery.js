@@ -41,7 +41,7 @@ export function useFaceRecovery({ onDistracted, onReturn } = {}) {
     let distractedSince = null;
     let focusedSince = null;
     let readyForNextPopup = true;
-    let lastPopup = -Infinity;
+    let popupWasOpen = false;
 
     async function startCamera() {
       try {
@@ -96,6 +96,15 @@ export function useFaceRecovery({ onDistracted, onReturn } = {}) {
           if (video.readyState < 2) return;
 
           const now = performance.now();
+
+          // Closing the popup starts a fresh countdown, so if they're still
+          // looking away it comes back after another POPUP_AFTER_MS.
+          if (popupWasOpen && !popupOpenRef.current) {
+            distractedSince = null;
+            readyForNextPopup = true;
+          }
+          popupWasOpen = popupOpenRef.current;
+
           const result = landmarker.detectForVideo(video, now);
           const face = result.faceLandmarks?.[0];
           const blendshapes = result.faceBlendshapes?.[0]?.categories ?? [];
@@ -158,12 +167,11 @@ export function useFaceRecovery({ onDistracted, onReturn } = {}) {
               now - distractedSince >= POPUP_AFTER_MS &&
               readyForNextPopup &&
               !popupOpenRef.current &&
-              now >= snoozedUntilRef.current &&
-              now - lastPopup >= 30000
+              now >= snoozedUntilRef.current
             ) {
               popupOpenRef.current = true;
+              popupWasOpen = true;
               setShowRecovery(true);
-              lastPopup = now;
               readyForNextPopup = false;
               callbacksRef.current.onDistracted?.(reason);
             }
