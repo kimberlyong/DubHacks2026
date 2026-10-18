@@ -1,4 +1,4 @@
-import { Check, PanelLeftClose, PanelLeftOpen, Settings } from "lucide-react";
+import { Check, Moon, PanelLeftClose, PanelLeftOpen, Settings, Sun } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
@@ -9,6 +9,7 @@ import DocumentViewer from "./components/DocumentViewer";
 import GamePage from "./components/game/GamePage";
 import SavedPlans from "./components/SavedPlans";
 import StudyPanel from "./components/StudyPanel";
+import CameraRecovery from "./components/CameraRecovery";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
 import { loadFile } from "./lib/fileStore";
@@ -28,20 +29,36 @@ const textSizes = {
   large: "text-lg",
 };
 
+// Each theme comes in a light and a dark version (see data-mode in index.css).
+// bg + accent are only for the little swatch in the settings menu.
 const themes = [
   // bg + accent are only for the little swatch in the settings menu.
-  { id: "default", label: "Default", bg: "#ffffff", accent: "#000000" },
+  { id: "default", label: "Default", bg: "#191919", accent: "#2383e2" },
   { id: "sand", label: "Warm", bg: "#faf6f0", accent: "#c0753f" },
   { id: "mauve", label: "Purple", bg: "#f7eef1", accent: "#a9829c" },
   { id: "sky", label: "Blue", bg: "#edf6fc", accent: "#4e84a8" },
   { id: "dusk", label: "Dark", bg: "#1e2328", accent: "#78aee8" },
+  { id: "mist", label: "Black & white", bg: "#ffffff", accent: "#000000" },
+];
+const modes = [
+  { id: "light", label: "Light", Icon: Sun },
+  { id: "dark", label: "Dark", Icon: Moon },
 ];
 
+// The old standalone "Dark" theme is now Blue in dark mode.
 function getSavedTheme() {
   const savedTheme = localStorage.getItem("recap-theme");
   if (themes.some(({ id }) => id === savedTheme)) return savedTheme;
-  if (savedTheme === "dark") return "dusk";
+  if (savedTheme === "dark" || savedTheme === "dusk") return "sky";
   return "default";
+}
+
+function getSavedMode() {
+  const savedMode = localStorage.getItem("recap-mode");
+  if (savedMode === "light" || savedMode === "dark") return savedMode;
+  // Before this setting existed, Default and Dark were the dark themes.
+  const savedTheme = localStorage.getItem("recap-theme");
+  return !savedTheme || ["default", "dark", "dusk"].includes(savedTheme) ? "dark" : "light";
 }
 
 function getSavedTextSize() {
@@ -63,6 +80,7 @@ function App() {
   const [name, setName] = useState(() => localStorage.getItem("recap-name") ?? "");
   const [nameInput, setNameInput] = useState("");
   const [theme, setTheme] = useState(getSavedTheme);
+  const [mode, setMode] = useState(getSavedMode);
   const [textSize, setTextSize] = useState(getSavedTextSize);
   const studyDoc = useDocument();
   const [extractError, setExtractError] = useState(null);
@@ -128,6 +146,11 @@ function App() {
   function handleThemeChange(nextTheme) {
     setTheme(nextTheme);
     localStorage.setItem("recap-theme", nextTheme);
+  }
+
+  function handleModeChange(nextMode) {
+    setMode(nextMode);
+    localStorage.setItem("recap-mode", nextMode);
   }
 
   function handleTextSizeChange(nextSize) {
@@ -246,6 +269,7 @@ function App() {
   return (
     <div
       data-theme={theme}
+      data-mode={mode}
       className={`min-h-screen bg-theme-bg text-theme-text ${textSizes[textSize]}`}
     >
       <div
@@ -316,6 +340,19 @@ function App() {
                 Sign out
               </button>
             )}
+            <button
+              type="button"
+              aria-label={mode === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              title={mode === "dark" ? "Light mode" : "Dark mode"}
+              className="flex cursor-pointer items-center bg-transparent p-1 text-inherit"
+              onClick={() => handleModeChange(mode === "dark" ? "light" : "dark")}
+            >
+              {mode === "dark" ? (
+                <Sun aria-hidden="true" className="size-6" />
+              ) : (
+                <Moon aria-hidden="true" className="size-6" />
+              )}
+            </button>
             <div className="relative" ref={settingsRef}>
               <button
                 type="button"
@@ -333,11 +370,32 @@ function App() {
                   id="settings-panel"
                   className="absolute right-0 top-full z-10 mt-2 w-64 rounded-xl border border-theme-border bg-theme-surface p-4 text-theme-text shadow-lg"
                 >
-
                   <fieldset>
+                    <legend className="sr-only">Mode</legend>
+                    <p aria-hidden="true" className="mb-2 text-sm font-semibold">Mode</p>
+                    <div className="flex rounded-lg border border-theme-border p-0.5">
+                      {modes.map(({ id, label, Icon }) => (
+                        <button
+                          key={id}
+                          type="button"
+                          className={`flex flex-1 cursor-pointer items-center justify-center gap-1.5 rounded-md px-2 py-1 text-sm ${
+                            mode === id
+                              ? "bg-theme-accent text-theme-on-accent"
+                              : "bg-transparent text-theme-text hover:bg-theme-border/30"
+                          }`}
+                          aria-pressed={mode === id}
+                          onClick={() => handleModeChange(id)}
+                        >
+                          <Icon aria-hidden="true" className="size-4" />
+                          {label}
+                        </button>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <fieldset className="mt-4 border-t border-theme-border pt-4">
                     <legend className="mb-2 text-sm font-semibold">Theme</legend>
                     <div className="flex flex-col gap-1">
-                      {themes.map(({ id, label, bg, accent }) => (
+                      {themes.map(({ id, label, [mode]: [bg, accent] }) => (
                         <button
                           key={id}
                           type="button"
@@ -390,6 +448,7 @@ function App() {
           </div>
         </header>
 
+
         <div className="relative flex min-w-0 flex-1">
         {view === "app" && navOpen && (
           <nav
@@ -430,6 +489,12 @@ function App() {
             view === "app" && !(ready && page === "study") ? "mx-auto w-full max-w-6xl" : ""
           }`}
         >
+          {view === "app" && page === "study" && (
+            <CameraRecovery
+              fileName={studyDoc.file?.name}
+              onBrainBreak={() => setPage("break")}
+            />
+          )}
           {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
 
           {view === "signin" && (

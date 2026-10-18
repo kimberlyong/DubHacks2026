@@ -1,5 +1,8 @@
 @import "tailwindcss";
 
+/* Tailwind's dark: classes follow the app's Light/Dark setting, not the OS. */
+@custom-variant dark (&:where([data-mode="dark"], [data-mode="dark"] *));
+
 :root,
 [data-theme="sand"] {
   color-scheme: light;
@@ -92,7 +95,8 @@
   --reflect-t: #e2e5f1;
 }
 
-[data-theme="dusk"] {
+[data-theme="dusk"],
+[data-theme="sky"][data-mode="dark"] {
   color-scheme: dark;
   --bg: #1e2328;
   --surface: #272d33;
@@ -111,6 +115,43 @@
   --review-t: #3f3622;
   --reflect: #c5b1e8;
   --reflect-t: #342c45;
+}
+
+/* The everyday theme, modeled on Notion's dark mode: plain dark gray,
+   soft off-white text, a blue main button, and muted tag colors. */
+[data-theme="default"] {
+  color-scheme: dark;
+  --bg: #191919;
+  --surface: #202020;
+  --text: #d4d4d4;
+  --muted: #9b9b9b;
+  --border: #2f2f2f;
+  --accent: #2383e2;
+  --on-accent: #fff;
+  --urgent: #df5452;
+  --urgent-t: #3e2725;
+  --concept: #5e87c9;
+  --concept-t: #252f3d;
+  --action: #529e72;
+  --action-t: #24342b;
+  --review: #ca9849;
+  --review-t: #3b3022;
+  --reflect: #9d68d3;
+  --reflect-t: #33293f;
+
+  --sprout-body: #c77d48;
+  --sprout-ear: #c77d48;
+  --sprout-leaf: #529e72;
+  --sprout-leaf-2: #529e72;
+  --sprout-cheek: #d15796;
+}
+
+[data-theme="default"] .bg-theme-accent:hover:not(:disabled) {
+  background: #0077d4;
+}
+
+[data-theme="default"] .dashboard-card {
+  box-shadow: none;
 }
 
 @theme inline {
