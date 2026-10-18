@@ -1157,23 +1157,23 @@ input,
 /* Plans calendar: soft, low-opacity event tints in the style of Notion's
    calendar. Built from each theme's colors, so they follow light/dark. */
 .cal-event {
-  background: color-mix(in srgb, var(--concept) 16%, transparent);
-  border-left: 3px solid color-mix(in srgb, var(--concept) 70%, transparent);
+  background: color-mix(in srgb, var(--concept) 26%, transparent);
+  border-left: 3px solid var(--concept);
   color: var(--text);
 }
 
 .cal-due {
-  background: color-mix(in srgb, var(--urgent) 14%, transparent);
+  background: color-mix(in srgb, var(--urgent) 22%, transparent);
   color: var(--urgent);
 }
 
 .cal-allday {
-  background: color-mix(in srgb, var(--reflect) 14%, transparent);
+  background: color-mix(in srgb, var(--reflect) 22%, transparent);
   color: var(--text);
 }
 
 .cal-free {
-  background: color-mix(in srgb, var(--action) 4%, transparent);
-  border: 1px dashed color-mix(in srgb, var(--action) 28%, transparent);
+  background: color-mix(in srgb, var(--action) 8%, transparent);
+  border: 1px dashed color-mix(in srgb, var(--action) 40%, transparent);
   color: color-mix(in srgb, var(--action) 80%, var(--muted));
 }

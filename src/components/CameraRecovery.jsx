@@ -1,7 +1,7 @@
-import { useEffect, useRef, useState } from "react";
-import { Camera, CameraOff, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Camera, CameraOff } from "lucide-react";
 import { useFaceRecovery } from "../hooks/useFaceRecovery";
-import { FOCUS_STATUS_MESSAGES, WELCOME_BACK_MESSAGES, pick } from "../sprout/messages";
+import { CAMERA_ON_MESSAGES, pick } from "../sprout/messages";
 import { useSprout } from "../sprout/SproutContext";
 
 const MODES = [
@@ -9,45 +9,16 @@ const MODES = [
   { id: "notes", label: "Taking notes" },
 ];
 
-// A status has to hold this long before Sprout mentions it, so a blink or a
-// quick glance doesn't set it off.
-const SETTLE_MS = 1500;
-const NUDGE_GAP_MS = 20_000;
-
-// Sprout says what the camera notices ("Eyes over here!") instead of the box
-// showing a status line.
-function useSproutFocusVoice(enabled, status) {
+// Sprout says hi when the camera starts watching. Looking away is handled by
+// the full popup below, not a small bubble.
+function useSproutCameraHello(status) {
   const { say } = useSprout();
-  const awayRef = useRef(false);
-  const lastNudgeRef = useRef(0);
-
   useEffect(() => {
-    if (!enabled) {
-      awayRef.current = false;
-      return;
-    }
-    const timer = setTimeout(() => {
-      if (status === "Facing screen") {
-        if (awayRef.current) say(pick(WELCOME_BACK_MESSAGES), "happy");
-        awayRef.current = false;
-        return;
-      }
-      const lines = FOCUS_STATUS_MESSAGES[status];
-      if (!lines) return;
-      if (status === "Watching for focus changes") {
-        say(pick(lines), "happy");
-        return;
-      }
-      if (Date.now() - lastNudgeRef.current < NUDGE_GAP_MS) return;
-      lastNudgeRef.current = Date.now();
-      awayRef.current = true;
-      say(pick(lines), "nudge");
-    }, SETTLE_MS);
-    return () => clearTimeout(timer);
-  }, [enabled, status, say]);
+    if (status === "Watching for focus changes") say(pick(CAMERA_ON_MESSAGES), "happy");
+  }, [status, say]);
 }
 
-export default function CameraRecovery({ fileName, onBrainBreak, onClose }) {
+export default function CameraRecovery({ fileName, onBrainBreak }) {
   const {
     enabled,
     setEnabled,
@@ -62,7 +33,7 @@ export default function CameraRecovery({ fileName, onBrainBreak, onClose }) {
   const [onBreak, setOnBreak] = useState(false);
   const [focusMode, setFocusMode] = useState("screen");
 
-  useSproutFocusVoice(enabled && focusMode === "screen", status);
+  useSproutCameraHello(status);
 
   function changeFocusMode(mode) {
     setFocusMode(mode);
@@ -77,31 +48,12 @@ export default function CameraRecovery({ fileName, onBrainBreak, onClose }) {
     setShowRecovery(false);
   }
 
-  function closeFocusBuddy() {
-    setEnabled(false);
-    setShowRecovery(false);
-    onClose?.();
-  }
-
   return (
     <section className="my-3 rounded-2xl border border-theme-border bg-theme-surface p-4">
-      <div className="flex items-start justify-between gap-3">
-        <div className="min-w-0">
-          <h2 className="text-base font-semibold">Your Focus Buddy</h2>
-          <p className="mt-0.5 text-xs text-theme-muted">
-            Sprout keeps you on track. The camera is optional and stays on your device.
-          </p>
-        </div>
-        <button
-          type="button"
-          onClick={closeFocusBuddy}
-          aria-label="Hide Focus Buddy"
-          title="Hide Focus Buddy (reopen from sidebar)"
-          className="shrink-0 cursor-pointer rounded-lg bg-transparent p-1 text-theme-muted transition hover:bg-theme-border/30 hover:text-theme-text"
-        >
-          <X className="size-5" aria-hidden="true" />
-        </button>
-      </div>
+      <h2 className="text-base font-semibold">Your Focus Buddy</h2>
+      <p className="mt-0.5 text-xs text-theme-muted">
+        Sprout keeps you on track. The camera is optional and stays on your device.
+      </p>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <div role="group" aria-label="Focus mode" className="flex rounded-lg border border-theme-border p-0.5">

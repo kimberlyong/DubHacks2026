@@ -99,21 +99,6 @@ function App() {
   });
   const [page, setPage] = useState("study");
   const [studyMode, setStudyMode] = useState(null);
-  const [focusBuddyVisible, setFocusBuddyVisible] = useState(
-    () => localStorage.getItem("clarity-focus-buddy-hidden") !== "true"
-  );
-
-  function hideFocusBuddy() {
-    setFocusBuddyVisible(false);
-    localStorage.setItem("clarity-focus-buddy-hidden", "true");
-  }
-
-  function showFocusBuddy() {
-    setFocusBuddyVisible(true);
-    localStorage.removeItem("clarity-focus-buddy-hidden");
-    setPage("study");
-    setStudyMode(null);
-  }
 
   useEffect(() => {
     function handlePointerDown(event) {
@@ -246,10 +231,6 @@ function App() {
   function navigate(target) {
     // On narrow screens the sidebar overlays the page, so tuck it away after a choice.
     if (window.innerWidth < 768) setNavOpen(false);
-    if (target === "focus") {
-      showFocusBuddy();
-      return;
-    }
     if (target === "history") {
       setHistory(getHistory());
       setPage("history");
@@ -272,7 +253,6 @@ function App() {
 
   const navItems = [
     { id: "home", label: "Home", needsDoc: false },
-    { id: "focus", label: "Focus Buddy", needsDoc: false },
     { id: "game", label: "Game", needsDoc: true },
     { id: "break", label: "Mental break", needsDoc: false },
     { id: "plans", label: "Plans", needsDoc: false },
@@ -479,11 +459,9 @@ function App() {
               {navItems.map((item) => {
                 const disabled = item.needsDoc && !ready;
                 const active =
-                  item.id === "focus"
-                    ? page === "study" && focusBuddyVisible && !studyMode
-                    : item.id === "history" || item.id === "plans" || item.id === "game" || item.id === "break"
-                      ? page === item.id
-                      : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
+                  item.id === "history" || item.id === "plans" || item.id === "game" || item.id === "break"
+                    ? page === item.id
+                    : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
                 return (
                   <button
                     key={item.id}
@@ -510,11 +488,10 @@ function App() {
             view === "app" && !(ready && page === "study") ? "mx-auto w-full max-w-6xl" : ""
           }`}
         >
-          {view === "app" && page === "study" && focusBuddyVisible && (
+          {view === "app" && page === "study" && (
             <CameraRecovery
               fileName={studyDoc.file?.name}
               onBrainBreak={() => setPage("break")}
-              onClose={hideFocusBuddy}
             />
           )}
           {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}

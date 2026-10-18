@@ -105,27 +105,11 @@ export function streakMessage(count) {
   ]);
 }
 
-// What the camera noticed, said in Sprout's voice instead of shown as a status
-// line. Keyed by the reasons useFaceRecovery reports.
-export const FOCUS_STATUS_MESSAGES = {
-  "Watching for focus changes": [
-    "Camera's on! I'll keep an eye out so you don't have to.",
-    "Okay, I'm watching your back. Just focus on the page.",
-  ],
-  "Looking away from screen (estimate)": [
-    "Eyes over here! I'm saving your spot.",
-    "Looking around? The page is right here when you're ready.",
-    "Psst, over here. Just one more paragraph?",
-  ],
-  "Face not visible": [
-    "Hmm, I can't see you. Did you step away?",
-    "Where'd you go? I'll be right here.",
-  ],
-  "Eyes appear closed": [
-    "Resting your eyes? Totally fine, just don't fall asleep on me.",
-    "Sleepy? Maybe a quick stretch would help.",
-  ],
-};
+// Said when the camera starts watching. Looking away gets the full popup.
+export const CAMERA_ON_MESSAGES = [
+  "Camera's on! I'll keep an eye out so you don't have to.",
+  "Okay, I'm watching your back. Just focus on the page.",
+];
 
 const greetTime = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" });
 
