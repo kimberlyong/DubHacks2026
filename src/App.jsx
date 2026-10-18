@@ -26,6 +26,7 @@ const textSizes = {
 
 const themes = [
   // bg + accent are only for the little swatch in the settings menu.
+  { id: "default", label: "Default", bg: "#121417", accent: "#6c8cff" },
   { id: "sand", label: "Warm", bg: "#faf6f0", accent: "#c0753f" },
   { id: "mauve", label: "Purple", bg: "#f7eef1", accent: "#a9829c" },
   { id: "sky", label: "Blue", bg: "#edf6fc", accent: "#4e84a8" },
@@ -37,7 +38,7 @@ function getSavedTheme() {
   const savedTheme = localStorage.getItem("recap-theme");
   if (themes.some(({ id }) => id === savedTheme)) return savedTheme;
   if (savedTheme === "dark") return "dusk";
-  return "sand";
+  return "default";
 }
 
 function getSavedTextSize() {

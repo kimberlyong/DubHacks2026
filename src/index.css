@@ -112,6 +112,73 @@
   --reflect-t: #342c45;
 }
 
+/* The everyday theme: neutral dark grays with a mix of accent colors,
+   instead of one hue everywhere. */
+[data-theme="default"] {
+  color-scheme: dark;
+  --bg: #121417;
+  --surface: #1b1e23;
+  --text: #ececf1;
+  --muted: #9aa1ad;
+  --border: #2e333b;
+  --accent: #6c8cff;
+  --on-accent: #0c1024;
+  --urgent: #ff6b6b;
+  --urgent-t: #3a1f22;
+  --concept: #4fb3ff;
+  --concept-t: #16293a;
+  --action: #3ecf8e;
+  --action-t: #15302a;
+  --review: #f5b544;
+  --review-t: #352a16;
+  --reflect: #b48cff;
+  --reflect-t: #2b2240;
+
+  --sprout-body: #f59e5b;
+  --sprout-ear: #f59e5b;
+  --sprout-leaf: #3ecf8e;
+  --sprout-leaf-2: #6c8cff;
+  --sprout-cheek: #ff6b8b;
+}
+
+/* Spread the palette across repeated UI so it isn't all blue. */
+[data-theme="default"] .homepage-kicker {
+  color: var(--action);
+}
+[data-theme="default"] .homepage-feature:nth-child(4n + 1) .homepage-feature-icon {
+  color: var(--concept);
+}
+[data-theme="default"] .homepage-feature:nth-child(4n + 2) .homepage-feature-icon {
+  color: var(--action);
+}
+[data-theme="default"] .homepage-feature:nth-child(4n + 3) .homepage-feature-icon {
+  color: var(--review);
+}
+[data-theme="default"] .homepage-feature:nth-child(4n + 4) .homepage-feature-icon {
+  color: var(--reflect);
+}
+[data-theme="default"] .dashboard-cards > :nth-child(odd) {
+  border-top: 3px solid var(--concept);
+}
+[data-theme="default"] .dashboard-cards > :nth-child(even) {
+  border-top: 3px solid var(--reflect);
+}
+[data-theme="default"] [aria-labelledby="study-options-heading"] button:not([aria-pressed="true"]):nth-child(5n + 1) svg {
+  color: var(--concept);
+}
+[data-theme="default"] [aria-labelledby="study-options-heading"] button:not([aria-pressed="true"]):nth-child(5n + 2) svg {
+  color: var(--action);
+}
+[data-theme="default"] [aria-labelledby="study-options-heading"] button:not([aria-pressed="true"]):nth-child(5n + 3) svg {
+  color: var(--review);
+}
+[data-theme="default"] [aria-labelledby="study-options-heading"] button:not([aria-pressed="true"]):nth-child(5n + 4) svg {
+  color: var(--reflect);
+}
+[data-theme="default"] [aria-labelledby="study-options-heading"] button:not([aria-pressed="true"]):nth-child(5n + 5) svg {
+  color: var(--urgent);
+}
+
 @theme inline {
   --color-theme-bg: var(--bg);
   --color-theme-surface: var(--surface);
