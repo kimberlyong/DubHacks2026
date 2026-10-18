@@ -1158,7 +1158,7 @@ input,
    calendar. Built from each theme's colors, so they follow light/dark. */
 .cal-event {
   background: color-mix(in srgb, var(--concept) 16%, transparent);
-  border-left: 3px solid var(--concept);
+  border-left: 3px solid color-mix(in srgb, var(--concept) 70%, transparent);
   color: var(--text);
 }
 

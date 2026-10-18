@@ -1,6 +1,51 @@
-import { useState } from "react";
-import { X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Camera, CameraOff, X } from "lucide-react";
 import { useFaceRecovery } from "../hooks/useFaceRecovery";
+import { FOCUS_STATUS_MESSAGES, WELCOME_BACK_MESSAGES, pick } from "../sprout/messages";
+import { useSprout } from "../sprout/SproutContext";
+
+const MODES = [
+  { id: "screen", label: "Screen focus" },
+  { id: "notes", label: "Taking notes" },
+];
+
+// A status has to hold this long before Sprout mentions it, so a blink or a
+// quick glance doesn't set it off.
+const SETTLE_MS = 1500;
+const NUDGE_GAP_MS = 20_000;
+
+// Sprout says what the camera notices ("Eyes over here!") instead of the box
+// showing a status line.
+function useSproutFocusVoice(enabled, status) {
+  const { say } = useSprout();
+  const awayRef = useRef(false);
+  const lastNudgeRef = useRef(0);
+
+  useEffect(() => {
+    if (!enabled) {
+      awayRef.current = false;
+      return;
+    }
+    const timer = setTimeout(() => {
+      if (status === "Facing screen") {
+        if (awayRef.current) say(pick(WELCOME_BACK_MESSAGES), "happy");
+        awayRef.current = false;
+        return;
+      }
+      const lines = FOCUS_STATUS_MESSAGES[status];
+      if (!lines) return;
+      if (status === "Watching for focus changes") {
+        say(pick(lines), "happy");
+        return;
+      }
+      if (Date.now() - lastNudgeRef.current < NUDGE_GAP_MS) return;
+      lastNudgeRef.current = Date.now();
+      awayRef.current = true;
+      say(pick(lines), "nudge");
+    }, SETTLE_MS);
+    return () => clearTimeout(timer);
+  }, [enabled, status, say]);
+}
 
 export default function CameraRecovery({ fileName, onBrainBreak, onClose }) {
   const {
@@ -15,16 +60,17 @@ export default function CameraRecovery({ fileName, onBrainBreak, onClose }) {
 
   const [snoozeMessage, setSnoozeMessage] = useState(false);
   const [onBreak, setOnBreak] = useState(false);
-
   const [focusMode, setFocusMode] = useState("screen");
 
-function changeFocusMode(mode) {
-  setFocusMode(mode);
-  setEnabled(false);
-  setShowRecovery(false);
-  setSnoozeMessage(false);
-  setOnBreak(false);
-}
+  useSproutFocusVoice(enabled && focusMode === "screen", status);
+
+  function changeFocusMode(mode) {
+    setFocusMode(mode);
+    setEnabled(false);
+    setShowRecovery(false);
+    setSnoozeMessage(false);
+    setOnBreak(false);
+  }
 
   function returnToStudy() {
     setOnBreak(false);
@@ -38,93 +84,82 @@ function changeFocusMode(mode) {
   }
 
   return (
-    <section className="my-3 rounded-xl border border-black p-4 dark:border-white">
+    <section className="my-3 rounded-2xl border border-theme-border bg-theme-surface p-4">
       <div className="flex items-start justify-between gap-3">
-      <h2 className="text-base font-semibold">Your Focus Buddy</h2>
+        <div className="min-w-0">
+          <h2 className="text-base font-semibold">Your Focus Buddy</h2>
+          <p className="mt-0.5 text-xs text-theme-muted">
+            Sprout keeps you on track. The camera is optional and stays on your device.
+          </p>
+        </div>
         <button
           type="button"
           onClick={closeFocusBuddy}
           aria-label="Hide Focus Buddy"
           title="Hide Focus Buddy (reopen from sidebar)"
-          className="rounded-lg p-1 text-theme-muted transition hover:bg-theme-border/30 hover:text-theme-text"
+          className="shrink-0 cursor-pointer rounded-lg bg-transparent p-1 text-theme-muted transition hover:bg-theme-border/30 hover:text-theme-text"
         >
           <X className="size-5" aria-hidden="true" />
         </button>
       </div>
 
-      <p className="my-2 text-xs text-theme-muted">
-        Your little study companion is here to keep you on track!
-        Camera monitoring is optional and processed locally.
-      </p>
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
+        <div role="group" aria-label="Focus mode" className="flex rounded-lg border border-theme-border p-0.5">
+          {MODES.map(({ id, label }) => (
+            <button
+              key={id}
+              type="button"
+              onClick={() => changeFocusMode(id)}
+              aria-pressed={focusMode === id}
+              className={`cursor-pointer rounded-md px-3 py-1.5 text-sm font-medium transition ${
+                focusMode === id ? "bg-theme-accent text-theme-on-accent" : "bg-transparent text-theme-muted hover:text-theme-text"
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
 
-      <div className="my-2 flex gap-2">
-  <button
-    type="button"
-    onClick={() => changeFocusMode("screen")}
-    aria-pressed={focusMode === "screen"}
-    className={`rounded-lg px-3 py-1.5 text-xs font-medium ${
-      focusMode === "screen"
-        ? "bg-black text-white dark:bg-white dark:text-black"
-        : "border border-gray-300 dark:border-gray-600"
-    }`}
-  >
-    Screen Focus
-  </button>
+        {focusMode === "screen" && (
+          <button
+            type="button"
+            onClick={() => {
+              setEnabled(!enabled);
+              setOnBreak(false);
+              setShowRecovery(false);
+            }}
+            className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium ${
+              enabled
+                ? "border border-theme-border bg-transparent text-theme-text"
+                : "bg-theme-accent text-theme-on-accent"
+            }`}
+          >
+            {enabled ? (
+              <CameraOff aria-hidden="true" className="size-4" />
+            ) : (
+              <Camera aria-hidden="true" className="size-4" />
+            )}
+            {enabled ? "Turn off camera" : "Turn on camera"}
+          </button>
+        )}
+      </div>
 
-  <button
-    type="button"
-    onClick={() => changeFocusMode("notes")}
-    aria-pressed={focusMode === "notes"}
-    className={`rounded-lg px-4 py-2 text-sm font-medium ${
-      focusMode === "notes"
-        ? "bg-black text-white dark:bg-white dark:text-black"
-        : "border border-gray-300 dark:border-gray-600"
-    }`}
-  >
-    Taking Notes
-  </button>
-</div>
+      {focusMode === "notes" && (
+        <p className="mt-3 rounded-lg bg-theme-action-t px-3 py-2 text-xs text-theme-text">
+          Taking notes mode is on! Look down and write freely. Focus reminders are paused until you switch back.
+        </p>
+      )}
 
-{focusMode === "notes" && (
-  <p className="mb-2 rounded-lg bg-green-50 px-3 py-2 text-xs text-green-900">
-    Taking notes mode is on! Look down and write freely!
-    Focus reminders are paused until you switch back.
-  </p>
-)}
-
-{focusMode === "screen" && (
-  <button
-    type="button"
-    onClick={() => {
-      setEnabled(!enabled);
-      setOnBreak(false);
-      setShowRecovery(false);
-    }}
-    className="rounded-lg bg-black px-4 py-2 text-white dark:bg-white dark:text-black"
-  >
-    {enabled ? "Turn off camera" : "Enable camera"}
-  </button>
-)}
-
-<p className="mt-2 text-xs text-theme-muted" aria-live="polite">
-      {focusMode === "notes"
-    ? "Taking notes - camera monitoring paused"
-    : enabled
-      ? status
-      : "Focus Buddy is sleeping"}
-      </p>
-
-      {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
+      {error && <p className="mt-2 text-sm text-theme-urgent">{error}</p>}
 
       {snoozeMessage && (
-        <p className="mt-3 rounded-lg bg-green-100 p-3 text-sm text-green-900">
-          Got it! We'll snooze focus reminders for 5 minutes.
-          Keep those ideas flowing!
+        <p className="mt-3 rounded-lg bg-theme-action-t px-3 py-2 text-sm text-theme-text">
+          Got it! We'll snooze focus reminders for 5 minutes. Keep those ideas flowing!
         </p>
       )}
 
       {onBreak && (
-        <div className="mt-4 rounded-xl border border-black p-4 dark:border-white">
+        <div className="mt-4 rounded-xl border border-theme-border p-4">
           <h3 className="text-lg font-semibold">Brain break!</h3>
           <p className="my-3">
             Take a quick stretch, grab some water, or rest your eyes.
@@ -133,7 +168,7 @@ function changeFocusMode(mode) {
           <button
             type="button"
             onClick={returnToStudy}
-            className="rounded-lg bg-black px-4 py-2 text-white dark:bg-white dark:text-black"
+            className="cursor-pointer rounded-lg bg-theme-accent px-4 py-2 text-theme-on-accent"
           >
             Back to studying
           </button>

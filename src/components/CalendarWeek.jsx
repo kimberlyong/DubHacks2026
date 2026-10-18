@@ -1,13 +1,14 @@
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useCalendar } from "../hooks/useCalendar";
 import { findFreeBlocks, isDeadline } from "../lib/schedule";
 import CalendarConnect from "./CalendarConnect";
 
-// The grid shows 8am–11pm; the data covers two weeks (see useCalendar).
-const FIRST_HOUR = 8;
-const LAST_HOUR = 23;
-const HOUR_PX = 44;
+// The grid covers 7am–midnight, zoomed in and scrolled to the current time;
+// the data covers two weeks (see useCalendar).
+const FIRST_HOUR = 7;
+const LAST_HOUR = 24;
+const HOUR_PX = 64;
 const DAYS = 7;
 const PAGES = 2;
 const MINUTE = 60_000;
@@ -84,6 +85,7 @@ export default function CalendarWeek() {
   const cal = useCalendar();
   const now = useNow();
   const [page, setPage] = useState(0);
+  const scrollRef = useRef(null);
 
   const firstDay = addDays(startOfDay(now), page * DAYS);
   const days = Array.from({ length: DAYS }, (_, i) => addDays(firstDay, i));
@@ -118,9 +120,18 @@ export default function CalendarWeek() {
   const hours = Array.from({ length: LAST_HOUR - FIRST_HOUR }, (_, i) => FIRST_HOUR + i);
   const hasDue = days.some((d) => dueByDay.get(d.toDateString())?.length);
   const lastDay = days[DAYS - 1];
+  const ready = Boolean(cal.connected && cal.events);
+
+  // Open the grid an hour before now (or at 8am on later weeks).
+  useEffect(() => {
+    if (!ready || !scrollRef.current) return;
+    const hour = page === 0 ? Math.max(now.getHours() - 1, FIRST_HOUR) : 8;
+    scrollRef.current.scrollTop = (hour - FIRST_HOUR) * HOUR_PX;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ready, page]);
 
   return (
-    <section className="rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
+    <section className="rounded-2xl border border-theme-border bg-theme-surface p-5 shadow-sm">
       <h2 className="text-xl font-semibold">Your calendar</h2>
       <p className="mt-1 text-sm text-theme-muted">
         Connect your calendars and we'll find when you're free and what's due, so plans fit your day.
@@ -162,8 +173,9 @@ export default function CalendarWeek() {
             </div>
           </div>
 
-          <div className="overflow-x-auto rounded-lg border border-theme-border">
-            <div className="min-w-[680px]">
+          <div ref={scrollRef} className="max-h-[440px] overflow-auto rounded-2xl border border-theme-border">
+            <div className="min-w-[760px]">
+              <div className="sticky top-0 z-20 bg-theme-surface">
               {/* Day headers */}
               <div className="grid grid-cols-[3rem_repeat(7,1fr)] border-b border-theme-border">
                 <div />
@@ -194,7 +206,7 @@ export default function CalendarWeek() {
                         <div
                           key={i}
                           title={item.due ? `${item.title} · due ${timeFormat.format(item.due)}` : item.title}
-                          className={`truncate rounded px-1.5 py-0.5 text-xs font-medium ${
+                          className={`truncate rounded-md px-2 py-1 text-[13px] font-medium ${
                             item.deadline ? "cal-due" : "cal-allday"
                           }`}
                         >
@@ -208,6 +220,7 @@ export default function CalendarWeek() {
                   ))}
                 </div>
               )}
+              </div>
 
               {/* Time grid */}
               <div className="grid grid-cols-[3rem_repeat(7,1fr)]">
@@ -250,7 +263,7 @@ export default function CalendarWeek() {
                           <div
                             key={b.start.toISOString()}
                             title={`Free ${timeFormat.format(b.start)}–${timeFormat.format(b.end)}`}
-                            className="cal-free absolute inset-x-1 truncate rounded-md px-1.5 py-0.5 text-[11px]"
+                            className="cal-free absolute inset-x-1 truncate rounded-lg px-2 py-1 text-xs"
                             style={{ top: top + 1, height: height - 2 }}
                           >
                             Free · {formatLength(b.minutes)}
@@ -260,13 +273,13 @@ export default function CalendarWeek() {
 
                       {events.map((e, i) => {
                         const top = offsetOf(e.start, day);
-                        const height = Math.max(offsetOf(e.end, day) - top, 18);
+                        const height = Math.max(offsetOf(e.end, day) - top, 24);
                         const width = 100 / e.lanes;
                         return (
                           <div
                             key={i}
                             title={`${e.title} · ${timeFormat.format(e.start)}–${timeFormat.format(e.end)}`}
-                            className={`cal-event absolute overflow-hidden rounded-md px-1.5 py-0.5 text-xs leading-tight ${
+                            className={`cal-event absolute overflow-hidden rounded-lg px-2 py-1 text-[13px] leading-snug ${
                               e.end < now ? "opacity-50" : ""
                             }`}
                             style={{
@@ -277,7 +290,7 @@ export default function CalendarWeek() {
                             }}
                           >
                             <p className="truncate font-medium">{e.title}</p>
-                            {height > 34 && <p className="truncate opacity-75">{timeFormat.format(e.start)}</p>}
+                            {height > 44 && <p className="truncate text-xs opacity-75">{timeFormat.format(e.start)}</p>}
                           </div>
                         );
                       })}
