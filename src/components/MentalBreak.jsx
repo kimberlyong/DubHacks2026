@@ -242,6 +242,7 @@ export default function MentalBreak() {
           </div>
         </header>
       </section>
+      <OrbFidget />
       <section
         ref={strandFullscreen.elementRef}
         className={`strand-fidget-section${strandFullscreen.isFullscreen ? " is-fullscreen" : ""}`}
@@ -287,7 +288,6 @@ export default function MentalBreak() {
           {isInteracting ? "Let go whenever you’re ready." : "Press, drag, and watch the motion settle."}
         </p>
       </section>
-      <OrbFidget />
     </div>
   );
 }
