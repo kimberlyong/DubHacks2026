@@ -2,6 +2,7 @@ import { Check, Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
+import MentalBreak from "./components/MentalBreak";
 import PrivacyNote from "./components/PrivacyNote";
 import DocumentViewer from "./components/DocumentViewer";
 import GamePage from "./components/game/GamePage";
@@ -12,6 +13,7 @@ import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
 import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
+import SproutArt from "./sprout/SproutArt";
 import {
   EXTENSION_READY_MESSAGES,
   UPLOAD_READY_MESSAGES,
@@ -27,6 +29,7 @@ const textSizes = {
 
 const themes = [
   // bg + accent are only for the little swatch in the settings menu.
+  { id: "default", label: "Default", bg: "#191919", accent: "#2383e2" },
   { id: "sand", label: "Warm", bg: "#faf6f0", accent: "#c0753f" },
   { id: "mauve", label: "Purple", bg: "#f7eef1", accent: "#a9829c" },
   { id: "sky", label: "Blue", bg: "#edf6fc", accent: "#4e84a8" },
@@ -38,7 +41,7 @@ function getSavedTheme() {
   const savedTheme = localStorage.getItem("recap-theme");
   if (themes.some(({ id }) => id === savedTheme)) return savedTheme;
   if (savedTheme === "dark") return "dusk";
-  return "sand";
+  return "default";
 }
 
 function getSavedTextSize() {
@@ -195,7 +198,7 @@ function App() {
       setPage("history");
       return;
     }
-    if (target === "plans" || target === "game") {
+    if (target === "plans" || target === "game" || target === "break") {
       setPage(target);
       return;
     }
@@ -213,6 +216,7 @@ function App() {
   const navItems = [
     { id: "home", label: "Home", needsDoc: false },
     { id: "game", label: "Game", needsDoc: true },
+    { id: "break", label: "Mental break", needsDoc: false },
     { id: "plans", label: "Plans", needsDoc: false },
     { id: "history", label: "Past documents", needsDoc: false },
   ];
@@ -256,7 +260,7 @@ function App() {
                     {navItems.map((item) => {
                       const disabled = item.needsDoc && !ready;
                       const active =
-                        item.id === "history" || item.id === "plans" || item.id === "game"
+                        item.id === "history" || item.id === "plans" || item.id === "game" || item.id === "break"
                           ? page === item.id
                           : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
                       return (
@@ -287,12 +291,34 @@ function App() {
                 if (name) navigate("home");
                 else setView("home");
               }}
-              className="cursor-pointer bg-transparent p-0 font-bold text-inherit"
+              className="flex cursor-pointer items-center gap-2 bg-transparent p-0 font-bold text-inherit"
             >
-              clarity
+              <SproutArt className="size-7" />
+              Clarity
             </button>
           </div>
           <div className="flex items-center gap-4">
+            {view === "home" && (
+              <>
+                <a href="#features" className="site-nav-link max-[560px]:hidden">
+                  Features
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setView(name ? "app" : "signin")}
+                  className="cursor-pointer whitespace-nowrap bg-transparent p-0 text-sm text-theme-text"
+                >
+                  Sign in
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setView(name ? "app" : "signin")}
+                  className="cursor-pointer whitespace-nowrap rounded-lg border border-theme-accent bg-theme-accent px-3 py-1.5 text-sm font-medium text-theme-on-accent max-[420px]:hidden"
+                >
+                  Get started
+                </button>
+              </>
+            )}
             {view === "app" && (
               <span className="text-sm text-theme-muted max-[420px]:hidden">{today}</span>
             )}
@@ -419,6 +445,8 @@ function App() {
           )}
 
           {view === "app" && page === "plans" && <SavedPlans />}
+
+          {view === "app" && page === "break" && <MentalBreak />}
 
           {view === "app" && page === "game" &&
             (ready ? (
