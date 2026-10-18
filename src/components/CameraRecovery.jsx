@@ -50,14 +50,14 @@ export default function CameraRecovery({ fileName }) {
 
       {snoozeMessage && (
   <p className="mt-3 rounded-lg bg-green-100 p-3 text-sm text-green-900">
-    🧠 Got it! We'll snooze focus reminders for 5 minutes.
+     Got it! We'll snooze focus reminders for 5 minutes.
     Keep those ideas flowing!
   </p>
 )}
 
       {onBreak && (
         <div className="mt-4 rounded-xl border border-black p-4 dark:border-white">
-          <h3 className="text-lg font-semibold">🎮 Brain break!</h3>
+          <h3 className="text-lg font-semibold">Brain break!</h3>
           <p className="my-3">
             Take a quick stretch, grab some water, or rest your eyes.
             Your study task will be waiting!
@@ -67,7 +67,7 @@ export default function CameraRecovery({ fileName }) {
             onClick={returnToStudy}
             className="rounded-lg bg-black px-4 py-2 text-white dark:bg-white dark:text-black"
           >
-            🚀 Back to studying
+            Back to studying
           </button>
         </div>
       )}
@@ -99,7 +99,7 @@ export default function CameraRecovery({ fileName }) {
                 <p className="text-xs font-semibold uppercase text-gray-500">
                   Your current study material
                 </p>
-                <p className="mt-1 font-medium">📚 {fileName}</p>
+                <p className="mt-1 font-medium"> {fileName}</p>
               </div>
             )}
 
@@ -109,7 +109,7 @@ export default function CameraRecovery({ fileName }) {
                 onClick={returnToStudy}
                 className="rounded-lg bg-black px-4 py-3 text-white"
               >
-                🚀 I'm back! Let's focus
+                I'm back! Let's focus
               </button>
 
               <button
@@ -121,7 +121,7 @@ export default function CameraRecovery({ fileName }) {
                 }}
                 className="rounded-lg border border-black px-4 py-3"
               >
-                🎮 I need a brain break
+                I need a brain break
               </button>
 
               <button
@@ -133,7 +133,7 @@ export default function CameraRecovery({ fileName }) {
                 }}
                 className="px-4 py-2 text-sm text-gray-500"
               >
-                🧠 I'm thinking, not distracted!
+                I'm thinking, not distracted!
               </button>
             </div>
           </div>
