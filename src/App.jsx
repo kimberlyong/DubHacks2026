@@ -6,7 +6,6 @@ import MentalBreak from "./components/MentalBreak";
 import PlansPreview from "./components/PlansPreview";
 import PrivacyNote from "./components/PrivacyNote";
 import DocumentViewer from "./components/DocumentViewer";
-import GamePage from "./components/game/GamePage";
 import SavedPlans from "./components/SavedPlans";
 import StudyPanel from "./components/StudyPanel";
 import CameraRecovery from "./components/CameraRecovery";
@@ -236,7 +235,7 @@ function App() {
       setPage("history");
       return;
     }
-    if (target === "plans" || target === "game" || target === "break") {
+    if (target === "plans" || target === "break") {
       setPage(target);
       return;
     }
@@ -253,7 +252,6 @@ function App() {
 
   const navItems = [
     { id: "home", label: "Home", needsDoc: false },
-    { id: "game", label: "Game", needsDoc: true },
     { id: "break", label: "Mental break", needsDoc: false },
     { id: "plans", label: "Plans", needsDoc: false },
     { id: "history", label: "Past documents", needsDoc: false },
@@ -459,7 +457,7 @@ function App() {
               {navItems.map((item) => {
                 const disabled = item.needsDoc && !ready;
                 const active =
-                  item.id === "history" || item.id === "plans" || item.id === "game" || item.id === "break"
+                  item.id === "history" || item.id === "plans" || item.id === "break"
                     ? page === item.id
                     : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
                 return (
@@ -532,16 +530,6 @@ function App() {
 
           {view === "app" && page === "break" && <MentalBreak />}
 
-          {view === "app" && page === "game" &&
-            (ready ? (
-              <GamePage documentId={studyDoc.documentId} text={studyDoc.text} fileName={studyDoc.file.name} />
-            ) : (
-              <section className="py-18">
-                <h1 className="text-3xl font-semibold">Sprout Run</h1>
-                <p className="mt-3 text-theme-muted">Upload a document first, then come back to play.</p>
-              </section>
-            ))}
-
           {view === "app" && page === "history" && (
             <section className="py-18">
               <h1 className="text-3xl font-semibold">Past documents</h1>
@@ -603,7 +591,7 @@ function App() {
                       documentId={studyDoc.documentId}
                       text={studyDoc.text}
                       mode={studyMode}
-                      onModeChange={(id) => (id === "game" ? setPage("game") : setStudyMode(id))}
+                      onModeChange={setStudyMode}
                     />
                   </>
                 ) : (
