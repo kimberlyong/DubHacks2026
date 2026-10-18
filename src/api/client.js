@@ -19,8 +19,8 @@ async function post(path, body, signal) {
 export const fetchSummary = ({ documentId, text, level }, signal) =>
   post("/summarize", { documentId, text, level }, signal).then((d) => d.summary);
 
-export const fetchAllSummaries = ({ documentId, text }, signal) =>
-  post("/summarize-all", { documentId, text }, signal).then((d) => d.summaries);
+export const fetchAllSummaries = ({ documentId, text, fileName }, signal) =>
+  post("/summarize-all", { documentId, text, fileName }, signal).then((d) => d.summaries);
 
 export const fetchTermImages = ({ term }, signal) =>
   post("/visualize/images", { term }, signal).then((d) => d.images);

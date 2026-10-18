@@ -11,6 +11,7 @@ import SavedPlans from "./components/SavedPlans";
 import StudyPanel from "./components/StudyPanel";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
+import { loadFile } from "./lib/fileStore";
 import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
 import SproutArt from "./sprout/SproutArt";
@@ -29,12 +30,11 @@ const textSizes = {
 
 const themes = [
   // bg + accent are only for the little swatch in the settings menu.
-  { id: "default", label: "Default", bg: "#191919", accent: "#2383e2" },
+  { id: "default", label: "Default", bg: "#ffffff", accent: "#000000" },
   { id: "sand", label: "Warm", bg: "#faf6f0", accent: "#c0753f" },
   { id: "mauve", label: "Purple", bg: "#f7eef1", accent: "#a9829c" },
   { id: "sky", label: "Blue", bg: "#edf6fc", accent: "#4e84a8" },
   { id: "dusk", label: "Dark", bg: "#1e2328", accent: "#78aee8" },
-  { id: "mist", label: "Black & white", bg: "#ffffff", accent: "#000000" },
 ];
 
 function getSavedTheme() {
@@ -188,9 +188,10 @@ function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  function handleResumeHistory(entry) {
+  async function handleResumeHistory(entry) {
+    const original = await loadFile(entry.fileName);
     setPage("study");
-    studyDoc.loadText(entry.text, entry.fileName, entry.source);
+    studyDoc.loadText(entry.text, entry.fileName, entry.source, original);
   }
 
   const ready = studyDoc.status === "ready";
@@ -231,7 +232,6 @@ function App() {
 
   const navItems = [
     { id: "home", label: "Home", needsDoc: false },
-    { id: "game", label: "Game", needsDoc: true },
     { id: "break", label: "Mental break", needsDoc: false },
     { id: "plans", label: "Plans", needsDoc: false },
     { id: "history", label: "Past documents", needsDoc: false },

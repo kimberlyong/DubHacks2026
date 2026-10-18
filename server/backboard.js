@@ -1,3 +1,4 @@
+import { createHash } from "crypto";
 import { config } from "./config.js";
 import { ApiError } from "./gemini.js";
 
@@ -46,6 +47,71 @@ async function createSession(fileName, text) {
     await new Promise((r) => setTimeout(r, 1000));
   }
   throw new ApiError(504, "Backboard took too long to index the document.");
+}
+
+// Saved summaries: stored as memories on one shared "library" assistant, keyed
+// by a hash of the document text, so reopening a past file shows the same
+// summaries instead of regenerating them. Best-effort: any Backboard failure
+// just means the summaries get generated fresh.
+const LIBRARY_NAME = "Recap summary library";
+const KIND = "summaries";
+let libraryId = null;
+const savedCache = new Map(); // docKey -> summaries
+
+export function documentKey(text) {
+  return createHash("sha256").update(text.slice(0, config.historyTextChars)).digest("hex");
+}
+
+async function getLibraryId() {
+  if (libraryId) return libraryId;
+  const list = await bb("/assistants");
+  const items = Array.isArray(list) ? list : (list.assistants ?? []);
+  const found = items.find((a) => a.name === LIBRARY_NAME);
+  if (found) return (libraryId = found.assistant_id);
+  const created = await bb("/assistants", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: LIBRARY_NAME, system_prompt: "Storage for saved study summaries." }),
+  });
+  return (libraryId = created.assistant_id);
+}
+
+export async function loadSavedSummaries(docKey) {
+  if (savedCache.has(docKey)) return savedCache.get(docKey);
+  if (!process.env.BACKBOARD_API_KEY) return null;
+  try {
+    const id = await getLibraryId();
+    for (let page = 1; ; page++) {
+      const { memories = [], total_pages } = await bb(`/assistants/${id}/memories?page=${page}&page_size=100`);
+      const hit = memories.find((m) => m.metadata?.kind === KIND && m.metadata?.docKey === docKey);
+      if (hit) {
+        const summaries = JSON.parse(hit.content);
+        savedCache.set(docKey, summaries);
+        return summaries;
+      }
+      if (!total_pages || page >= total_pages) return null;
+    }
+  } catch {
+    return null;
+  }
+}
+
+export async function saveSummaries(docKey, fileName, summaries) {
+  savedCache.set(docKey, summaries);
+  if (!process.env.BACKBOARD_API_KEY) return;
+  try {
+    const id = await getLibraryId();
+    await bb(`/assistants/${id}/memories`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        content: JSON.stringify(summaries),
+        metadata: { kind: KIND, docKey, fileName: String(fileName ?? "").slice(0, 200) },
+      }),
+    });
+  } catch (err) {
+    console.error("Couldn't save summaries to Backboard:", err.message);
+  }
 }
 
 export function registerDocument(documentId, fileName, text) {

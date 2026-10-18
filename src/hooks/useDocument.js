@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { registerDocument } from "../api/client";
 import { extractText } from "../lib/extractText";
+import { saveFile } from "../lib/fileStore";
 import { addToHistory } from "../lib/studyHistory";
 
 const EMPTY = { file: null, documentId: null, text: "", status: "idle", error: null };
@@ -29,6 +30,7 @@ export function useDocument() {
       const documentId = crypto.randomUUID();
       setDoc({ file, documentId, text, status: "ready", error: null });
       addToHistory({ fileName: file.name, text, source: "upload" });
+      saveFile(file);
 
       // Fire-and-forget: sets up the Backboard thread for "Ask Questions".
       const controller = new AbortController();
@@ -41,13 +43,14 @@ export function useDocument() {
   }, []);
 
   // Same as upload(), but for text that already arrived as text (e.g. from
-  // the Canvas extension) instead of a File the user picked.
-  const loadText = useCallback((text, fileName, source = "extension") => {
+  // the Canvas extension) instead of a File the user picked. `original` is the
+  // saved file when reopening a past document, so the real file is previewed.
+  const loadText = useCallback((text, fileName, source = "extension", original = null) => {
     const request = ++requestRef.current;
     abortRef.current?.abort();
 
     const documentId = crypto.randomUUID();
-    const file = { name: fileName || "Canvas page" };
+    const file = original ?? { name: fileName || "Canvas page" };
     setDoc({ file, documentId, text, status: "ready", error: null });
     addToHistory({ fileName: file.name, text, source });
 

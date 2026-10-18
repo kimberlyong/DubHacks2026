@@ -49,6 +49,9 @@ export const config = {
   // GET /models/provider/google. Defaults to the same model as above.
   backboardModel: process.env.BACKBOARD_GEMINI_MODEL || process.env.GEMINI_MODEL || "gemini-3.8-flash",
   backboardBaseUrl: process.env.BACKBOARD_BASE_URL || "https://app.backboard.io/api",
+  // Must match MAX_TEXT_CHARS in src/lib/studyHistory.js: a reopened past file only
+  // has this much text, and summaries are keyed by a hash of it.
+  historyTextChars: 50_000,
   maxTextChars: 1_000_000,
   minTextChars: 20,
   singlePassChars: 30_000, // at or below this, summarize in one call

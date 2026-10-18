@@ -4,7 +4,7 @@ import { DEFAULT_LEVEL, LEVELS } from "../lib/levels";
 
 // Fetches every summary level in one request, so moving the slider is instant.
 // Mount with key={documentId} so state resets for each document.
-export function useSummary({ documentId, text }) {
+export function useSummary({ documentId, text, fileName }) {
   const [level, setLevel] = useState(DEFAULT_LEVEL);
   const [summaries, setSummaries] = useState(null); // level id -> summary
   const [error, setError] = useState(null);
@@ -13,7 +13,7 @@ export function useSummary({ documentId, text }) {
   useEffect(() => {
     const controller = new AbortController();
     setError(null);
-    fetchAllSummaries({ documentId, text }, controller.signal)
+    fetchAllSummaries({ documentId, text, fileName }, controller.signal)
       .then(setSummaries)
       .catch((err) => {
         if (err.name !== "AbortError") setError(err.message);

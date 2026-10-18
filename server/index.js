@@ -2,7 +2,7 @@ import { randomUUID } from "crypto";
 import express from "express";
 import { config } from "./config.js";
 import { ApiError } from "./gemini.js";
-import { chat, registerDocument } from "./backboard.js";
+import { chat, documentKey, loadSavedSummaries, registerDocument, saveSummaries } from "./backboard.js";
 import { buildFlowchart, findImages } from "./visualize.js";
 import { flashcards, gameQuestions, keyTerms, plan, summarize, summarizeAll, validateText } from "./study.js";
 
@@ -55,9 +55,15 @@ app.post("/api/summarize", route(async (req, res) => {
 }));
 
 app.post("/api/summarize-all", route(async (req, res) => {
-  const { documentId, text } = req.body ?? {};
+  const { documentId, text, fileName } = req.body ?? {};
   requireId(documentId);
-  return { summaries: await summarizeAll({ documentId, text, signal: abortOnClose(req, res) }) };
+  validateText(text);
+  const docKey = documentKey(text);
+  const saved = await loadSavedSummaries(docKey);
+  if (saved) return { summaries: saved };
+  const summaries = await summarizeAll({ documentId, text, signal: abortOnClose(req, res) });
+  await saveSummaries(docKey, fileName, summaries);
+  return { summaries };
 }));
 
 app.post("/api/visualize/images", route(async (req, res) => {
