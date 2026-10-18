@@ -2,6 +2,7 @@ import { Check, Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
+import MentalBreak from "./components/MentalBreak";
 import PrivacyNote from "./components/PrivacyNote";
 import DocumentViewer from "./components/DocumentViewer";
 import GamePage from "./components/game/GamePage";
@@ -196,7 +197,7 @@ function App() {
       setPage("history");
       return;
     }
-    if (target === "plans" || target === "game") {
+    if (target === "plans" || target === "game" || target === "break") {
       setPage(target);
       return;
     }
@@ -214,6 +215,7 @@ function App() {
   const navItems = [
     { id: "home", label: "Home", needsDoc: false },
     { id: "game", label: "Game", needsDoc: true },
+    { id: "break", label: "Mental break", needsDoc: false },
     { id: "plans", label: "Plans", needsDoc: false },
     { id: "history", label: "Past documents", needsDoc: false },
   ];
@@ -257,7 +259,7 @@ function App() {
                     {navItems.map((item) => {
                       const disabled = item.needsDoc && !ready;
                       const active =
-                        item.id === "history" || item.id === "plans" || item.id === "game"
+                        item.id === "history" || item.id === "plans" || item.id === "game" || item.id === "break"
                           ? page === item.id
                           : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
                       return (
@@ -438,6 +440,8 @@ function App() {
           )}
 
           {view === "app" && page === "plans" && <SavedPlans />}
+
+          {view === "app" && page === "break" && <MentalBreak />}
 
           {view === "app" && page === "game" &&
             (ready ? (
