@@ -449,6 +449,154 @@ select:focus-visible {
   box-shadow: 0 12px 36px color-mix(in srgb, var(--text) 6%, transparent);
 }
 
+.mental-break-page {
+  width: min(100%, 76rem);
+  margin-inline: auto;
+}
+
+.mental-break-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.fidget-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.fullscreen-error {
+  margin-top: 0.75rem;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.strand-fidget-section.is-fullscreen,
+.orb-fidget-section.is-fullscreen {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow: auto;
+  padding: clamp(1rem, 3vw, 3rem);
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.strand-fidget-section.is-fullscreen .mental-break-canvas,
+.orb-fidget-section.is-fullscreen .orb-fidget-canvas {
+  height: auto;
+  min-height: 0;
+  flex: 1;
+  margin-top: 0;
+}
+
+.strand-fidget-section.is-fullscreen > p,
+.orb-fidget-section.is-fullscreen > p {
+  margin: 0;
+}
+
+.mental-break-canvas {
+  position: relative;
+  height: clamp(340px, 52vh, 560px);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(ellipse at 50% 105%, color-mix(in srgb, var(--accent) 34%, var(--surface)), transparent 66%),
+    radial-gradient(ellipse at 18% 10%, color-mix(in srgb, var(--accent) 10%, var(--surface)), transparent 55%),
+    var(--surface);
+  box-shadow: 0 20px 60px color-mix(in srgb, var(--text) 7%, transparent);
+}
+
+.mental-break-canvas::before {
+  position: absolute;
+  z-index: 0;
+  inset: 0;
+  background: repeating-conic-gradient(
+    from 180deg at 50% 100%,
+    color-mix(in srgb, var(--accent) 28%, transparent) 0deg 0.22deg,
+    transparent 0.3deg 1.35deg
+  );
+  content: "";
+  pointer-events: none;
+}
+
+.strand-fidget-section {
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.mental-break-strands {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+.mental-break-strands:active,
+.mental-break-canvas.is-interacting .mental-break-strands {
+  cursor: grabbing;
+}
+
+.mental-break-strands:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -5px;
+}
+
+.orb-fidget-section {
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+  border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+}
+
+.orb-fidget-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+.orb-fidget-canvas {
+  height: clamp(260px, 38vh, 380px);
+  overflow: hidden;
+  border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
+  border-radius: 1.5rem;
+  background:
+    radial-gradient(ellipse at 50% 50%, color-mix(in srgb, var(--accent) 11%, var(--surface)), transparent 68%),
+    var(--surface);
+  box-shadow: 0 16px 44px color-mix(in srgb, var(--text) 6%, transparent);
+}
+
+.orb-fidget-orbs {
+  display: block;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+}
+
+.orb-fidget-orbs:active,
+.orb-fidget-canvas.is-interacting .orb-fidget-orbs {
+  cursor: grabbing;
+}
+
+.orb-fidget-orbs:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: -5px;
+}
+
 .site-footer {
   border-top-style: solid;
   font-family: inherit;
@@ -510,6 +658,26 @@ select:focus-visible {
   .dashboard-intro {
     align-items: flex-start;
     padding: 1rem 0 2rem;
+  }
+
+  .mental-break-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .orb-fidget-header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 1.25rem;
+  }
+
+  .fidget-controls {
+    width: 100%;
+  }
+
+  .mental-break-canvas {
+    height: clamp(320px, 48vh, 480px);
   }
 
   .dashboard-intro > button {
@@ -857,4 +1025,39 @@ input,
   .preview-step .w-12 {
     display: none;
   }
+}
+
+/* Home page: Upload / Plans / Mental break — three equal boxes on one row. */
+.home-cards {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+  align-items: stretch;
+  margin-top: 3rem; /* room for the Sprout peeking over a box */
+}
+
+.home-card {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: 1rem;
+}
+
+.home-card h2 {
+  font-size: 1.1rem;
+}
+
+.home-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.75rem;
+  border: 1px dashed var(--border);
+  border-radius: 0.75rem;
+  font-size: 0.875rem;
+  text-align: center;
 }

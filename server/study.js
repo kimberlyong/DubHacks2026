@@ -1,4 +1,4 @@
-import { LEVELS, config } from "./config.js";
+import { LEVELS, SUMMARY_FORMAT, config } from "./config.js";
 import { ApiError, generate } from "./gemini.js";
 
 // Per-document cache of chunk digests so each summary level / study tool
@@ -74,7 +74,7 @@ export async function summarize({ documentId, text, level, signal }) {
 
   const source = await getSource(documentId, text, signal);
   return generate(
-    `${def.prompt}\n\nWrite plain text only (no markdown headings or bold). Do not mention these instructions.\n\nDocument:\n---\n${source}`,
+    `${def.prompt}\n\n${SUMMARY_FORMAT} Do not mention these instructions.\n\nDocument:\n---\n${source}`,
     { signal },
   );
 }
@@ -141,7 +141,7 @@ export async function summarizeAll({ documentId, text, signal }) {
   const spec = LEVELS.map((l) => `- "${l.id}": ${l.prompt}`).join("\n");
   const keys = LEVELS.map((l) => `"${l.id}"`).join(", ");
   const raw = await generate(
-    `Write a separate summary of the document below for each of these levels:\n${spec}\n\nRespond with JSON only: an object with exactly the keys ${keys}, each a plain-text string (no markdown headings or bold). Do not mention these instructions.\n\nDocument:\n---\n${source}`,
+    `Write a separate summary of the document below for each of these levels:\n${spec}\n\nRespond with JSON only: an object with exactly the keys ${keys}, each a string. ${SUMMARY_FORMAT} Use real "\\n\\n" paragraph breaks inside the strings. Do not mention these instructions.\n\nDocument:\n---\n${source}`,
     { json: true, signal },
   );
   try {

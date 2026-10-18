@@ -1,7 +1,9 @@
-import { Check, Settings } from "lucide-react";
+import { Check, PanelLeftClose, PanelLeftOpen, Settings } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import ExtensionBanner from "./components/ExtensionBanner";
 import Homepage from "./components/Homepage";
+import MentalBreak from "./components/MentalBreak";
+import PlansPreview from "./components/PlansPreview";
 import PrivacyNote from "./components/PrivacyNote";
 import DocumentViewer from "./components/DocumentViewer";
 import GamePage from "./components/game/GamePage";
@@ -69,8 +71,16 @@ function App() {
   const [history, setHistory] = useState(getHistory);
   const { say } = useSprout();
   const justExtractedRef = useRef(false);
-  const [navOpen, setNavOpen] = useState(false);
-  const navRef = useRef(null);
+  // The sidebar is open by default on wide screens and remembers the last choice.
+  const [navOpen, setNavOpen] = useState(() => {
+    try {
+      const saved = localStorage.getItem("recap-nav-open");
+      if (saved !== null) return saved === "true";
+    } catch {
+      // storage unavailable; fall through to the default
+    }
+    return window.innerWidth >= 768;
+  });
   const [page, setPage] = useState("study");
   const [studyMode, setStudyMode] = useState(null);
 
@@ -79,15 +89,11 @@ function App() {
       if (!settingsRef.current?.contains(event.target)) {
         setSettingsOpen(false);
       }
-      if (!navRef.current?.contains(event.target)) {
-        setNavOpen(false);
-      }
     }
 
     function handleKeyDown(event) {
       if (event.key === "Escape") {
         setSettingsOpen(false);
-        setNavOpen(false);
       }
     }
 
@@ -189,14 +195,26 @@ function App() {
 
   const ready = studyDoc.status === "ready";
 
+  function toggleNav() {
+    setNavOpen((open) => {
+      try {
+        localStorage.setItem("recap-nav-open", String(!open));
+      } catch {
+        // ignore; the toggle still works for this session
+      }
+      return !open;
+    });
+  }
+
   function navigate(target) {
-    setNavOpen(false);
+    // On narrow screens the sidebar overlays the page, so tuck it away after a choice.
+    if (window.innerWidth < 768) setNavOpen(false);
     if (target === "history") {
       setHistory(getHistory());
       setPage("history");
       return;
     }
-    if (target === "plans" || target === "game") {
+    if (target === "plans" || target === "game" || target === "break") {
       setPage(target);
       return;
     }
@@ -214,6 +232,7 @@ function App() {
   const navItems = [
     { id: "home", label: "Home", needsDoc: false },
     { id: "game", label: "Game", needsDoc: true },
+    { id: "break", label: "Mental break", needsDoc: false },
     { id: "plans", label: "Plans", needsDoc: false },
     { id: "history", label: "Past documents", needsDoc: false },
   ];
@@ -230,57 +249,26 @@ function App() {
       className={`min-h-screen bg-theme-bg text-theme-text ${textSizes[textSize]}`}
     >
       <div
-        className={`app-shell mx-auto flex min-h-screen w-full flex-col px-6 ${studyDoc.status === "ready" && (view === "app" || name) ? "max-w-7xl" : "max-w-4xl"}`}
+        className={`app-shell mx-auto flex min-h-screen w-full flex-col ${view === "app" ? "px-3" : `px-6 ${studyDoc.status === "ready" && name ? "max-w-7xl" : "max-w-4xl"}`}`}
       >
         <header className="site-header flex min-h-16 items-center justify-between border-b border-theme-border">
           <div className="flex items-center gap-4">
             {view === "app" && (
-              <div className="relative" ref={navRef}>
-                <button
-                  type="button"
-                  aria-label="Navigation menu"
-                  aria-expanded={navOpen}
-                  aria-controls="nav-menu"
-                  onClick={() => setNavOpen((open) => !open)}
-                  className="flex h-9 w-9 cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-black bg-transparent dark:border-white"
-                >
-                  <span className="h-0.5 w-5 bg-current" />
-                  <span className="h-0.5 w-5 bg-current" />
-                  <span className="h-0.5 w-5 bg-current" />
-                </button>
-                {navOpen && (
-                  <nav
-                    id="nav-menu"
-                    aria-label="Pages"
-                    className="absolute left-0 top-full z-10 mt-2 w-56 rounded-xl border border-theme-border bg-theme-surface p-2 text-theme-text"
-                  >
-                    {navItems.map((item) => {
-                      const disabled = item.needsDoc && !ready;
-                      const active =
-                        item.id === "history" || item.id === "plans" || item.id === "game"
-                          ? page === item.id
-                          : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
-                      return (
-                        <button
-                          key={item.id}
-                          type="button"
-                          disabled={disabled}
-                          title={disabled ? "Upload a document first" : undefined}
-                          aria-current={active ? "page" : undefined}
-                          onClick={() => navigate(item.id)}
-                          className={`block w-full rounded-lg px-3 py-2 text-left disabled:cursor-not-allowed disabled:opacity-40 ${
-                            active
-                              ? "bg-theme-accent text-theme-on-accent"
-                              : "bg-transparent hover:bg-theme-border/30"
-                          }`}
-                        >
-                          {item.label}
-                        </button>
-                      );
-                    })}
-                  </nav>
+              <button
+                type="button"
+                aria-label={navOpen ? "Close navigation sidebar" : "Open navigation sidebar"}
+                title={navOpen ? "Close sidebar" : "Open sidebar"}
+                aria-expanded={navOpen}
+                aria-controls="nav-menu"
+                onClick={toggleNav}
+                className="flex size-9 cursor-pointer items-center justify-center rounded-lg border border-theme-border bg-transparent text-inherit hover:bg-theme-border/30"
+              >
+                {navOpen ? (
+                  <PanelLeftClose aria-hidden="true" className="size-5" />
+                ) : (
+                  <PanelLeftOpen aria-hidden="true" className="size-5" />
                 )}
-              </div>
+              </button>
             )}
             <button
               type="button"
@@ -402,7 +390,46 @@ function App() {
           </div>
         </header>
 
-        <main className="app-main flex-1">
+        <div className="relative flex min-w-0 flex-1">
+        {view === "app" && navOpen && (
+          <nav
+            id="nav-menu"
+            aria-label="Pages"
+            className="app-sidebar absolute inset-y-0 left-0 z-20 w-52 border-r border-theme-border bg-theme-bg py-6 pr-3 max-md:bg-theme-surface max-md:px-3 max-md:shadow-lg md:static md:shrink-0"
+          >
+            <div className="flex flex-col gap-1 md:sticky md:top-6">
+              {navItems.map((item) => {
+                const disabled = item.needsDoc && !ready;
+                const active =
+                  item.id === "history" || item.id === "plans" || item.id === "game" || item.id === "break"
+                    ? page === item.id
+                    : page === "study" && (item.id === "home" ? !studyMode : studyMode === item.id);
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    disabled={disabled}
+                    title={disabled ? "Upload a document first" : undefined}
+                    aria-current={active ? "page" : undefined}
+                    onClick={() => navigate(item.id)}
+                    className={`block w-full cursor-pointer rounded-lg px-3 py-2 text-left disabled:cursor-not-allowed disabled:opacity-40 ${
+                      active
+                        ? "bg-theme-accent text-theme-on-accent"
+                        : "bg-transparent hover:bg-theme-border/30"
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                );
+              })}
+            </div>
+          </nav>
+        )}
+        <main
+          className={`app-main min-w-0 flex-1 ${view === "app" && navOpen ? "md:pl-8" : ""} ${
+            view === "app" && !(ready && page === "study") ? "mx-auto w-full max-w-6xl" : ""
+          }`}
+        >
           {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
 
           {view === "signin" && (
@@ -438,6 +465,8 @@ function App() {
           )}
 
           {view === "app" && page === "plans" && <SavedPlans />}
+
+          {view === "app" && page === "break" && <MentalBreak />}
 
           {view === "app" && page === "game" &&
             (ready ? (
@@ -479,11 +508,13 @@ function App() {
 
           {view === "app" && page === "study" && (
             <section className="dashboard-section py-18">
-              <div className="dashboard-intro flex items-start justify-between gap-4">
-                <div>
-                  <h1 className="text-3xl font-semibold">Welcome, {name}.</h1>
+              {!ready && !studyMode && (
+                <div className="dashboard-intro flex items-start justify-between gap-4">
+                  <div>
+                    <h1 className="text-3xl font-semibold">Welcome, {name}.</h1>
+                  </div>
                 </div>
-              </div>
+              )}
 
               {studyDoc.error && (
                 <p role="alert" className="mt-4 text-theme-urgent">
@@ -493,7 +524,7 @@ function App() {
 
               <ExtensionBanner />
 
-              <div className={`dashboard-cards mt-8 grid grid-cols-1 gap-4 ${ready ? "lg:grid-cols-[3fr_2fr]" : "lg:grid-cols-2"}`}>
+              <div className={ready ? "dashboard-cards mt-8 grid gap-4 lg:grid-cols-[3fr_2fr]" : "home-cards"}>
                 {ready ? (
                   <>
                     <DocumentViewer
@@ -513,9 +544,9 @@ function App() {
                   </>
                 ) : (
                   <>
-                    <article className="dashboard-card rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
-                      <h2 className="text-xl font-semibold">Upload a file</h2>
-                      <div className="mt-4">
+                    <article className="dashboard-card home-card rounded-xl border border-theme-border bg-theme-surface shadow-sm">
+                      <h2 className="font-semibold">Upload a file</h2>
+                      <div className="home-card-body">
                         <UploadArea
                           file={studyDoc.file}
                           status={studyDoc.status}
@@ -526,32 +557,29 @@ function App() {
                       </div>
                     </article>
 
+                    <article className="dashboard-card home-card rounded-xl border border-theme-border bg-theme-surface shadow-sm">
+                      <h2 className="font-semibold">Plans</h2>
+                      <div className="home-card-body">
+                        <PlansPreview onOpen={() => navigate("plans")} />
+                      </div>
+                    </article>
 
-                    <article className="dashboard-card rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
-                      <h2 className="text-xl font-semibold">Past files</h2>
-                      {history.length === 0 ? (
-                        <p className="mt-4 text-theme-muted">
-                          Nothing here yet. Files you upload will show up here.
-                        </p>
-                      ) : (
-                        <ul className="mt-4 max-h-96 space-y-2 overflow-y-auto">
-                          {history.map((entry) => (
-                            <li key={entry.fileName + entry.savedAt}>
-                              <button
-                                type="button"
-                                onClick={() => handleResumeHistory(entry)}
-                                className="flex w-full cursor-pointer items-center justify-between gap-3 rounded-lg border border-theme-border px-4 py-3 text-left hover:bg-theme-border/20"
-                              >
-                                <span className="min-w-0 truncate font-medium">{entry.fileName}</span>
-                                <span className="shrink-0 text-xs text-theme-muted">
-                                  {relativeTime(entry.savedAt)}
-                                </span>
-                              </button>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-
+                    <article className="dashboard-card home-card relative rounded-xl border border-theme-border bg-theme-surface shadow-sm">
+                      {/* Sprout peeks over the top edge of this box. */}
+                      <div aria-hidden="true" className="pointer-events-none absolute bottom-full right-6 h-10 w-16 overflow-hidden">
+                        <SproutArt className="w-16" />
+                      </div>
+                      <h2 className="font-semibold">Mental break</h2>
+                      <div className="home-card-body">
+                        <p>Step away for a minute and reset.</p>
+                        <button
+                          type="button"
+                          onClick={() => navigate("break")}
+                          className="cursor-pointer rounded-lg border border-theme-accent bg-theme-accent px-3 py-1.5 text-theme-on-accent"
+                        >
+                          Take a break
+                        </button>
+                      </div>
                     </article>
                   </>
                 )}
@@ -559,6 +587,7 @@ function App() {
             </section>
           )}
         </main>
+        </div>
 
         <footer className="site-footer border-t border-theme-border py-4 text-sm text-theme-muted">
           Clarity
