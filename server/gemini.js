@@ -13,6 +13,16 @@ const RETRYABLE = new Set([429, 500, 502, 503, 504]);
 // Model -> timestamp until which we skip it after it reported overloaded.
 const coolingUntil = new Map();
 
+// When a model is out of quota (not just briefly busy), retrying is wasted
+// time: skip it for as long as Google says, or 10 minutes.
+const QUOTA_COOLDOWN_MS = 10 * 60_000;
+
+function quotaCooldownMs(body) {
+  if (!/quota/i.test(body)) return 0;
+  const delay = body.match(/"retryDelay":\s*"(\d+(?:\.\d+)?)s"/);
+  return delay ? Math.max(config.geminiCooldownMs, Number(delay[1]) * 1000) : QUOTA_COOLDOWN_MS;
+}
+
 class UpstreamError extends Error {
   constructor(status, body) {
     super(`Gemini responded ${status}`);
@@ -92,6 +102,13 @@ export async function generate(prompt, { json = false, signal } = {}) {
         }
         if (err.status === 404) break; // model id not available: try the next one
         if (!RETRYABLE.has(err.status)) throw new ApiError(502, `Gemini request failed (${err.status}).`);
+
+        const quotaMs = err.status === 429 ? quotaCooldownMs(err.body) : 0;
+        if (quotaMs) {
+          coolingUntil.set(model, Date.now() + quotaMs);
+          console.warn(`[gemini] ${model} is out of quota, skipping it for ${Math.round(quotaMs / 1000)}s`);
+          break;
+        }
 
         if (attempt < config.geminiRetries) {
           await sleep(500 * 2 ** attempt + Math.random() * 250, signal);

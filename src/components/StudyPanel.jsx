@@ -1,3 +1,5 @@
+import { useEffect } from "react";
+import { prefetchFlashcards } from "../hooks/useFlashcards";
 import { useSummary } from "../hooks/useSummary";
 import StudyOptions from "./StudyOptions";
 import SummaryDisplay from "./SummaryDisplay";
@@ -10,6 +12,12 @@ import Visualizer from "./study/Visualizer";
 // `mode` is owned by App so the top navigator can jump straight to a tool.
 export default function StudyPanel({ fileName, documentId, text, mode, onModeChange }) {
   const { level, setLevel, summary, status, error, retry } = useSummary({ documentId, text, fileName });
+
+  // Once the summary is up, make the flashcards in the background so the
+  // Flashcards tab opens instantly.
+  useEffect(() => {
+    if (status === "ready") prefetchFlashcards({ documentId, text });
+  }, [status, documentId, text]);
 
   function handleSelect(id) {
     onModeChange(mode === id ? null : id);
