@@ -32,13 +32,11 @@ const textSizes = {
 // Each theme comes in a light and a dark version (see data-mode in index.css).
 // bg + accent are only for the little swatch in the settings menu.
 const themes = [
-  // bg + accent are only for the little swatch in the settings menu.
-  { id: "default", label: "Default", bg: "#191919", accent: "#2383e2" },
-  { id: "sand", label: "Warm", bg: "#faf6f0", accent: "#c0753f" },
-  { id: "mauve", label: "Purple", bg: "#f7eef1", accent: "#a9829c" },
-  { id: "sky", label: "Blue", bg: "#edf6fc", accent: "#4e84a8" },
-  { id: "dusk", label: "Dark", bg: "#1e2328", accent: "#78aee8" },
-  { id: "mist", label: "Black & white", bg: "#ffffff", accent: "#000000" },
+  { id: "default", label: "Default", light: ["#ffffff", "#2383e2"], dark: ["#191919", "#2383e2"] },
+  { id: "sand", label: "Warm", light: ["#faf6f0", "#c0753f"], dark: ["#1f1a16", "#d8925c"] },
+  { id: "mauve", label: "Purple", light: ["#f7eef1", "#a9829c"], dark: ["#221a1f", "#c9a0bb"] },
+  { id: "sky", label: "Blue", light: ["#edf6fc", "#4e84a8"], dark: ["#1e2328", "#78aee8"] },
+  { id: "mist", label: "Black & white", light: ["#ffffff", "#000000"], dark: ["#000000", "#ffffff"] },
 ];
 const modes = [
   { id: "light", label: "Light", Icon: Sun },
