@@ -1,10 +1,55 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { Camera, CameraOff } from "lucide-react";
+import { Camera, CameraOff, Volume2, VolumeX } from "lucide-react";
 import { useFaceRecovery } from "../hooks/useFaceRecovery";
+import { playChime } from "../lib/chime";
 import { CAMERA_ON_MESSAGES, pick } from "../sprout/messages";
 import SproutArt from "../sprout/SproutArt";
 import { useSprout } from "../sprout/SproutContext";
+
+// Chime when the "Still with me?" popup appears, but sparingly: repeated
+// alerts get tuned out (alarm fatigue) and can stress people who are sensitive
+// to sound. At most MAX_CHIMES per stretch of looking away, spaced out, and
+// the count resets once they've really looked back at the screen.
+const MAX_CHIMES = 3;
+const CHIME_GAP_MS = 20_000;
+const SOUND_KEY = "clarity:focusSound";
+
+function useFocusChime() {
+  const [soundOn, setSoundOn] = useState(() => {
+    try {
+      return localStorage.getItem(SOUND_KEY) !== "off";
+    } catch {
+      return true;
+    }
+  });
+  const countRef = useRef(0);
+  const lastRef = useRef(-Infinity);
+
+  function toggleSound() {
+    const next = !soundOn;
+    setSoundOn(next);
+    try {
+      localStorage.setItem(SOUND_KEY, next ? "on" : "off");
+    } catch {
+      // Private mode etc.: the choice just won't be remembered.
+    }
+  }
+
+  function onDistracted() {
+    const now = performance.now();
+    if (!soundOn || countRef.current >= MAX_CHIMES || now - lastRef.current < CHIME_GAP_MS) return;
+    countRef.current += 1;
+    lastRef.current = now;
+    playChime();
+  }
+
+  function onReturn() {
+    countRef.current = 0;
+  }
+
+  return { soundOn, toggleSound, onDistracted, onReturn };
+}
 
 const MODES = [
   { id: "screen", label: "Screen focus" },
@@ -88,6 +133,7 @@ function RecoveryDialog({ fileName, onBack, onBreak, onThinking }) {
 }
 
 export default function CameraRecovery({ fileName, onBrainBreak }) {
+  const chime = useFocusChime();
   const {
     enabled,
     setEnabled,
@@ -96,7 +142,7 @@ export default function CameraRecovery({ fileName, onBrainBreak }) {
     setShowRecovery,
     snoozeRecovery,
     error,
-  } = useFaceRecovery();
+  } = useFaceRecovery({ onDistracted: chime.onDistracted, onReturn: chime.onReturn });
 
   const [snoozeMessage, setSnoozeMessage] = useState(false);
   const [onBreak, setOnBreak] = useState(false);
@@ -142,26 +188,42 @@ export default function CameraRecovery({ fileName, onBrainBreak }) {
         </div>
 
         {focusMode === "screen" && (
-          <button
-            type="button"
-            onClick={() => {
-              setEnabled(!enabled);
-              setOnBreak(false);
-              setShowRecovery(false);
-            }}
-            className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium ${
-              enabled
-                ? "border border-theme-border bg-transparent text-theme-text"
-                : "bg-theme-accent text-theme-on-accent"
-            }`}
-          >
-            {enabled ? (
-              <CameraOff aria-hidden="true" className="size-4" />
-            ) : (
-              <Camera aria-hidden="true" className="size-4" />
-            )}
-            {enabled ? "Turn off camera" : "Turn on camera"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={chime.toggleSound}
+              aria-pressed={chime.soundOn}
+              title={chime.soundOn ? "Mute the focus chime" : "Turn on the focus chime"}
+              className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-theme-border bg-transparent px-3 py-1.5 text-sm font-medium text-theme-text"
+            >
+              {chime.soundOn ? (
+                <Volume2 aria-hidden="true" className="size-4" />
+              ) : (
+                <VolumeX aria-hidden="true" className="size-4" />
+              )}
+              {chime.soundOn ? "Sound on" : "Sound off"}
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setEnabled(!enabled);
+                setOnBreak(false);
+                setShowRecovery(false);
+              }}
+              className={`flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium ${
+                enabled
+                  ? "border border-theme-border bg-transparent text-theme-text"
+                  : "bg-theme-accent text-theme-on-accent"
+              }`}
+            >
+              {enabled ? (
+                <CameraOff aria-hidden="true" className="size-4" />
+              ) : (
+                <Camera aria-hidden="true" className="size-4" />
+              )}
+              {enabled ? "Turn off camera" : "Turn on camera"}
+            </button>
+          </div>
         )}
       </div>
 

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaceLandmarker, FilesetResolver } from "@mediapipe/tasks-vision";
 
 // Looking away this long brings up the "Still with me?" popup.
-const POPUP_AFTER_MS = 4000;
+const POPUP_AFTER_MS = 3000;
 // How long you have to look back before the countdown starts over.
 const REFOCUS_MS = 1000;
 
@@ -68,7 +68,7 @@ export function useFaceRecovery({ onDistracted, onReturn } = {}) {
         if (cancelled) return;
 
         const vision = await FilesetResolver.forVisionTasks(
-          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@0.10.32/wasm"
+          "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision@1.1.1/wasm"
         );
 
         if (cancelled) return;
@@ -180,6 +180,7 @@ export function useFaceRecovery({ onDistracted, onReturn } = {}) {
             // countdown; only a real look back (a full second) does.
             if (focusedSince === null) focusedSince = now;
             if (now - focusedSince >= REFOCUS_MS) {
+              if (distractedSince !== null) callbacksRef.current.onReturn?.();
               distractedSince = null;
               readyForNextPopup = true;
             }
