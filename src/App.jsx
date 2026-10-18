@@ -11,6 +11,7 @@ import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
 import { getHistory, relativeTime } from "./lib/studyHistory";
 import Sprout from "./sprout/Sprout";
+import SproutArt from "./sprout/SproutArt";
 import {
   EXTENSION_READY_MESSAGES,
   UPLOAD_READY_MESSAGES,
@@ -287,12 +288,34 @@ function App() {
                 if (name) navigate("home");
                 else setView("home");
               }}
-              className="cursor-pointer bg-transparent p-0 font-bold text-inherit"
+              className="flex cursor-pointer items-center gap-2 bg-transparent p-0 font-bold text-inherit"
             >
-              clarity
+              <SproutArt className="size-7" />
+              Clarity
             </button>
           </div>
           <div className="flex items-center gap-4">
+            {view === "home" && (
+              <>
+                <a href="#features" className="site-nav-link max-[560px]:hidden">
+                  Features
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setView(name ? "app" : "signin")}
+                  className="cursor-pointer whitespace-nowrap bg-transparent p-0 text-sm text-theme-text"
+                >
+                  Sign in
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setView(name ? "app" : "signin")}
+                  className="cursor-pointer whitespace-nowrap rounded-lg border border-theme-accent bg-theme-accent px-3 py-1.5 text-sm font-medium text-theme-on-accent max-[420px]:hidden"
+                >
+                  Get started
+                </button>
+              </>
+            )}
             {view === "app" && (
               <span className="text-sm text-theme-muted max-[420px]:hidden">{today}</span>
             )}
