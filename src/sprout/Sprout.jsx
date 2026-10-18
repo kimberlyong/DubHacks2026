@@ -1,38 +1,9 @@
 import { useEffect, useRef } from "react";
+import { CLICK_MESSAGES, IDLE_TIPS, pick } from "./messages";
 import { useSprout } from "./SproutContext";
 
-const IDLE_TIPS = [
-  "Stuck on something? Try reading it out loud — it slows your brain down just enough.",
-  "Break it into one small step. You don't have to see the whole thing yet.",
-  "Took a break? That's not falling behind, that's how focus works.",
-  "If your eyes are moving but nothing's landing, try the Simplify slider.",
-  "Not sure where to start? Pick literally anything. Momentum comes after.",
-];
-
-// Short things Sprout says when you click it.
-const CLICK_MESSAGES = [
-  "Hi! I'm rooting for you 🌱",
-  "You're doing great.",
-  "One small step at a time.",
-  "Sip of water? 💧",
-  "Proud of you for showing up.",
-  "Deep breath. You've got this.",
-  "Tiny progress is still progress.",
-  "Stretch break? I'll wait.",
-  "Hehe, that tickles!",
-  "Let's grow together 🌿",
-  "Focus mode: activated.",
-  "You're smarter than you think.",
-  "Done is better than perfect.",
-  "I believe in you!",
-  "Keep going — you're almost there.",
-];
-
-const MOOD_ICON = { idle: null, happy: "✨", nudge: "👀", thinking: "💭" };
-
-function randomTip() {
-  return IDLE_TIPS[Math.floor(Math.random() * IDLE_TIPS.length)];
-}
+// The sparkle is saved for real wins (see "celebrate" in messages.js) so it stays special.
+const MOOD_ICON = { idle: null, happy: null, celebrate: "✨", nudge: null, thinking: null };
 
 function shuffled(items) {
   const copy = [...items];
@@ -67,7 +38,7 @@ export default function Sprout() {
   useEffect(() => {
     function scheduleIdleTip() {
       idleTimerRef.current = setTimeout(() => {
-        say(randomTip(), "idle", 6000);
+        say(pick(IDLE_TIPS), "idle");
         scheduleIdleTip();
       }, 45_000);
     }
@@ -83,7 +54,7 @@ export default function Sprout() {
         <div
           role="status"
           aria-live="polite"
-          className="max-w-64 rounded-2xl rounded-br-sm border border-theme-border bg-theme-surface px-4 py-3 text-sm text-theme-text shadow-lg"
+          className="max-w-72 rounded-2xl rounded-br-sm border border-theme-border bg-theme-surface px-4 py-3 text-sm text-theme-text shadow-lg"
         >
           <p>
             {MOOD_ICON[mood] && <span className="mr-1">{MOOD_ICON[mood]}</span>}
@@ -94,8 +65,8 @@ export default function Sprout() {
 
       <button
         type="button"
-        aria-label="Sprout, your study buddy — click to say hi"
-        onClick={() => say(nextClickMessage(), "happy", 4000)}
+        aria-label="Sprout, your study buddy. Click to say hi"
+        onClick={() => say(nextClickMessage(), "happy")}
         className={`group relative size-20 cursor-pointer rounded-full bg-transparent p-0 transition-transform duration-200 hover:scale-105 ${
           mood === "nudge" ? "animate-sprout-shake" : "animate-sprout-bob"
         }`}

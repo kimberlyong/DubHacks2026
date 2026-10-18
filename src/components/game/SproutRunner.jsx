@@ -1,5 +1,6 @@
 import { Heart, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { streakMessage } from "../../sprout/messages";
 import { useSprout } from "../../sprout/SproutContext";
 import { gradeTyped } from "./grading";
 import { HEIGHT, MAX_LIVES, QUESTION_EVERY, WIDTH, createRunner } from "./runner";
@@ -53,7 +54,7 @@ function QuestionCard({ question, type, number, onDone }) {
   return (
     <div className="rounded-xl border border-theme-border bg-theme-surface p-5 shadow-sm">
       <p className="text-sm text-theme-muted">
-        Checkpoint {number} — answer to keep running
+        Checkpoint {number}
       </p>
       <h2 className="mt-1 text-lg font-semibold">
         {type === "vocab" ? "Which term matches this definition?" : question.question}
@@ -213,7 +214,7 @@ export default function SproutRunner({ questions, type, onExit }) {
   function handleAnswered(correct) {
     if (correct) {
       streakRef.current += 1;
-      if (streakRef.current % 3 === 0) say(`${streakRef.current} in a row — you're on fire! 🔥`, "happy");
+      if (streakRef.current % 3 === 0) say(streakMessage(streakRef.current), "happy");
     } else {
       streakRef.current = 0;
     }

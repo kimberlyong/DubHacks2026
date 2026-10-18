@@ -1,7 +1,7 @@
-# Recap for Canvas (extension)
+# Clarity for Canvas (extension)
 
 Pulls the assignment, syllabus, lecture page, discussion, or quiz off a Canvas
-page and sends it straight into Recap — no copy-paste, no file upload.
+page and sends it straight into Clarity — no copy-paste, no file upload.
 
 ## Load it in Chrome
 
@@ -16,7 +16,7 @@ page and sends it straight into Recap — no copy-paste, no file upload.
    `:8787` and the web app on `:5173`)
 2. Open any Canvas assignment, syllabus, page, discussion, or quiz
 3. Click the extension icon, then **Extract this page**
-4. Recap opens in a new tab with the page already loaded and ready to study
+4. Clarity opens in a new tab with the page already loaded and ready to study
 
 ## How it works
 

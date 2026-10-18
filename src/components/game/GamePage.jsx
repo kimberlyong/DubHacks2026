@@ -4,14 +4,14 @@ import { fetchGameQuestions } from "../../api/client";
 import SproutRunner from "./SproutRunner";
 
 const QUIZ_TYPES = [
-  { id: "multiple", label: "Multiple choice", blurb: "Pick the right answer from four options.", Icon: ListChecks },
-  { id: "short", label: "Short answer", blurb: "Type a word or short phrase from memory.", Icon: PenLine },
-  { id: "vocab", label: "Vocab", blurb: "Match each definition to its key term.", Icon: SpellCheck },
+  { id: "multiple", label: "Multiple choice", Icon: ListChecks },
+  { id: "short", label: "Short answer", Icon: PenLine },
+  { id: "vocab", label: "Vocab", Icon: SpellCheck },
 ];
 
 const cache = new Map(); // `${documentId}:${type}` -> questions
 
-export default function GamePage({ documentId, text, fileName }) {
+export default function GamePage({ documentId, text }) {
   const [type, setType] = useState("multiple");
   const [status, setStatus] = useState("setup"); // setup | loading | playing
   const [error, setError] = useState(null);
@@ -58,22 +58,17 @@ export default function GamePage({ documentId, text, fileName }) {
   return (
     <section className="mx-auto max-w-2xl py-18">
       <h1 className="text-3xl font-semibold">Sprout Run</h1>
-      <p className="mt-3 leading-relaxed text-theme-muted">
-        Help Sprout run! Jump over obstacles, and every so often Sprout stops for a question about{" "}
-        <span className="break-all font-medium text-theme-text">{fileName}</span>. Answer to keep going — a wrong
-        answer or a bump costs a heart.
-      </p>
 
       <fieldset className="mt-6" disabled={status === "loading"}>
         <legend className="mb-2 font-medium">Choose your questions</legend>
         <div className="grid gap-3 sm:grid-cols-3">
-          {QUIZ_TYPES.map(({ id, label, blurb, Icon }) => (
+          {QUIZ_TYPES.map(({ id, label, Icon }) => (
             <button
               key={id}
               type="button"
               aria-pressed={type === id}
               onClick={() => setType(id)}
-              className={`cursor-pointer rounded-xl border p-4 text-left ${
+              className={`card-button cursor-pointer rounded-xl border p-4 text-left ${
                 type === id
                   ? "border-theme-accent bg-theme-accent text-theme-on-accent"
                   : "border-theme-border bg-theme-surface text-theme-text hover:bg-theme-border/30"
@@ -81,7 +76,6 @@ export default function GamePage({ documentId, text, fileName }) {
             >
               <Icon aria-hidden="true" className="size-6" />
               <span className="mt-2 block font-semibold">{label}</span>
-              <span className="mt-1 block text-sm opacity-80">{blurb}</span>
             </button>
           ))}
         </div>

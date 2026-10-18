@@ -20,7 +20,6 @@ export default function SummarySlider({ level, onChange }) {
           step={1}
           value={level}
           aria-valuetext={current.name}
-          aria-describedby="summary-level-description"
           onChange={(e) => onChange(Number(e.target.value))}
           className={`h-4 w-full cursor-pointer appearance-none bg-transparent focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-theme-accent [&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full [&::-webkit-slider-runnable-track]:bg-theme-border [&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-theme-border ${thumb}`}
         />
@@ -36,9 +35,6 @@ export default function SummarySlider({ level, onChange }) {
           ))}
         </div>
       </div>
-      <p id="summary-level-description" className="mt-8 text-sm" aria-live="polite">
-        <span className="font-semibold">{current.name}:</span> {current.description}
-      </p>
     </div>
   );
 }
