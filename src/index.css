@@ -461,9 +461,52 @@ select:focus-visible {
   gap: 2rem;
 }
 
+.fidget-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.fullscreen-error {
+  margin-top: 0.75rem;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.strand-fidget-section.is-fullscreen,
+.orb-fidget-section.is-fullscreen {
+  box-sizing: border-box;
+  display: flex;
+  width: 100%;
+  height: 100%;
+  max-height: 100%;
+  flex-direction: column;
+  gap: 1.25rem;
+  overflow: auto;
+  padding: clamp(1rem, 3vw, 3rem);
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: var(--surface);
+  color: var(--text);
+}
+
+.strand-fidget-section.is-fullscreen .mental-break-canvas,
+.orb-fidget-section.is-fullscreen .orb-fidget-canvas {
+  height: auto;
+  min-height: 0;
+  flex: 1;
+  margin-top: 0;
+}
+
+.strand-fidget-section.is-fullscreen > p,
+.orb-fidget-section.is-fullscreen > p {
+  margin: 0;
+}
+
 .mental-break-canvas {
   position: relative;
-  height: clamp(380px, 62vh, 680px);
+  height: clamp(340px, 52vh, 560px);
   overflow: hidden;
   border: 1px solid color-mix(in srgb, var(--accent) 18%, var(--border));
   border-radius: 1.5rem;
@@ -476,6 +519,7 @@ select:focus-visible {
 
 .mental-break-canvas::before {
   position: absolute;
+  z-index: 0;
   inset: 0;
   background: repeating-conic-gradient(
     from 180deg at 50% 100%,
@@ -484,6 +528,12 @@ select:focus-visible {
   );
   content: "";
   pointer-events: none;
+}
+
+.strand-fidget-section {
+  padding-top: clamp(2.5rem, 5vw, 4rem);
+  margin-top: clamp(2.5rem, 5vw, 4rem);
+  border-top: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
 }
 
 .mental-break-strands {
@@ -622,8 +672,12 @@ select:focus-visible {
     gap: 1.25rem;
   }
 
+  .fidget-controls {
+    width: 100%;
+  }
+
   .mental-break-canvas {
-    height: clamp(360px, 58vh, 560px);
+    height: clamp(320px, 48vh, 480px);
   }
 
   .dashboard-intro > button {
