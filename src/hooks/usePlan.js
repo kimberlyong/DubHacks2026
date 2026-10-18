@@ -4,8 +4,8 @@ import { fetchPlan } from "../api/client";
 const cache = new Map(); // documentId -> { steps, params }
 
 // Unlike useSummary/useKeyTerms, this doesn't fetch on mount — it needs the
-// student's chosen time and energy first. Call generate(minutes, energy) to
-// kick it off.
+// student's chosen time and energy first. Call generate(minutes, energy,
+// deadline?) to kick it off; deadline ({ title, due }) comes from their calendar.
 export function usePlan({ documentId, text }) {
   const cached = cache.get(documentId);
   const [steps, setSteps] = useState(cached?.steps ?? null);
@@ -15,13 +15,13 @@ export function usePlan({ documentId, text }) {
   const abortRef = useRef(null);
 
   const generate = useCallback(
-    (minutes, energy) => {
+    (minutes, energy, deadline) => {
       abortRef.current?.abort();
       const controller = new AbortController();
       abortRef.current = controller;
       setStatus("loading");
       setError(null);
-      fetchPlan({ documentId, text, minutes, energy }, controller.signal)
+      fetchPlan({ documentId, text, minutes, energy, deadline }, controller.signal)
         .then((result) => {
           cache.set(documentId, { steps: result, params: { minutes, energy } });
           setSteps(result);

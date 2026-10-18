@@ -1,5 +1,6 @@
-import { RotateCcw } from "lucide-react";
+import { Maximize, Minimize, RotateCcw } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import useFullscreen from "../../hooks/useFullscreen";
 
 const ORB_COUNT = 12;
 
@@ -10,6 +11,7 @@ export default function OrbFidget() {
   const drawRef = useRef(null);
   const pointerRef = useRef({ down: false, x: 0, y: 0 });
   const [isInteracting, setIsInteracting] = useState(false);
+  const fullscreen = useFullscreen();
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -223,7 +225,11 @@ export default function OrbFidget() {
   }
 
   return (
-    <section className="orb-fidget-section mt-16 sm:mt-20" aria-labelledby="orb-fidget-title">
+    <section
+      ref={fullscreen.elementRef}
+      className={`orb-fidget-section mt-16 sm:mt-20${fullscreen.isFullscreen ? " is-fullscreen" : ""}`}
+      aria-labelledby="orb-fidget-title"
+    >
       <header className="orb-fidget-header">
         <div>
           <p className="mb-2 text-sm font-medium uppercase tracking-[0.16em] text-theme-accent">
@@ -236,15 +242,29 @@ export default function OrbFidget() {
             Tap or sweep through the orbs and watch them scatter, then settle back into place.
           </p>
         </div>
-        <button
-          type="button"
-          className="inline-flex shrink-0 items-center gap-2 rounded-full border border-theme-border bg-theme-surface px-4 py-2 text-sm"
-          onClick={resetOrbs}
-        >
-          <RotateCcw aria-hidden="true" className="size-4" />
-          Reset
-        </button>
+        <div className="fidget-controls">
+          <button
+            type="button"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-theme-border bg-theme-surface px-4 py-2 text-sm"
+            onClick={resetOrbs}
+          >
+            <RotateCcw aria-hidden="true" className="size-4" />
+            Reset
+          </button>
+          <button
+            type="button"
+            className="inline-flex shrink-0 items-center gap-2 rounded-full border border-theme-border bg-theme-surface px-4 py-2 text-sm"
+            onClick={fullscreen.toggleFullscreen}
+            aria-label={fullscreen.isFullscreen ? "Exit fullscreen orbs" : "View orbs fullscreen"}
+          >
+            {fullscreen.isFullscreen
+              ? <Minimize aria-hidden="true" className="size-4" />
+              : <Maximize aria-hidden="true" className="size-4" />}
+            {fullscreen.isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+          </button>
+        </div>
       </header>
+      {fullscreen.error && <p className="fullscreen-error" role="alert">{fullscreen.error}</p>}
       <div className={`orb-fidget-canvas mt-6 ${isInteracting ? "is-interacting" : ""}`}>
         <canvas
           ref={canvasRef}

@@ -1,4 +1,4 @@
-import { FileText, Loader2, UploadCloud, X } from "lucide-react";
+import { FileText, Loader2, X } from "lucide-react";
 import { useRef, useState } from "react";
 import { ACCEPTED_EXTENSIONS } from "../lib/extractText";
 
@@ -13,9 +13,9 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
   }
 
   return (
-    <div>
+    <div className="w-full">
       <div
-        className={`flex flex-col items-center gap-2 rounded-xl border border-dashed border-theme-border p-6 text-center ${
+        className={`flex flex-col items-center gap-2 rounded-lg text-center text-sm ${
           dragging ? "bg-theme-border/20" : ""
         }`}
         onDragOver={(e) => {
@@ -29,7 +29,6 @@ export default function UploadArea({ file, status, error, onSelect, onRemove }) 
           handleFiles(e.dataTransfer.files);
         }}
       >
-        <UploadCloud aria-hidden="true" className="size-6" />
         <p>Drag a file here, or</p>
         <button
           type="button"
