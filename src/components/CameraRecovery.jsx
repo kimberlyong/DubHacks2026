@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useFaceRecovery } from "../hooks/useFaceRecovery";
 
-export default function CameraRecovery({ fileName }) {
+export default function CameraRecovery({ fileName, onBrainBreak }) {
   const {
     enabled,
     setEnabled,
@@ -23,7 +23,7 @@ export default function CameraRecovery({ fileName }) {
 
   return (
     <section className="my-6 rounded-xl border border-black p-5 dark:border-white">
-      <h2 className="text-xl font-semibold">👀 Your Focus Buddy</h2>
+      <h2 className="text-xl font-semibold">Your Focus Buddy</h2>
 
       <p className="my-3 text-sm">
         Your little study companion is here to keep you on track!
@@ -43,7 +43,7 @@ export default function CameraRecovery({ fileName }) {
       </button>
 
       <p className="mt-3 text-sm" aria-live="polite">
-        {enabled ? `✨ ${status}` : "😴 Focus Buddy is sleeping"}
+        {enabled ? `${status}` : "😴 Focus Buddy is sleeping"}
       </p>
 
       {error && <p className="mt-2 text-sm text-red-500">{error}</p>}
@@ -80,7 +80,7 @@ export default function CameraRecovery({ fileName }) {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
         >
           <div className="w-full max-w-md rounded-2xl bg-white p-6 text-black shadow-2xl">
-            <div className="mb-3 text-center text-5xl">👀</div>
+            <div className="mb-3 text-center text-5xl"></div>
 
             <h3
               id="recovery-title"
@@ -115,9 +115,9 @@ export default function CameraRecovery({ fileName }) {
               <button
                 type="button"
                 onClick={() => {
-                  setOnBreak(true);
                   setEnabled(false);
                   setShowRecovery(false);
+                  onBrainBreak();
                 }}
                 className="rounded-lg border border-black px-4 py-3"
               >

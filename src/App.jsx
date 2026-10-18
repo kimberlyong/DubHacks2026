@@ -408,7 +408,10 @@ function App() {
         <main className="app-main flex-1">
 
 	{view === "app" && (
-  <CameraRecovery fileName={studyDoc.file?.name} />
+  <CameraRecovery
+  fileName={studyDoc.file?.name}
+  onBrainBreak={() => setPage("break")}
+/>
 )}
           {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
 
