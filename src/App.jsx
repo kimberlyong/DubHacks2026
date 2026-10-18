@@ -9,6 +9,7 @@ import DocumentViewer from "./components/DocumentViewer";
 import GamePage from "./components/game/GamePage";
 import SavedPlans from "./components/SavedPlans";
 import StudyPanel from "./components/StudyPanel";
+import CameraRecovery from "./components/CameraRecovery";
 import UploadArea from "./components/UploadArea";
 import { useDocument } from "./hooks/useDocument";
 import { getHistory, relativeTime } from "./lib/studyHistory";
@@ -390,6 +391,7 @@ function App() {
           </div>
         </header>
 
+
         <div className="relative flex min-w-0 flex-1">
         {view === "app" && navOpen && (
           <nav
@@ -430,6 +432,12 @@ function App() {
             view === "app" && !(ready && page === "study") ? "mx-auto w-full max-w-6xl" : ""
           }`}
         >
+          {view === "app" && page === "study" && (
+            <CameraRecovery
+              fileName={studyDoc.file?.name}
+              onBrainBreak={() => setPage("break")}
+            />
+          )}
           {view === "home" && <Homepage onGetStarted={() => setView(name ? "app" : "signin")} />}
 
           {view === "signin" && (
