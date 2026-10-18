@@ -3,6 +3,7 @@ import express from "express";
 import { config } from "./config.js";
 import { ApiError } from "./gemini.js";
 import { chat, registerDocument } from "./backboard.js";
+import { readIcsCalendar } from "./calendar.js";
 import { buildFlowchart, findImages } from "./visualize.js";
 import { flashcards, gameQuestions, keyTerms, plan, summarize, summarizeAll, validateText } from "./study.js";
 
@@ -84,9 +85,15 @@ app.post("/api/flashcards", route(async (req, res) => {
 }));
 
 app.post("/api/plan", route(async (req, res) => {
-  const { documentId, text, minutes, energy } = req.body ?? {};
+  const { documentId, text, minutes, energy, deadline } = req.body ?? {};
   requireId(documentId);
-  return { steps: await plan({ documentId, text, minutes, energy, signal: abortOnClose(req, res) }) };
+  return { steps: await plan({ documentId, text, minutes, energy, deadline, signal: abortOnClose(req, res) }) };
+}));
+
+// Reads an Apple / Outlook / Canvas / any .ics calendar link for the given range.
+app.post("/api/calendar/ics", route(async (req, res) => {
+  const { url, from, to } = req.body ?? {};
+  return await readIcsCalendar({ url, from, to, signal: abortOnClose(req, res) });
 }));
 
 app.post("/api/game-questions", route(async (req, res) => {

@@ -85,7 +85,7 @@ export const ENERGY_LEVELS = ["low", "medium", "high"];
 // fit the student's stated time and energy — feature #1 from the brief:
 // "upload a reading... pick your time and energy, and get it broken into
 // small steps."
-export async function plan({ documentId, text, minutes, energy, signal }) {
+export async function plan({ documentId, text, minutes, energy, deadline, signal }) {
   validateText(text);
   const mins = Number(minutes);
   if (!Number.isFinite(mins) || mins < 5 || mins > 240) {
@@ -102,8 +102,16 @@ export async function plan({ documentId, text, minutes, energy, signal }) {
     high: "The student has good energy right now — steps can be a little more substantial and can include synthesis, not just reading.",
   }[energy];
 
+  // From the student's calendar (see src/lib/schedule.js): their nearest
+  // upcoming deadline, so the plan can lean toward what's due next.
+  const deadlineNote =
+    deadline && typeof deadline.title === "string" && typeof deadline.due === "string"
+      ? `The student's next calendar deadline is "${deadline.title.slice(0, 120)}" (${deadline.due.slice(0, 60)}). If this document relates to it, focus the steps on what they'll need for it; otherwise ignore this.\n`
+      : "";
+
   const raw = await generate(
     `Break this document into a short ordered study plan that fits in about ${mins} minutes total. ${energyNote}\n` +
+      deadlineNote +
       `Make each step small enough to start without dread — a concrete, doable chunk (e.g. "Read section 2 on X" or "Answer: what does Y mean?"), not a vague instruction like "study the material". ` +
       `Use 3-8 steps, whichever fits the time. Each step's minutes should be realistic (3-20 each) and the total should be close to ${mins}. ` +
       `Respond with JSON only: an array of objects {"title": string (under 60 chars), "minutes": number, "instruction": string (one sentence, concrete, what to actually do)}.\n\n` +

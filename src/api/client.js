@@ -34,8 +34,12 @@ export const fetchKeyTerms = ({ documentId, text }, signal) =>
 export const fetchFlashcards = ({ documentId, text }, signal) =>
   post("/flashcards", { documentId, text }, signal).then((d) => d.cards);
 
-export const fetchPlan = ({ documentId, text, minutes, energy }, signal) =>
-  post("/plan", { documentId, text, minutes, energy }, signal).then((d) => d.steps);
+export const fetchPlan = ({ documentId, text, minutes, energy, deadline }, signal) =>
+  post("/plan", { documentId, text, minutes, energy, deadline }, signal).then((d) => d.steps);
+
+// Apple / Outlook / Canvas / any .ics link, read by the server. Returns { name, events }.
+export const fetchIcsCalendar = ({ url, from, to }, signal) =>
+  post("/calendar/ics", { url, from, to }, signal);
 
 export const fetchGameQuestions = ({ documentId, text, type }, signal) =>
   post("/game-questions", { documentId, text, type }, signal).then((d) => d.questions);

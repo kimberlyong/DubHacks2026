@@ -2,6 +2,7 @@ import { Trash2 } from "lucide-react";
 import { useState } from "react";
 import { deletePlan, getSavedPlans, updatePlanProgress } from "../lib/savedPlans";
 import { relativeTime } from "../lib/studyHistory";
+import CalendarWeek from "./CalendarWeek";
 
 const ENERGY_LABEL = { low: "Low", medium: "Medium", high: "High" };
 
@@ -17,8 +18,11 @@ export default function SavedPlans() {
   return (
     <section className="py-18">
       <h1 className="text-3xl font-semibold">Plans</h1>
+      <div className="mt-6">
+        <CalendarWeek />
+      </div>
       {plans.length === 0 ? (
-        <p className="mt-3 text-theme-muted">
+        <p className="mt-6 text-theme-muted">
           Nothing here yet. Make a plan in the study panel and choose “Save plan” to keep it here.
         </p>
       ) : (
