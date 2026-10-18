@@ -43,6 +43,8 @@ export const config = {
     .split(",")
     .map((m) => m.trim())
     .filter(Boolean),
+  // "low" keeps answers quick: the default thinking made simple calls take 7-11s.
+  geminiThinkingLevel: process.env.GEMINI_THINKING_LEVEL || "low",
   geminiRetries: 1, // extra attempts per model before falling back
   geminiCooldownMs: 60_000, // skip a model this long after it reports overloaded
   // Backboard's docs don't list Gemini model ids; set this to a name returned by

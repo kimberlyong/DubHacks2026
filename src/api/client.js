@@ -41,8 +41,8 @@ export const fetchPlan = ({ documentId, text, minutes, energy, deadline }, signa
 export const fetchIcsCalendar = ({ url, from, to }, signal) =>
   post("/calendar/ics", { url, from, to }, signal);
 
-export const fetchGameQuestions = ({ documentId, text, type }, signal) =>
-  post("/game-questions", { documentId, text, type }, signal).then((d) => d.questions);
+export const fetchGameQuestions = ({ documentId, text, type, count }, signal) =>
+  post("/game-questions", { documentId, text, type, count }, signal).then((d) => d.questions);
 
 // Starts the Backboard assistant/thread for this document.
 export const registerDocument = ({ documentId, fileName, text }, signal) =>

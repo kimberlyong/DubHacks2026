@@ -55,7 +55,7 @@ function modelOrder() {
   return [...ready, ...cooling];
 }
 
-async function callModel(model, key, prompt, json, signal) {
+async function callModel(model, key, prompt, json, signal, thinking) {
   let res;
   try {
     res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
@@ -64,7 +64,10 @@ async function callModel(model, key, prompt, json, signal) {
       headers: { "Content-Type": "application/json", "x-goog-api-key": key },
       body: JSON.stringify({
         contents: [{ role: "user", parts: [{ text: prompt }] }],
-        generationConfig: json ? { responseMimeType: "application/json" } : {},
+        generationConfig: {
+          ...(json && { responseMimeType: "application/json" }),
+          ...(thinking && { thinkingConfig: { thinkingLevel: thinking } }),
+        },
       }),
     });
   } catch (err) {
@@ -89,9 +92,10 @@ export async function generate(prompt, { json = false, signal } = {}) {
   if (!key) throw new ApiError(500, "Server is missing GEMINI_API_KEY.");
 
   for (const model of modelOrder()) {
+    let thinking = config.geminiThinkingLevel;
     for (let attempt = 0; attempt <= config.geminiRetries; attempt++) {
       try {
-        const text = await callModel(model, key, prompt, json, signal);
+        const text = await callModel(model, key, prompt, json, signal, thinking);
         coolingUntil.delete(model);
         if (model !== config.geminiModel) console.warn(`[gemini] served by fallback model ${model}`);
         return text;
@@ -101,6 +105,11 @@ export async function generate(prompt, { json = false, signal } = {}) {
           throw new ApiError(413, "This document is too large for the model to process.");
         }
         if (err.status === 404) break; // model id not available: try the next one
+        if (err.status === 400 && thinking && /thinking/i.test(err.body)) {
+          thinking = null; // this model doesn't take that thinking level: use its default
+          attempt--;
+          continue;
+        }
         if (!RETRYABLE.has(err.status)) throw new ApiError(502, `Gemini request failed (${err.status}).`);
 
         const quotaMs = err.status === 429 ? quotaCooldownMs(err.body) : 0;

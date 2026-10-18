@@ -110,9 +110,9 @@ app.post("/api/calendar/ics", route(async (req, res) => {
 }));
 
 app.post("/api/game-questions", route(async (req, res) => {
-  const { documentId, text, type } = req.body ?? {};
+  const { documentId, text, type, count } = req.body ?? {};
   requireId(documentId);
-  return { questions: await gameQuestions({ documentId, text, type, signal: abortOnClose(req, res) }) };
+  return { questions: await gameQuestions({ documentId, text, type, count, signal: abortOnClose(req, res) }) };
 }));
 
 // Starts a Backboard assistant + thread for the document (runs in the background).

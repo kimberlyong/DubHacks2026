@@ -17,7 +17,7 @@ function pickSpread(questions) {
 
 function load(documentId, text) {
   if (!pending.has(documentId)) {
-    const request = fetchGameQuestions({ documentId, text, type: "multiple" })
+    const request = fetchGameQuestions({ documentId, text, type: "multiple", count: QUIZ_LENGTH })
       .then((questions) => {
         const quiz = pickSpread(questions);
         cache.set(documentId, quiz);

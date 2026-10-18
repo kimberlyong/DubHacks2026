@@ -180,7 +180,8 @@ export const GAME_QUESTION_TYPES = ["multiple", "short", "vocab"];
 // Questions for the runner game, in one of three styles. Every question has
 // the same base shape — {question, answer} — plus `choices` + `answerIndex`
 // (multiple choice) or `keywords` (short answer) so the client can grade it.
-export async function gameQuestions({ documentId, text, type, signal }) {
+export async function gameQuestions({ documentId, text, type, count, signal }) {
+  const n = Number.isInteger(count) && count >= 1 && count <= 12 ? count : 12;
   validateText(text);
   if (!GAME_QUESTION_TYPES.includes(type)) {
     throw new ApiError(400, `Type must be one of: ${GAME_QUESTION_TYPES.join(", ")}.`);
@@ -203,7 +204,7 @@ export async function gameQuestions({ documentId, text, type, signal }) {
       : `short answer, answerable in a word or one short phrase. Each item: {"question": string, "answer": string (the ideal short answer), "keywords": array of 1-3 lowercase words that any correct answer must contain}.`;
 
   const raw = await generate(
-    `Write 12 ${spec}\nQuestions must be about the document's content (not trivia about the document itself), self-contained, and ordered from easier to harder.\n` +
+    `Write ${n} ${spec}\nQuestions must be about the document's content (not trivia about the document itself), self-contained, and ordered from easier to harder.\n` +
       `Respond with JSON only: an array of these objects.\n\nDocument:\n---\n${source}`,
     { json: true, signal },
   );
